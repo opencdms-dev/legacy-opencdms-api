@@ -40,6 +40,9 @@ class StationSchema(BaseModel):
     cptSelection: int
     stationOperational: int
 
+    class Config:
+        orm_mode = True
+
 
 
 def get_session():
