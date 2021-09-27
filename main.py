@@ -1,4 +1,5 @@
 import uvicorn
+import os
 from typing import List
 from opencdms.models.climsoft.v4_1_1_core import Station
 from fastapi import FastAPI, Depends
@@ -9,17 +10,16 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# Set database url to mariadb_climsoft_db_v4 database url
-database_url = ""
+database_url = os.getenv("DATABASE_URI")
 engine = create_engine(database_url)
 
 
 SessionLocal = sessionmaker(engine)
 
 
-
 class StationSchema(BaseModel):
     """Station response schema"""
+
     stationId: str
     stationName: str
     wmoid: str
@@ -44,7 +44,6 @@ class StationSchema(BaseModel):
         orm_mode = True
 
 
-
 def get_session():
     """
     Api dependency to provide database session to a request
@@ -53,13 +52,13 @@ def get_session():
     try:
         yield session
         session.commit()
-    except:
+    except Exception:
         session.rollback()
     finally:
         session.close()
 
 
-@app.get('/stations', response_model=List[StationSchema])
+@app.get("/stations", response_model=List[StationSchema])
 def fetch_stations(session: Session = Depends(get_session)):
     return session.query(Station).all()
 
