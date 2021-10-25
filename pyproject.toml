@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "opencdms-server"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.70.0"
+uvicorn = "^0.15.0"
+SQLAlchemy = "^1.4.26"
+mch-api = {git = "https://github.com/Shaibujnr/mch-api.git", rev = "make_mch_api_installable"}
+opencdms = {git = "https://github.com/Shaibujnr/pyopencdms.git", rev = "remove-other-setups"}
+passlib = "^1.7.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

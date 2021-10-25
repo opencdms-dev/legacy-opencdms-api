@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  opencdms_api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: opencdms_api
+    ports:
+      - "5070:5000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/code/surface/api
+    depends_on:
+      - opencdms_surface_db
+      # - opencdms_mch_db
+    # volumes:
+    #   - .:/code
+    command:
+      [
+        "python",
+        "-m",
+        "uvicorn",
+        "opencdms_server.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5000",
+        "--reload",
+      ]
+
+  opencdms_surface_db:
+    image: timescale/timescaledb-postgis:2.3.0-pg13
+    container_name: opencdms_surface_db
+    volumes:
+      - ./:/code
+      - ./data/shared:/data/shared
+      - surface_postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "10"
+    env_file:
+      - .surface_db.env
+volumes:
+  surface_postgres_data:
