@@ -1,16 +1,14 @@
+from typing import Optional
 from fastapi.exceptions import HTTPException
 
-# from passlib.hash import django_pbkdf2_sha256 as handler
-# from typing import List, Optional
 from fastapi import Request
-
-# from pydantic import BaseModel
-# from sqlalchemy.orm.session import Session
-# from test_fastapi.db import SessionLocal
-# from test_fastapi.models import User
-# from test_django.wsgi import application as django_application
 from fastapi.security.utils import get_authorization_scheme_param
+from jose.exceptions import JWTError
 from starlette.types import Scope, Receive, Send, ASGIApp
+from jose import jwt
+from opencdms_server import models
+from opencdms_server.config import settings
+from opencdms_server.db import db_session_scope
 
 
 class WSGIAuthMiddleWare:
@@ -21,15 +19,32 @@ class WSGIAuthMiddleWare:
     def __init__(self, app: ASGIApp):
         self.app = app
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send):
-        request = Request(scope, receive, send)
-        authorization_header = request.headers.get("Authorization")
+    def get_user(self, username: str) -> Optional[models.AuthUser]:
+        with db_session_scope() as session:
+            user: models.AuthUser = (
+                session.query(models.AuthUser)
+                .filter(models.AuthUser.username == username)
+                .one_or_none()
+            )
+            return user
+
+    def authenticate_request(self, request: Request):
+        authorization_header = request.headers.get("authorization")
         if authorization_header is None:
             raise HTTPException(401, "Unauthorized request")
         scheme, token = get_authorization_scheme_param(authorization_header)
         if scheme.lower() != "bearer":
             raise HTTPException(401, "Invalid authorization header scheme")
-        # Token Validation code goes here
-        if token != "auth_token":
+        try:
+            claims = jwt.decode(token, settings.SECRET_KEY)
+        except JWTError:
             raise HTTPException(401, "Unauthorized request")
+        username = claims["sub"]
+        user = self.get_user(username)
+        if user is None:
+            raise HTTPException(401, "Unauthorized request")
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        request = Request(scope, receive, send)
+        self.authenticate_request(request)
         await self.app(scope, receive, send)

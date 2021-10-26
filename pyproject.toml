@@ -12,6 +12,9 @@ SQLAlchemy = "^1.4.26"
 mch-api = {git = "https://github.com/Shaibujnr/mch-api.git", rev = "make_mch_api_installable"}
 opencdms = {git = "https://github.com/Shaibujnr/pyopencdms.git", rev = "remove-other-setups"}
 passlib = "^1.7.4"
+inflection = "^0.5.1"
+python-jose = "^3.3.0"
+pydantic = {extras = ["email"], version = "^1.8.2"}
 
 [tool.poetry.dev-dependencies]
 

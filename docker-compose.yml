@@ -15,12 +15,10 @@ services:
     depends_on:
       - opencdms_surface_db
       # - opencdms_mch_db
-    # volumes:
-    #   - .:/code
+    volumes:
+      - .:/code
     command:
       [
-        "python",
-        "-m",
         "uvicorn",
         "opencdms_server.main:app",
         "--host",
@@ -28,6 +26,7 @@ services:
         "--port",
         "5000",
         "--reload",
+        "--use-colors",
       ]
 
   opencdms_surface_db:

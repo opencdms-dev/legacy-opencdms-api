@@ -1,4 +1,13 @@
+from pydantic.networks import EmailStr
+import inflection
 from pydantic import BaseModel
+
+
+class BaseSchema(BaseModel):
+    class Config:
+        extra = "forbid"
+        alias_generator = lambda x: inflection.camelize(x, False)  # noqa
+        allow_population_by_field_name = True
 
 
 class StationSchema(BaseModel):
@@ -26,3 +35,20 @@ class StationSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserCreateSchema(BaseSchema):
+    email: EmailStr
+    username: str
+    first_name: str
+    last_name: str
+    password: str
+
+
+class AuthenticationSchema(BaseSchema):
+    username: str
+    password: str
+
+
+class TokenSchema(BaseModel):
+    access_token: str

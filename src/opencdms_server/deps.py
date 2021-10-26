@@ -10,7 +10,8 @@ def get_session():
     try:
         yield session
         session.commit()
-    except Exception:
+    except Exception as e:
         session.rollback()
+        raise e
     finally:
         session.close()

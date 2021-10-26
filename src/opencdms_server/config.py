@@ -4,6 +4,7 @@ from pydantic import BaseSettings, PostgresDsn, validator
 
 
 class Settings(BaseSettings):
+    SECRET_KEY: str
 
     SURFACE_DB_HOST: str
     SURFACE_DB_PORT: str
@@ -12,6 +13,8 @@ class Settings(BaseSettings):
     SURFACE_DB_PASSWORD: str
 
     DATABASE_URI: Optional[PostgresDsn] = None
+
+    
 
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(
@@ -25,7 +28,7 @@ class Settings(BaseSettings):
             password=values.get("SURFACE_DB_PASSWORD"),
             host=values.get("SURFACE_DB_HOST"),
             port=values.get("SURFACE_DB_PORT"),
-            path=f"/{values.get('SURFACE_DG_NAME') or ''}",
+            path=f"/{values.get('SURFACE_DB_NAME') or ''}",
         )
 
     class Config:
