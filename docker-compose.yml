@@ -14,7 +14,7 @@ services:
       - PYTHONPATH=/code/surface/api
     depends_on:
       - opencdms_surface_db
-      # - opencdms_mch_db
+      - opencdms_mch_db
     volumes:
       - .:/code
     command:
@@ -35,7 +35,7 @@ services:
     volumes:
       - ./:/code
       - ./data/shared:/data/shared
-      - surface_postgres_data:/var/lib/postgresql/data/
+      - opencdms_surface_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     logging:
@@ -45,5 +45,17 @@ services:
         max-file: "10"
     env_file:
       - .surface_db.env
+
+  opencdms_mch_db:
+    image: mysql:8.0.27
+    container_name: opencdms_mch_db
+    volumes:
+      - opencdms_mch_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    env_file:
+      - .mch_db.env
+
 volumes:
-  surface_postgres_data:
+  opencdms_surface_data:
+  opencdms_mch_data:

@@ -321,7 +321,7 @@ pandas = ">=1.2.2"
 type = "git"
 url = "https://github.com/Shaibujnr/mch-api.git"
 reference = "make_mch_api_installable"
-resolved_reference = "7d2b809d9ac5a9092ef3b13379764e7010e39d29"
+resolved_reference = "cbcb8e04a3b0a08a260b77275b1ba49a64b46456"
 
 [[package]]
 name = "mysqlclient"

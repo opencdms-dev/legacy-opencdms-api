@@ -1,6 +1,9 @@
 surface_db_upgrade:
 	docker-compose run opencdms_api python surface/api/manage.py migrate
 
+surface_db_load_initial_data:
+	docker-compose run opencdms_api bash load_initial_surface_data.sh
+
 down:
 	docker-compose down
 
@@ -15,3 +18,7 @@ build:
 
 bash:
 	docker-compose run opencdms_api bash
+
+install:
+	pip install --upgrade pip poetry
+	poetry install -v

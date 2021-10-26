@@ -43,6 +43,7 @@ class WSGIAuthMiddleWare:
         user = self.get_user(username)
         if user is None:
             raise HTTPException(401, "Unauthorized request")
+        request.state.user = user
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         request = Request(scope, receive, send)
