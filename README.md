@@ -11,6 +11,10 @@ OpenCDMS server uses Python FastAPI to expose a web interface for `opencdms-app`
 
 ## Dev
 
+- create `.env`, `.surface_db.env` and `.mch_db.env` files
+- Copy contents from `.example.env` to `.env`
+- Copy contents from `.surface_db.example.env` to `.surface_db.env`
+- Copy contents from `.mch_db.example.env` to `.mch_db.env`
 - Activate virtual environment
 - make install
 - make surface_db_upgrade (To run the surface db migration)
@@ -19,6 +23,9 @@ OpenCDMS server uses Python FastAPI to expose a web interface for `opencdms-app`
 - visit `localhost:5070/docs` for swagger api documentation
 - Surface api is mounted on path `localhost:5070/surface/*`
 - Mch api is mounted on path `localhost:5070/mch/*`
+
+`.surface_db.env` file sets the credentials for the surface postgres database
+`.mch_db.env` file sets the credentials for the mch mysql database
 
 ### NOTE
 

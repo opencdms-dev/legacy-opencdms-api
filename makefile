@@ -17,7 +17,10 @@ build:
 	docker-compose build
 
 bash:
-	docker-compose run opencdms_api bash
+	docker-compose exec opencdms_api bash
+
+logs:
+	docker-compose logs -f opencdms_api
 
 install:
 	pip install --upgrade pip poetry
