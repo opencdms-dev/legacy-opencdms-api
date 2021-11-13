@@ -4,3 +4,5 @@ SQLAlchemy==1.4.23
 uvicorn==0.15.0
 alembic===1.6.5
 git+https://github.com/opencdms/pyopencdms@main#egg=opencdms
+pydantic
+fastapi-sqlalchemy
