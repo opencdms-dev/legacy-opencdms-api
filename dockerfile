@@ -11,8 +11,7 @@ ENV PYTHONFAULTHANDLER=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
     POETRY_VERSION=1.1.11 \
-    POETRY_VIRTUALENVS_CREATE=0 \
-    PORT=5000
+    POETRY_VIRTUALENVS_CREATE=0
 
 RUN apt-get update --fix-missing
 RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it
@@ -40,6 +39,8 @@ RUN poetry install
 
 RUN useradd -m opencdms_server_user && chown -R opencdms_server_user /code
 
+RUN ["chmod", "+x", "/code/scripts/load_initial_surface_data.sh"]
+
 USER opencdms_server_user
 
-ENTRYPOINT [ "/bin/bash", "-c", "uvicorn opencdms_server.main:app --host 0.0.0.0 --port $PORT --reload --use-colors"]
+ENTRYPOINT [ "/bin/sh", "entrypoint.sh" ]

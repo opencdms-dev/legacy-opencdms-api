@@ -2,6 +2,7 @@ version: "3"
 
 services:
   opencdms_api:
+    image: opencdms_server:0.1.0
     build:
       context: .
       dockerfile: dockerfile
@@ -17,6 +18,19 @@ services:
       - opencdms_mch_db
     volumes:
       - ./src:/code/src
+    networks:
+      - opencdms_server_dev_network
+    command:
+      [
+        "uvicorn",
+        "opencdms_server.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5000",
+        "--reload",
+        "--use-colors",
+      ]
 
   opencdms_surface_db:
     image: timescale/timescaledb-postgis:2.3.0-pg13
@@ -33,6 +47,8 @@ services:
         max-file: "10"
     env_file:
       - .surface_db.env
+    networks:
+      - opencdms_server_dev_network
 
   opencdms_mch_db:
     image: mysql:8.0.27
@@ -43,7 +59,12 @@ services:
       - "3306:3306"
     env_file:
       - .mch_db.env
+    networks:
+      - opencdms_server_dev_network
 
 volumes:
   opencdms_surface_data:
   opencdms_mch_data:
+
+networks:
+  opencdms_server_dev_network:
