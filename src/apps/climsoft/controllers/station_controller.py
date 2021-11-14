@@ -1,5 +1,4 @@
-from typing import Union
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from fastapi_sqlalchemy import db
 from src.apps.climsoft.services import station_service
 from src.apps.climsoft.schemas import station_schema
