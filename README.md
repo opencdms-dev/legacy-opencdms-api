@@ -1,6 +1,6 @@
 # opencdms-server
 
-OpenCDMS server uses Python FastAPI to expose a web interface for `opencdms-app` and other applications
+OpenCDMS server uses Python FastAPI to expose a web interface for `opencdms-app` and other applications.
 
 ## Requirements
 
@@ -37,3 +37,9 @@ This will create a surface folder and clone the surface django project into it.
 
 Alternatively: comment out the volume mounting (This will prevent reload on code change) and the cloned `surface` project
 from the image would still be in the workdir.
+
+## Serve
+
+Run `make serve` to start dev server
+Visit `http://localhost:5070/docs`
+Run `make test` to run test
