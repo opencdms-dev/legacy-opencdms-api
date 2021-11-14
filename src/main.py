@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi_sqlalchemy import DBSessionMiddleware
-from apps.climsoft.controllers import station_controller
-from apps.climsoft.db.migration import migrate as migrate_climsoft_db
-from db.engine import db_engine
+from src.apps.climsoft.controllers import station_controller
+from src.apps.climsoft.db.migration import migrate as migrate_climsoft_db
+from src.db.engine import db_engine
 
 app = FastAPI()
 

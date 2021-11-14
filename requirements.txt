@@ -9,3 +9,4 @@ fastapi-sqlalchemy
 pytest~=6.2.5
 starlette~=0.14.2
 Faker
+requests

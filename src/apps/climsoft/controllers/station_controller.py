@@ -1,11 +1,15 @@
-from fastapi import APIRouter
+from typing import Union
+from fastapi import APIRouter, HTTPException
 from fastapi_sqlalchemy import db
-from apps.climsoft.services import station_service
-from apps.climsoft.schemas import station_schema
-from utils.response import get_success_response, get_error_response
+from src.apps.climsoft.services import station_service
+from src.apps.climsoft.schemas import station_schema
+from src.utils.response import get_success_response, get_error_response
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/v1/climsoft",
+    tags=["climsoft"]
+)
 
 
 @router.get("/stations", response_model=station_schema.StationResponse)
@@ -105,8 +109,9 @@ def update_station(station_id: str, data: station_schema.UpdateStation):
 @router.delete("/stations/{station_id}", response_model=station_schema.StationResponse)
 def delete_station(station_id: str):
     try:
+        station_service.delete(db_session=db.session, station_id=station_id)
         return get_success_response(
-            result=[station_service.delete(db_session=db.session, station_id=station_id)],
+            result=[],
             message="Successfully deleted station."
         )
     except station_service.FailedDeletingStation as e:
