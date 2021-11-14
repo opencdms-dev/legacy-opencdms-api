@@ -4,25 +4,25 @@ from pydantic import BaseModel, constr
 
 
 class CreateStation(BaseModel):
-    station_id: constr(max_length=255)
-    station_name: constr(max_length=255)
+    stationId: constr(max_length=255)
+    stationName: constr(max_length=255)
     wmoid: constr(max_length=20)
     icaoid: constr(max_length=20)
     latitude: float
     qualifier: constr(max_length=20)
     longitude: float
     elevation: constr(max_length=255)
-    geolocation_method: constr(max_length=255)
-    geolocation_accuracy: float
-    opening_datetime: datetime.datetime
-    closing_datetime: datetime.datetime
+    geoLocationMethod: constr(max_length=255)
+    geoLocationAccuracy: float
+    openingDatetime: datetime.datetime
+    closingDatetime: datetime.datetime
     country: constr(max_length=50)
     authority: constr(max_length=255)
-    admin_region: constr(max_length=255)
-    drainage_basin: constr(max_length=255)
-    waca_selection: bool
-    cpt_selection: bool
-    station_operational: bool
+    adminRegion: constr(max_length=255)
+    drainageBasin: constr(max_length=255)
+    wacaSelection: bool
+    cptSelection: bool
+    stationOperational: bool
 
     class Config:
         fields = {
@@ -41,24 +41,24 @@ class CreateStation(BaseModel):
 
 
 class UpdateStation(BaseModel):
-    station_name: constr(max_length=255)
+    stationName: constr(max_length=255)
     wmoid: constr(max_length=20)
     icaoid: constr(max_length=20)
     latitude: float
     qualifier: constr(max_length=20)
     longitude: float
     elevation: constr(max_length=255)
-    geolocation_method: constr(max_length=255)
-    geolocation_accuracy: float
-    opening_datetime: datetime.datetime
-    closing_datetime: datetime.datetime
+    geoLocationMethod: constr(max_length=255)
+    geoLocationAccuracy: float
+    openingDatetime: datetime.datetime
+    closingDatetime: datetime.datetime
     country: constr(max_length=50)
     authority: constr(max_length=255)
-    admin_region: constr(max_length=255)
-    drainage_basin: constr(max_length=255)
-    waca_selection: bool
-    cpt_selection: bool
-    station_operational: bool
+    adminRegion: constr(max_length=255)
+    drainageBasin: constr(max_length=255)
+    wacaSelection: bool
+    cptSelection: bool
+    stationOperational: bool
 
     class Config:
         fields = {
