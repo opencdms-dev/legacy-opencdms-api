@@ -6,3 +6,4 @@ alembic===1.6.5
 git+https://github.com/opencdms/pyopencdms@main#egg=opencdms
 pydantic
 fastapi-sqlalchemy
+pytest

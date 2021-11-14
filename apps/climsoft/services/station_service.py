@@ -150,7 +150,7 @@ def query(
         raise FailedGettingStationList("Failed getting station list.")
 
 
-def update(db_session: Session, station_id: int, updates: station_schema.UpdateStation) -> station_schema.Station:
+def update(db_session: Session, station_id: str, updates: station_schema.UpdateStation) -> station_schema.Station:
     try:
         db_session.query(models.Station).filter_by(stationId=station_id).update(updates.dict())
         db_session.commit()
@@ -162,7 +162,7 @@ def update(db_session: Session, station_id: int, updates: station_schema.UpdateS
         raise FailedUpdatingStation("Failed updating station")
 
 
-def delete(db_session: Session, station_id: int) -> bool:
+def delete(db_session: Session, station_id: str) -> bool:
     try:
         db_session.query(models.Station).filter_by(stationId=station_id).delete()
         db_session.commit()
