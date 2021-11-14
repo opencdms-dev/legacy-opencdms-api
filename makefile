@@ -27,7 +27,7 @@ install:
 	poetry install -v
 
 test:
-	docker-compose -f docker-compose.test.yml run test_opencdms_api
+	docker-compose -f docker-compose.test.yml run test_opencdms_api; docker-compose -f docker-compose.test.yml down
 
 make test-down:
 	docker-compose -f docker-compose.test.yml down

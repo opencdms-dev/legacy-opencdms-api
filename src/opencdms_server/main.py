@@ -13,14 +13,16 @@ from opencdms_server.deps import get_session
 from opencdms_server.router import router
 
 
+def get_app():
+    app = FastAPI()
+    app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(surface_application)))
+    app.mount("/mch", WSGIAuthMiddleWare(WSGIMiddleware(mch_api_application)))
+    app.include_router(router)
+    return app
 
 
-app = FastAPI()
+app = get_app()
 
-app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(surface_application)))
-app.mount("/mch", WSGIAuthMiddleWare(WSGIMiddleware(mch_api_application)))
-
-app.include_router(router)
 
 @app.get("/stations", response_model=List[StationSchema])
 def fetch_stations(session: Session = Depends(get_session)):

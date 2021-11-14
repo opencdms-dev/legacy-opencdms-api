@@ -15,7 +15,7 @@ from jose import jwt
 router = APIRouter()
 
 
-@router.post("/users")
+@router.post("/users", status_code=201)
 def register_new_user(
     payload: UserCreateSchema,
     session: Session = Depends(deps.get_session),
