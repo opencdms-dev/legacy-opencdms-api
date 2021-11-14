@@ -2,8 +2,8 @@ import logging
 from typing import List
 from sqlalchemy.orm.session import Session
 from opencdms.models.climsoft import v4_1_1_core as models
-from apps.climsoft.schemas import station_schema
-
+from src.apps.climsoft.schemas import station_schema
+from fastapi.exceptions import HTTPException
 
 logger = logging.getLogger("ClimsoftStationService")
 logging.basicConfig(level=logging.INFO)
@@ -50,10 +50,10 @@ def get(db_session: Session, station_id: str) -> station_schema.Station:
         station = db_session.query(models.Station).filter_by(stationId=station_id).first()
 
         if not station:
-            raise StationDoesNotExist("Station does not exist.")
+            raise HTTPException(status_code=404, detail="Station does not exist.")
 
         return station_schema.Station.from_orm(station)
-    except StationDoesNotExist:
+    except HTTPException:
         raise
     except Exception as e:
         logger.exception(e)
