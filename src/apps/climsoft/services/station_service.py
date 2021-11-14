@@ -84,6 +84,34 @@ def query(
         limit: int = 25,
         offset: int = 0
 ) -> List[station_schema.Station]:
+    """
+    This function builds a query based on the given parameter and returns `limit` numbers of `obselement` row skipping
+    `offset` number of rows
+
+    :param db_session: sqlalchemy database session
+    :param station_id: compares with `stationId` for an exact match
+    :param station_name: compares with `stationName` for an exact match
+    :param wmoid: compares with `wmoid` for an exact match
+    :param icaoid: compares with `icaoid` for an exact match
+    :param latitude: return items with greater or equal latitude
+    :param longitude: return items with greater or equal longitude
+    :param qualifier: checks if qualifier column contains given input
+    :param elevation: checks if elevation column contains given input
+    :param geolocation_method: checks if geolocation method column contains given input
+    :param geolocation_accuracy: return items with greater or equal geolocation accuracy
+    :param opening_datetime: return items with greater or equal for `openingDatetime` column
+    :param closing_datetime: return items with smaller or equal for `closingDatetime` column
+    :param country: compares with `country` for an exact match
+    :param authority: compares with `authority` for an exact match
+    :param admin_region: compares with `adminRegion` for an exact match
+    :param drainage_basin: compares with `drainageBasin` for an exact match
+    :param waca_selection: compares with `wacaSelection` for an exact match
+    :param cpt_selection: compares with `cptSelection` for an exact match
+    :param station_operational: compares with `stationOperational` for an exact match
+    :param limit: describes page size
+    :param offset: describe how many to skip
+    :return: list of `obselement`
+    """
     try:
         q = db_session.query(models.Station)
 
@@ -121,7 +149,7 @@ def query(
             q = q.filter(models.Station.openingDatetime >= opening_datetime)
 
         if closing_datetime is not None:
-            q = q.filter(models.Station.closingDatetime >= closing_datetime)
+            q = q.filter(models.Station.closingDatetime <= closing_datetime)
 
         if country is not None:
             q = q.filter_by(contry=country)
