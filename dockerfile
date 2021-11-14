@@ -20,7 +20,7 @@ RUN apt-get install -y curl git && pip install --upgrade pip "poetry==${POETRY_V
 WORKDIR /code
 
 # TODO replace with actual surface repo
-RUN git clone https://github.com/Shaibujnr/surface.git surface
+RUN git clone --branch refactor-for-opencdms-server https://github.com/Shaibujnr/surface.git surface
 
 RUN pip install numpy==1.21.2 --no-warn-script-location
 RUN pip install -r surface/api/requirements.txt

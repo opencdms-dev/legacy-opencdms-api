@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from uuid import uuid4
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm.session import Session
@@ -52,7 +53,13 @@ def authenticate(
     if not handler.verify(payload.password, user.password):
         raise HTTPException(400, "Invalid login credentials")
     access_token = jwt.encode(
-        {"sub": user.username, "exp": datetime.utcnow() + timedelta(hours=24)},
-        key=settings.SECRET_KEY,
+        {
+            "sub": user.username,
+            "exp": datetime.utcnow() + timedelta(hours=24),
+            "token_type": "access",
+            "jti": str(uuid4()),
+            "user_id": int(user.id),
+        },
+        key=settings.SURFACE_SECRET_KEY,
     )
     return TokenSchema(access_token=access_token)
