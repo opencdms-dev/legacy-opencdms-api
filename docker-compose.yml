@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  opencdms-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: opencdms-server
+    hostname: opencdms-server
