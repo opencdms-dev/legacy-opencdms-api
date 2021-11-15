@@ -53,7 +53,7 @@ def get(db_session: Session, instrument_id: str) -> instrument_schema.Instrument
         if not instrument:
             raise HTTPException(status_code=404, detail="Instrument does not exist.")
 
-        return instrument_schema.Instrument.from_orm(instrument)
+        return instrument_schema.InstrumentWithStation.from_orm(instrument)
     except HTTPException:
         raise
     except Exception as e:
