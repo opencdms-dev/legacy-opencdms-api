@@ -30,8 +30,6 @@ class CreateInstrument(BaseModel):
     instrumentPicture: constr(max_length=255)
     installedAt: constr(max_length=255)
 
-    station: station_schema.Station
-
     class Config:
         fields = field_names
 
