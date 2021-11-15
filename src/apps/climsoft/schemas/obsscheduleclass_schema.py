@@ -22,7 +22,11 @@ class UpdateObsScheduleClass(CreateObsScheduleClass):
 
 
 class ObsScheduleClass(CreateObsScheduleClass):
-    pass
+
+    class Config:
+        fields = field_names
+        orm_mode = True
+        allow_population_by_field_name = True
 
 
 class ObsScheduleClassResponse(Response):
