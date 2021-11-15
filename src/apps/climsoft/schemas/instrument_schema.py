@@ -1,5 +1,7 @@
+from typing import List
 from pydantic import BaseModel, constr
 from src.apps.climsoft.schemas import station_schema
+from src.apps.climsoft.schemas import Response
 
 
 field_names = {
@@ -47,8 +49,6 @@ class UpdateInstrument(BaseModel):
     instrumentPicture: constr(max_length=255)
     installedAt: constr(max_length=255)
 
-    station: station_schema.Station
-
     class Config:
         fields = field_names
 
@@ -58,3 +58,16 @@ class Instrument(CreateInstrument):
         fields = field_names
         orm_mode = True
         allow_population_by_field_name = True
+
+
+class InstrumentResponse(Response):
+    result: List[Instrument]
+
+
+class InstrumentWithStation(Instrument):
+    station: station_schema.Station
+
+
+class InstrumentWithStationResponse(Response):
+    result: List[InstrumentWithStation]
+
