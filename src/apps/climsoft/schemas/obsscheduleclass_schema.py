@@ -3,7 +3,6 @@ from pydantic import BaseModel, constr
 from src.apps.climsoft.schemas import Response, station_schema
 
 field_names = {
-    "scheduleClass": "schedule_class",
     "refersTo": "refers_to"
 }
 
@@ -14,17 +13,21 @@ class CreateObsScheduleClass(BaseModel):
     refersTo: constr(max_length=255)
 
     class Config:
+        fields = {**field_names, "scheduleClass": "schedule_class"}
+
+
+class UpdateObsScheduleClass(BaseModel):
+    description: constr(max_length=255)
+    refersTo: constr(max_length=255)
+
+    class Config:
         fields = field_names
-
-
-class UpdateObsScheduleClass(CreateObsScheduleClass):
-    pass
 
 
 class ObsScheduleClass(CreateObsScheduleClass):
 
     class Config:
-        fields = field_names
+        fields = {**field_names, "scheduleClass": "schedule_class"}
         orm_mode = True
         allow_population_by_field_name = True
 
