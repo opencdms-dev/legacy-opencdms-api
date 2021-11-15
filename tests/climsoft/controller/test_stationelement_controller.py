@@ -6,7 +6,7 @@ from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from src.db.engine import db_engine
 from src.apps.climsoft.schemas import stationelement_schema
-from tests.datagen.climsoft import station_element as climsoft_station_element, obsscheduleclass as climsoft_obsscheduleclass, obselement as climsoft_obselement, stationelement as climsoft_stationelement, station as climsoft_station
+from tests.datagen.climsoft import stationelement as climsoft_station_element, obsscheduleclass as climsoft_obsscheduleclass, obselement as climsoft_obselement, station as climsoft_station, instrument as climsoft_instrument
 from faker import Faker
 from fastapi.testclient import TestClient
 
@@ -48,14 +48,14 @@ def setup_module(module):
         db_session.add(obs_schedule_class)
         db_session.commit()
 
-        station_element = climsoft_models.Stationelement(
-            **climsoft_station_element.get_valid_station_element_input(station_id=station.stationId).dict()
+        instrument = climsoft_models.Instrument(
+            **climsoft_instrument.get_valid_instrument_input(station_id=station.stationId).dict()
         )
-        db_session.add(station_element)
+        db_session.add(instrument)
         db_session.commit()
 
         db_session.add(climsoft_models.Stationelement(
-            **climsoft_stationelement.get_valid_station_element_input(station_id=station.stationId, station_element_id=station_element.station_elementId, element_id=obs_element.elementId, schedule_class=obs_schedule_class.scheduleClass)
+            **climsoft_station_element.get_valid_station_element_input(station_id=station.stationId, instrument_id=instrument.instrumentId, element_id=obs_element.elementId, schedule_class=obs_schedule_class.scheduleClass).dict()
         ))
         db_session.commit()
     db_session.close()
@@ -109,21 +109,22 @@ def get_obselement():
 
 
 @pytest.fixture
-def get_station_element(get_station: climsoft_models.Station):
+def get_instrument(get_station: climsoft_models.Station):
     Session = sessionmaker(bind=db_engine)
     session = Session()
-    station_element = climsoft_models.Stationelement(**climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId).dict())
-    session.add(station_element)
+    instrument = climsoft_models.Instrument(**climsoft_instrument.get_valid_instrument_input(station_id=get_station.stationId).dict())
+    session.add(instrument)
     session.commit()
-    yield station_element
+    yield instrument
     session.close()
 
 
 @pytest.fixture
-def get_station_element(get_station: climsoft_models.Station, get_station_element: climsoft_models.Stationelement, get_obselement: climsoft_models.Obselement, get_obs_schedule_class: climsoft_models.Obsscheduleclas):
+def get_station_element(get_station: climsoft_models.Station, get_instrument: climsoft_models.Instrument, get_obselement: climsoft_models.Obselement, get_obs_schedule_class: climsoft_models.Obsscheduleclas):
     Session = sessionmaker(bind=db_engine)
     session = Session()
-    station_element = climsoft_models.Stationelement(**climsoft_stationelement.get_valid_station_element_input(station_id=get_station.stationId, station_element_id=get_station_element.station_elementId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass).dict())
+    station_element = climsoft_models.Stationelement(
+        **climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, instrument_id=get_instrument.instrumentId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass).dict())
     session.add(station_element)
     session.commit()
     yield station_element
@@ -148,8 +149,8 @@ def test_should_return_single_station_element(test_app: TestClient, get_station_
         isinstance(s, stationelement_schema.StationElement)
 
 
-def test_should_create_a_station_element(test_app: TestClient, get_station: climsoft_models.Station):
-    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId).dict(by_alias=True)
+def test_should_create_a_station_element(test_app: TestClient, get_station: climsoft_models.Station, get_instrument, get_obselement, get_obs_schedule_class):
+    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict()
     response = test_app.post("/api/v1/climsoft/station-elements", data=json.dumps(station_element_data, default=str))
     assert response.status_code == 200
     response_data = response.json()
@@ -158,29 +159,28 @@ def test_should_create_a_station_element(test_app: TestClient, get_station: clim
         isinstance(s, stationelement_schema.StationElement)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station):
-    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId).dict()
+def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_instrument, get_obselement, get_obs_schedule_class):
+    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict()
     response = test_app.post("/api/v1/climsoft/station-elements", data=json.dumps(station_element_data, default=str))
     assert response.status_code == 422
 
 
 def test_should_update_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement):
-    station_element_data = stationelement_schema.StationElement.from_orm(get_station_element).dict(by_alias=True)
-    station_element_id = station_element_data.pop("station_element_id")
-    updates = {**station_element_data, "station_element_name": "updated name"}
+    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict()
+    updates = {**station_element_data, "height": 100}
 
-    response = test_app.put(f"/api/v1/climsoft/station-elements/{station_element_id}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/v1/climsoft/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
     assert response.status_code == 200
-    assert response_data["result"][0]["station_element_name"] == updates["station_element_name"]
+    assert response_data["result"][0]["height"] == updates["height"]
 
 
-def test_should_delete_station_element(test_app: TestClient, get_station_element):
+def test_should_delete_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement):
     station_element_data = stationelement_schema.StationElement.from_orm(get_station_element).dict(by_alias=True)
     station_element_id = station_element_data.pop("station_element_id")
 
-    response = test_app.delete(f"/api/v1/climsoft/station-elements/{station_element_id}")
+    response = test_app.delete(f"/api/v1/climsoft/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
     assert response.status_code == 200
 
     response = test_app.get(f"/api/v1/climsoft/station-elements/{station_element_id}")
