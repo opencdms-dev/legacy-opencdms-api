@@ -1,6 +1,7 @@
 from typing import List
 from pydantic import BaseModel, constr
-
+from src.apps.climsoft.schemas import instrument_schema, obselement_schema, station_schema, Response, \
+    obsscheduleclass_schema
 
 field_names = {
     "recordedFrom": "recorded_from",
@@ -39,7 +40,22 @@ class StationElement(CreateStationElement):
         allow_population_by_field_name = True
 
 
-class StationElementResponse(BaseModel):
-    message: str
-    status: str
+class StationElementResponse(Response):
     result: List[StationElement]
+
+
+class StationElementWithChildren(StationElement):
+    obselement: obselement_schema.ObsElement
+    station: station_schema.Station
+    instrument: instrument_schema.Instrument
+    obsscheduleclas: obsscheduleclass_schema.ObsScheduleClass
+
+    class Config:
+        orm_mode = True
+        fields = {**field_names, "obselement": "obs_element", "obsscheduleclas": "obs_schedule_class"}
+        allow_population_by_field_name = True
+
+
+class StationElementWithChildrenResponse(Response):
+    result: List[StationElementWithChildren]
+
