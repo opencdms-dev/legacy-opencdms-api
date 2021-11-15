@@ -10,7 +10,7 @@ field_names = {
     "installationDatetime": "installation_datetime",
     "deinstallationDatetime": "uninstallation_datetime",
     "instrumentPicture": "instrument_picture",
-    "installedAt": "installed_at"
+    "installedAt": "station_id"
 }
 
 
