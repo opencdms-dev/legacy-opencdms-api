@@ -3,14 +3,14 @@ import random
 import datetime
 from typing import Tuple
 from faker import Faker
-from src.apps.climsoft.schemas import observationinitial_schema
+from src.apps.climsoft.schemas import observationfinal_schema
 
 
 fake = Faker()
 
 
-def get_valid_observation_initial_input(station_id: str, element_id: int, obs_datetime: str = None, qc_status: int = None, acquisition_type: int = None):
-    return observationinitial_schema.CreateObservationInitial(
+def get_valid_observation_final_input(station_id: str, element_id: int, obs_datetime: str = None, qc_status: int = None, acquisition_type: int = None):
+    return observationfinal_schema.CreateObservationFinal(
         recordedFrom=station_id,
         describedBy=element_id,
         obsDatetime=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S") if obs_datetime is None else obs_datetime,
