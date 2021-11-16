@@ -28,8 +28,14 @@ class CreateStationElement(BaseModel):
         fields = field_names
 
 
-class UpdateStationElement(CreateStationElement):
-    pass
+class UpdateStationElement(BaseModel):
+    instrumentcode: constr(max_length=6)
+    scheduledFor: constr(max_length=255)
+    height: float
+    endDate: constr(max_length=255)
+
+    class Config:
+        fields = field_names
 
 
 class StationElement(CreateStationElement):
