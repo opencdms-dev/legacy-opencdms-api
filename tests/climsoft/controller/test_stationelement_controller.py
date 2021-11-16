@@ -144,13 +144,14 @@ def test_should_return_single_station_element(test_app: TestClient, get_station_
     response = test_app.get(f"/api/v1/climsoft/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
     assert response.status_code == 200
     response_data = response.json()
+    print(response_data)
     assert len(response_data["result"]) == 1
     for s in response_data["result"]:
         isinstance(s, stationelement_schema.StationElement)
 
 
 def test_should_create_a_station_element(test_app: TestClient, get_station: climsoft_models.Station, get_instrument, get_obselement, get_obs_schedule_class):
-    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict()
+    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict(by_alias=True)
     response = test_app.post("/api/v1/climsoft/station-elements", data=json.dumps(station_element_data, default=str))
     assert response.status_code == 200
     response_data = response.json()
@@ -166,7 +167,13 @@ def test_should_raise_validation_error(test_app: TestClient, get_station: climso
 
 
 def test_should_update_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement):
-    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict()
+    station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station_element.recordedFrom, element_id=get_station_element.describedBy, schedule_class=get_station_element.scheduledFor, instrument_id=get_station_element.recordedWith).dict(by_alias=True)
+
+    recorded_from = station_element_data.pop("recorded_from")
+    described_by = station_element_data.pop("described_by")
+    recorded_with = station_element_data.pop("recorded_with")
+    begin_date = station_element_data.pop("begin_date")
+
     updates = {**station_element_data, "height": 100}
 
     response = test_app.put(f"/api/v1/climsoft/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}", data=json.dumps(updates, default=str))
@@ -178,10 +185,13 @@ def test_should_update_station_element(test_app: TestClient, get_station_element
 
 def test_should_delete_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement):
     station_element_data = stationelement_schema.StationElement.from_orm(get_station_element).dict(by_alias=True)
-    station_element_id = station_element_data.pop("station_element_id")
+    recorded_from = station_element_data.pop("recorded_from")
+    described_by = station_element_data.pop("described_by")
+    recorded_with = station_element_data.pop("recorded_with")
+    begin_date = station_element_data.pop("begin_date")
 
     response = test_app.delete(f"/api/v1/climsoft/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/v1/climsoft/station-elements/{station_element_id}")
+    response = test_app.get(f"/api/v1/climsoft/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
     assert response.status_code == 404

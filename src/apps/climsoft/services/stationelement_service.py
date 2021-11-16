@@ -53,7 +53,7 @@ def get(db_session: Session, recorded_from: str, described_by: int, recorded_wit
             .filter_by(describedBy=described_by)\
             .filter_by(recordedWith=recorded_with)\
             .filter_by(beginDate=begin_date)\
-            .options(joinedload("obselement"), joinedload("station"), joinedload("station_element"), joinedload("obsscheduleclas"))\
+            .options(joinedload("obselement"), joinedload("station"), joinedload("instrument"), joinedload("obsscheduleclas"))\
             .first()
 
         if not station_element:
