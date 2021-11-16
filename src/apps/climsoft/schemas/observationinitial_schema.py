@@ -31,7 +31,7 @@ field_names_all = {
 class CreateObservationInitial(BaseModel):
     recordedFrom: constr(max_length=255)
     describedBy: int
-    obsDatetime: datetime.datetime
+    obsDatetime: str
     qcStatus: int
     acquisitionType: int
     obsLevel: constr(max_length=255)
@@ -44,6 +44,7 @@ class CreateObservationInitial(BaseModel):
     mark: bool
     temperatureUnits: constr(max_length=255)
     precipitationUnits: constr(max_length=255)
+    cloudHeightUnits: constr(max_length=255)
     visUnits: constr(max_length=255)
     dataSourceTimeZone: int
 
@@ -62,6 +63,7 @@ class UpdateObservationInitial(BaseModel):
     mark: bool
     temperatureUnits: constr(max_length=255)
     precipitationUnits: constr(max_length=255)
+    cloudHeightUnits: constr(max_length=255)
     visUnits: constr(max_length=255)
     dataSourceTimeZone: int
 
@@ -70,6 +72,8 @@ class UpdateObservationInitial(BaseModel):
 
 
 class ObservationInitial(CreateObservationInitial):
+    obsDatetime: datetime.datetime
+
     class Config:
         orm_mode = True
         fields = field_names_all

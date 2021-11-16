@@ -39,6 +39,7 @@ def create(db_session: Session, data: observationinitial_schema.CreateObservatio
         observation_initial = models.Observationinitial(**data.dict())
         db_session.add(observation_initial)
         db_session.commit()
+        print(observation_initial.obsDatetime)
         return observationinitial_schema.ObservationInitial.from_orm(observation_initial)
     except Exception as e:
         db_session.rollback()
@@ -85,6 +86,7 @@ def query(
         mark: bool = None,
         temperature_units: str = None,
         precipitation_units: str = None,
+        cloud_height_units: str = None,
         vis_units: str = None,
         data_source_timezone: int = None,
         limit: int = 25,
@@ -93,6 +95,28 @@ def query(
     """
     This function builds a query based on the given parameter and returns `limit` numbers of `observationinitial` row skipping
     `offset` number of rows
+    :param db_session: db session
+    :param recorded_from:
+    :param described_by:
+    :param obs_datetime:
+    :param qc_status:
+    :param acquisition_type:
+    :param obs_level:
+    :param obs_value:
+    :param flag:
+    :param period:
+    :param qc_type_log:
+    :param data_form:
+    :param captured_by:
+    :param mark:
+    :param temperature_units:
+    :param precipitation_units:
+    :param cloud_height_units:
+    :param vis_units:
+    :param data_source_timezone:
+    :param limit:
+    :param offset:
+    :return:
     """
     try:
         q = db_session.query(models.Observationinitial)
@@ -104,7 +128,7 @@ def query(
             q = q.filter_by(describedBy=described_by)
 
         if obs_datetime is not None:
-            q = q.filter(models.Observationinitial.obsDatetime >= obs_datetime)
+            q = q.filter_by(obsDatetime=obs_datetime)
 
         if qc_status is not None:
             q = q.filter_by(qcStatus=qc_status)
@@ -142,6 +166,9 @@ def query(
         if precipitation_units is not None:
             q = q.filter(models.Observationinitial.precipitationUnits.ilike(f"%{precipitation_units}%"))
 
+        if cloud_height_units is not None:
+            q = q.filter(models.Observationinitial.cloudHeightUnits.ilike(f"%{cloud_height_units}%"))
+
         if vis_units is not None:
             q = q.filter_by(models.Observationinitial.visUnits.ilike(f"%{vis_units}%"))
 
@@ -164,7 +191,13 @@ def update(db_session: Session, recorded_from: str, described_by: int, obs_datet
             .filter_by(acquisitionType=acquisition_type)\
             .update(updates.dict())
         db_session.commit()
-        updated_instrument = db_session.query(models.Observationinitial).filter_by(recordedFrom=recorded_from).filter_by(describedBy=described_by).filter_by(recordedWith=recorded_with).filter_by(beginDate=begin_date).first()
+        updated_instrument = db_session.query(models.Observationinitial)\
+            .filter_by(recordedFrom=recorded_from)\
+            .filter_by(describedBy=described_by)\
+            .filter_by(obsDatetime=obs_datetime)\
+            .filter_by(qcStatus=qc_status)\
+            .filter_by(acquisitionType=acquisition_type)\
+            .first()
         return observationinitial_schema.ObservationInitial.from_orm(updated_instrument)
     except Exception as e:
         db_session.rollback()

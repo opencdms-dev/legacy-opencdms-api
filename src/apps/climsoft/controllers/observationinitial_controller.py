@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.get("/observation-initial", response_model=observationinitial_schema.ObservationInitialResponse)
+@router.get("/observation-initials", response_model=observationinitial_schema.ObservationInitialResponse)
 def get_observation_initials(
         recorded_from: str = None,
         described_by: int = None,
@@ -28,6 +28,7 @@ def get_observation_initials(
         mark: bool = None,
         temperature_units: str = None,
         precipitation_units: str = None,
+        cloud_height_units: str = None,
         vis_units: str = None,
         data_source_timezone: int = None,
         limit: int = 25,
@@ -51,6 +52,7 @@ def get_observation_initials(
             mark=mark,
             temperature_units=temperature_units,
             precipitation_units=precipitation_units,
+            cloud_height_units=cloud_height_units,
             vis_units=vis_units,
             data_source_timezone=data_source_timezone,
             limit=limit,
@@ -62,7 +64,7 @@ def get_observation_initials(
         return get_error_response(message=str(e))
 
 
-@router.get("/observation-initial/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialWithChildrenResponse)
+@router.get("/observation-initials/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialWithChildrenResponse)
 def get_observation_initial_by_id(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int):
     try:
         return get_success_response(
@@ -75,7 +77,7 @@ def get_observation_initial_by_id(recorded_from: str, described_by: int, obs_dat
         )
 
 
-@router.post("/observation-initial", response_model=observationinitial_schema.ObservationInitialResponse)
+@router.post("/observation-initials", response_model=observationinitial_schema.ObservationInitialResponse)
 def create_observation_initial(data: observationinitial_schema.CreateObservationInitial):
     try:
         return get_success_response(
@@ -88,7 +90,7 @@ def create_observation_initial(data: observationinitial_schema.CreateObservation
         )
 
 
-@router.put("/observation-initial/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialResponse)
+@router.put("/observation-initials/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialResponse)
 def update_observation_initial(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int, data: observationinitial_schema.UpdateObservationInitial):
     try:
         return get_success_response(
@@ -101,7 +103,7 @@ def update_observation_initial(recorded_from: str, described_by: int, obs_dateti
         )
 
 
-@router.delete("/observation-initial/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialResponse)
+@router.delete("/observation-initials/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialResponse)
 def delete_observation_initial(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int):
     try:
         observationinitial_service.delete(db_session=db.session, recorded_from=recorded_from, described_by=described_by, obs_datetime=obs_datetime, qc_status=qc_status, acquisition_type=acquisition_type)
