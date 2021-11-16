@@ -39,7 +39,7 @@ class CreateObservationInitial(BaseModel):
     flag: constr(max_length=255)
     period: int
     qcTypeLog: str
-    dataFrom: constr(max_length=255)
+    dataForm: constr(max_length=255)
     capturedBy: constr(max_length=255)
     mark: bool
     temperatureUnits: constr(max_length=255)
@@ -57,7 +57,7 @@ class UpdateObservationInitial(BaseModel):
     flag: constr(max_length=255)
     period: int
     qcTypeLog: str
-    dataFrom: constr(max_length=255)
+    dataForm: constr(max_length=255)
     capturedBy: constr(max_length=255)
     mark: bool
     temperatureUnits: constr(max_length=255)
