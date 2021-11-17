@@ -96,3 +96,9 @@ class ObservationInitialWithChildren(ObservationInitial):
 
 class ObservationInitialWithChildrenResponse(Response):
     result: List[ObservationInitialWithChildren]
+
+
+class ObservationInitialInputGen(CreateObservationInitial):
+    class Config:
+        fields = field_names_all
+        allow_population_by_field_name = True

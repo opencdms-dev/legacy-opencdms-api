@@ -10,7 +10,7 @@ fake = Faker()
 
 
 def get_valid_observation_initial_input(station_id: str, element_id: int, obs_datetime: str = None, qc_status: int = None, acquisition_type: int = None):
-    return observationinitial_schema.CreateObservationInitial(
+    return observationinitial_schema.ObservationInitialInputGen(
         recordedFrom=station_id,
         describedBy=element_id,
         obsDatetime=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S") if obs_datetime is None else obs_datetime,

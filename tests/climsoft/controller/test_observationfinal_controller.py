@@ -130,11 +130,12 @@ def test_should_raise_validation_error(test_app: TestClient, get_station: climso
 
 
 def test_should_update_observation_final(test_app: TestClient, get_observation_final: climsoft_models.Observationfinal):
-    observation_final_data = climsoft_observation_final.get_valid_observation_final_input(station_id=get_observation_final.recordedFrom, element_id=get_observation_final.describedBy, obs_datetime=get_observation_final.obsDatetime, qc_status=get_observation_final.qcStatus, acquisition_type=get_observation_final.acquisitionType).dict(by_alias=True)
+    observation_final_data = climsoft_observation_final.get_valid_observation_final_input(station_id=get_observation_final.recordedFrom, element_id=get_observation_final.describedBy, obs_datetime=str(get_observation_final.obsDatetime), qc_status=get_observation_final.qcStatus, acquisition_type=get_observation_final.acquisitionType).dict(by_alias=True)
 
     recorded_from = observation_final_data.pop("recorded_from")
     described_by = observation_final_data.pop("described_by")
     obs_datetime = observation_final_data.pop("obs_datetime")
+
     updates = {**observation_final_data, "period": 100}
 
     response = test_app.put(f"/api/v1/climsoft/observation-finals/{get_observation_final.recordedFrom}/{get_observation_final.describedBy}/{get_observation_final.obsDatetime}", data=json.dumps(updates, default=str))
