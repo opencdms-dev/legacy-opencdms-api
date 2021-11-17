@@ -130,7 +130,7 @@ def test_should_raise_validation_error(test_app: TestClient, get_station: climso
 
 
 def test_should_update_observation_initial(test_app: TestClient, get_observation_initial: climsoft_models.Observationinitial):
-    observation_initial_data = climsoft_observation_initial.get_valid_observation_initial_input(station_id=get_observation_initial.recordedFrom, element_id=get_observation_initial.describedBy, obs_datetime=get_observation_initial.obsDatetime, qc_status=get_observation_initial.qcStatus, acquisition_type=get_observation_initial.acquisitionType).dict(by_alias=True)
+    observation_initial_data = climsoft_observation_initial.get_valid_observation_initial_input(station_id=get_observation_initial.recordedFrom, element_id=get_observation_initial.describedBy, obs_datetime=str(get_observation_initial.obsDatetime), qc_status=get_observation_initial.qcStatus, acquisition_type=get_observation_initial.acquisitionType).dict(by_alias=True)
 
     recorded_from = observation_initial_data.pop("recorded_from")
     described_by = observation_initial_data.pop("described_by")

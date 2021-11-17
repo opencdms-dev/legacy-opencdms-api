@@ -98,3 +98,11 @@ class ObservationFinalWithChildren(ObservationFinal):
 
 class ObservationFinalWithChildrenResponse(Response):
     result: List[ObservationFinalWithChildren]
+
+
+class ObservationFinalInputGen(CreateObservationFinal):
+    class Config:
+        fields = field_names_all
+        allow_population_by_field_name = True
+
+
