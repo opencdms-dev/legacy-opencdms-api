@@ -78,4 +78,4 @@ $ pip install -r requirements.txt
 $ uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Note: You have to run database instance separately
+Note: You have to run database instance separately. Go to this repository for detail. https://github.com/opencdms/opencdms-test-data
