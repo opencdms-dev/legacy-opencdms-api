@@ -1,14 +1,23 @@
-from fastapi import APIRouter
-from fastapi_sqlalchemy import db
+from fastapi import APIRouter, Depends
 from src.apps.climsoft.services import stationelement_service
 from src.apps.climsoft.schemas import stationelement_schema
 from src.utils.response import get_success_response, get_error_response
+from sqlalchemy.orm.session import Session
+from src.apps.climsoft.db.engine import SessionLocal
 
 
 router = APIRouter(
     prefix="/api/v1/climsoft",
     tags=["climsoft"]
 )
+
+
+async def get_db() -> Session:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @router.get("/station-elements", response_model=stationelement_schema.StationElementResponse)
@@ -22,11 +31,12 @@ def get_station_elements(
         begin_date: float = None,
         end_date: str = None,
         limit: int = 25,
-        offset: int = 0
+        offset: int = 0,
+        db_session: Session = Depends(get_db)
 ):
     try:
         station_elements = stationelement_service.query(
-            db_session=db.session,
+            db_session=db_session,
             recorded_from=recorded_from,
             recorded_with=recorded_with,
             described_by=described_by,
@@ -45,10 +55,10 @@ def get_station_elements(
 
 
 @router.get("/station-elements/{recorded_from}/{described_by}/{recorded_with}/{begin_date}", response_model=stationelement_schema.StationElementWithChildrenResponse)
-def get_station_element_by_id(recorded_from: str, described_by: int, recorded_with: str, begin_date: str):
+def get_station_element_by_id(recorded_from: str, described_by: int, recorded_with: str, begin_date: str, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[stationelement_service.get(db_session=db.session, recorded_from=recorded_from, recorded_with=recorded_with, described_by=described_by, begin_date=begin_date)],
+            result=[stationelement_service.get(db_session=db_session, recorded_from=recorded_from, recorded_with=recorded_with, described_by=described_by, begin_date=begin_date)],
             message="Successfully fetched station_element."
         )
     except stationelement_service.FailedGettingStationElement as e:
@@ -58,10 +68,10 @@ def get_station_element_by_id(recorded_from: str, described_by: int, recorded_wi
 
 
 @router.post("/station-elements", response_model=stationelement_schema.StationElementResponse)
-def create_station_element(data: stationelement_schema.CreateStationElement):
+def create_station_element(data: stationelement_schema.CreateStationElement, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[stationelement_service.create(db_session=db.session, data=data)],
+            result=[stationelement_service.create(db_session=db_session, data=data)],
             message="Successfully created station_element."
         )
     except stationelement_service.FailedCreatingStationElement as e:
@@ -71,10 +81,10 @@ def create_station_element(data: stationelement_schema.CreateStationElement):
 
 
 @router.put("/station-elements/{recorded_from}/{described_by}/{recorded_with}/{begin_date}", response_model=stationelement_schema.StationElementResponse)
-def update_station_element(recorded_from: str, described_by: int, recorded_with: str, begin_date: str, data: stationelement_schema.UpdateStationElement):
+def update_station_element(recorded_from: str, described_by: int, recorded_with: str, begin_date: str, data: stationelement_schema.UpdateStationElement, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[stationelement_service.update(db_session=db.session,  recorded_from=recorded_from, recorded_with=recorded_with, described_by=described_by, begin_date=begin_date, updates=data)],
+            result=[stationelement_service.update(db_session=db_session,  recorded_from=recorded_from, recorded_with=recorded_with, described_by=described_by, begin_date=begin_date, updates=data)],
             message="Successfully updated station_element."
         )
     except stationelement_service.FailedUpdatingStationElement as e:
@@ -84,9 +94,9 @@ def update_station_element(recorded_from: str, described_by: int, recorded_with:
 
 
 @router.delete("/station-elements/{recorded_from}/{described_by}/{recorded_with}/{begin_date}", response_model=stationelement_schema.StationElementResponse)
-def delete_station_element(recorded_from: str, described_by: int, recorded_with: str, begin_date: str):
+def delete_station_element(recorded_from: str, described_by: int, recorded_with: str, begin_date: str, db_session: Session = Depends(get_db)):
     try:
-        stationelement_service.delete(db_session=db.session,  recorded_from=recorded_from, recorded_with=recorded_with, described_by=described_by, begin_date=begin_date)
+        stationelement_service.delete(db_session=db_session,  recorded_from=recorded_from, recorded_with=recorded_with, described_by=described_by, begin_date=begin_date)
         return get_success_response(
             result=[],
             message="Successfully deleted station_element."

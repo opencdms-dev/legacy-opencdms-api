@@ -1,12 +1,15 @@
-fastapi~=0.68.1
 mysqlclient~=2.0.3
 SQLAlchemy~=1.4.23
 uvicorn~=0.15.0
 alembic~=1.6.5
-pydantic~=1.8.2
+fastapi
 fastapi-sqlalchemy
 pytest~=6.2.5
 starlette~=0.14.2
 Faker
 requests
+passlib
+python-jose[cryptography]
+pydantic
+pydantic[email]
 git+https://github.com/opencdms/pyopencdms@main#egg=opencdms
