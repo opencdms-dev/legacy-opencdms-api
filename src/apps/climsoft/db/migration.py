@@ -1,8 +1,6 @@
-from sqlalchemy.engine import Engine
 from opencdms.models.climsoft.v4_1_1_core import Base
-from fastapi_sqlalchemy import db
+from src.apps.climsoft.db import engine
 
 
-def migrate(engine: Engine):
-    with db():
-        Base.metadata.create_all(engine)
+def migrate():
+    Base.metadata.create_all(engine.db_engine)

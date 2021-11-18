@@ -1,14 +1,23 @@
-from fastapi import APIRouter
-from fastapi_sqlalchemy import db
+from fastapi import APIRouter, Depends
 from src.apps.climsoft.services import observationinitial_service
 from src.apps.climsoft.schemas import observationinitial_schema
 from src.utils.response import get_success_response, get_error_response
+from sqlalchemy.orm.session import Session
+from src.apps.climsoft.db.engine import SessionLocal
 
 
 router = APIRouter(
     prefix="/api/v1/climsoft",
     tags=["climsoft"]
 )
+
+
+async def get_db() -> Session:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @router.get("/observation-initials", response_model=observationinitial_schema.ObservationInitialResponse)
@@ -32,11 +41,12 @@ def get_observation_initials(
         vis_units: str = None,
         data_source_timezone: int = None,
         limit: int = 25,
-        offset: int = 0
+        offset: int = 0,
+        db_session: Session = Depends(get_db)
 ):
     try:
         observation_initials = observationinitial_service.query(
-            db_session=db.session,
+            db_session=db_session,
             recorded_from=recorded_from,
             obs_datetime=obs_datetime,
             qc_status=qc_status,
@@ -65,10 +75,10 @@ def get_observation_initials(
 
 
 @router.get("/observation-initials/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialWithChildrenResponse)
-def get_observation_initial_by_id(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int):
+def get_observation_initial_by_id(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[observationinitial_service.get(db_session=db.session, recorded_from=recorded_from, described_by=described_by, obs_datetime=obs_datetime, qc_status=qc_status, acquisition_type=acquisition_type)],
+            result=[observationinitial_service.get(db_session=db_session, recorded_from=recorded_from, described_by=described_by, obs_datetime=obs_datetime, qc_status=qc_status, acquisition_type=acquisition_type)],
             message="Successfully fetched observation_initial."
         )
     except observationinitial_service.FailedGettingObservationInitial as e:
@@ -78,10 +88,10 @@ def get_observation_initial_by_id(recorded_from: str, described_by: int, obs_dat
 
 
 @router.post("/observation-initials", response_model=observationinitial_schema.ObservationInitialResponse)
-def create_observation_initial(data: observationinitial_schema.CreateObservationInitial):
+def create_observation_initial(data: observationinitial_schema.CreateObservationInitial, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[observationinitial_service.create(db_session=db.session, data=data)],
+            result=[observationinitial_service.create(db_session=db_session, data=data)],
             message="Successfully created observation_initial."
         )
     except observationinitial_service.FailedCreatingObservationInitial as e:
@@ -91,10 +101,10 @@ def create_observation_initial(data: observationinitial_schema.CreateObservation
 
 
 @router.put("/observation-initials/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialResponse)
-def update_observation_initial(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int, data: observationinitial_schema.UpdateObservationInitial):
+def update_observation_initial(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int, data: observationinitial_schema.UpdateObservationInitial, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[observationinitial_service.update(db_session=db.session, recorded_from=recorded_from, described_by=described_by, obs_datetime=obs_datetime, qc_status=qc_status, acquisition_type=acquisition_type, updates=data)],
+            result=[observationinitial_service.update(db_session=db_session, recorded_from=recorded_from, described_by=described_by, obs_datetime=obs_datetime, qc_status=qc_status, acquisition_type=acquisition_type, updates=data)],
             message="Successfully updated observation_initial."
         )
     except observationinitial_service.FailedUpdatingObservationInitial as e:
@@ -104,9 +114,9 @@ def update_observation_initial(recorded_from: str, described_by: int, obs_dateti
 
 
 @router.delete("/observation-initials/{recorded_from}/{described_by}/{obs_datetime}/{qc_status}/{acquisition_type}", response_model=observationinitial_schema.ObservationInitialResponse)
-def delete_observation_initial(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int):
+def delete_observation_initial(recorded_from: str, described_by: int, obs_datetime: str, qc_status: int, acquisition_type: int, db_session: Session = Depends(get_db)):
     try:
-        observationinitial_service.delete(db_session=db.session, recorded_from=recorded_from, described_by=described_by, obs_datetime=obs_datetime, qc_status=qc_status, acquisition_type=acquisition_type)
+        observationinitial_service.delete(db_session=db_session, recorded_from=recorded_from, described_by=described_by, obs_datetime=obs_datetime, qc_status=qc_status, acquisition_type=acquisition_type)
         return get_success_response(
             result=[],
             message="Successfully deleted observation_initial."

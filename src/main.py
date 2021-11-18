@@ -1,22 +1,20 @@
 import uvicorn
 import os
 from fastapi import FastAPI
-from fastapi_sqlalchemy import DBSessionMiddleware
 from src.apps.climsoft.db.migration import migrate as migrate_climsoft_db
-from src.db.engine import db_engine
+from src.apps.auth.db.migration import migrate as migrate_auth_db
 from src.utils.controllers import Controllers
 
 app = FastAPI()
 
-app.add_middleware(DBSessionMiddleware, custom_engine=db_engine)
-
 BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
 
 # migrate
-migrate_climsoft_db(engine=db_engine)
+migrate_climsoft_db()
+migrate_auth_db()
 
 # load controllers
-controllers = Controllers(base_dir=BASE_DIR, app_name="climsoft")
+controllers = Controllers(base_dir=BASE_DIR, apps=["climsoft", "auth"])
 controllers.detect(app)
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
-from src.db.engine import db_engine
+from src.apps.climsoft.db.engine import db_engine
 from src.apps.climsoft.schemas import observationinitial_schema
 from tests.datagen.climsoft import observationinitial as climsoft_observation_initial, obsscheduleclass as climsoft_obsscheduleclass, obselement as climsoft_obselement, station as climsoft_station, instrument as climsoft_instrument
 from faker import Faker

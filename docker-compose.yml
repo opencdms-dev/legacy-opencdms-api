@@ -1,33 +1,33 @@
 version: "3"
 
 services:
-  auth-db:
+  authdb:
     image: postgres
-    container_name: auth-db
-    hostname: auth-db
+    container_name: authdb
+    hostname: authdb
     ports:
       - "15432:5432"
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=auth
 
-  climsoft-db:
+  climsoftdb:
+    image: mariadb:10.1
+    container_name: climsoftdb
+    hostname: climsoftdb
+    ports:
+      - "13306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=climsoft
+
+
+  surfacedb:
     image: postgres
-    container_name: climsoft-db
-    hostname: climsoft-db
+    container_name: surfacedb
+    hostname: surfacedb
     ports:
       - "25432:5432"
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=climsoft
-
-
-  surface-db:
-    image: postgres
-    container_name: surface-db
-    hostname: surface-db
-    ports:
-      - "35432:5432"
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=surface
@@ -42,6 +42,9 @@ services:
     ports:
       - "8000:5000"
     depends_on:
-      - auth-db
-      - climsoft-db
-      - surface-db
+      - authdb
+      - climsoftdb
+      - surfacedb
+    environment:
+      - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
+      - AUTH_DB_URI=postgresql+psycopg2://postgres:password@authdb/auth
