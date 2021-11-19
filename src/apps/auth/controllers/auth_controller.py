@@ -55,7 +55,7 @@ def sign_in(data: auth_schema.SignInRequest, db_session: Session = Depends(get_d
                 "jti": uuid.uuid4().hex,
                 "user_id": int(user.id),
             },
-            key=app_config.get("APP_SECRET"),
+            key=app_config.APP_SECRET,
         )
         return auth_schema.SignInSuccessResponse(access_token=access_token)
     except Exception as e:
