@@ -51,8 +51,10 @@ def test_should_signup_successfully(test_app: TestClient):
 
 
 def test_should_signin_successfully(test_app: TestClient, get_user: user_model.AuthUser):
-    response = test_app.post(f"/api/auth/v1/sign-in", json=auth_user.get_valid_signin_input(username=get_user.username).dict())
+    sign_in_data = {"username": get_user.username, "password": "password", "scope": ""}
+    response = test_app.post(f"/api/auth/v1/sign-in", data=sign_in_data)
     response_data = response.json()
+    print(response_data)
     assert response.status_code == 200
     assert 'access_token' in response_data and response_data['access_token'] != ''
 

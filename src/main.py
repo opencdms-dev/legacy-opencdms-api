@@ -5,19 +5,23 @@ from src.apps.auth.db.migration import migrate as migrate_auth_db
 from src.apps.surface.db.migration import migrate as migrate_surface_db
 from src.utils.controllers import ControllerLoader
 from src.config import app_config
+from src.apps.surface.settings import setup as setup_surface
 
 app = FastAPI()
+
+# setup surface
+setup_surface()
+# migrate
+migrate_climsoft_db()
+migrate_auth_db()
+# load controllers
+controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft", "auth", "surface"])
+controller_loader.detect(app)
 
 
 @app.on_event("startup")
 async def run_migrations():
-    # migrate
-    migrate_climsoft_db()
-    migrate_auth_db()
     await migrate_surface_db()
-    # load controllers
-    controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft", "auth", "surface"])
-    controller_loader.detect(app)
 
 
 if __name__ == "__main__":

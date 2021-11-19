@@ -9,11 +9,6 @@ class SignUpRequest(BaseModel):
     password: str
 
 
-class SignInRequest(BaseModel):
-    username: str
-    password: str
-
-
 class SignInSuccessResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
