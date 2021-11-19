@@ -15,7 +15,6 @@ async def run_migrations():
     migrate_climsoft_db()
     migrate_auth_db()
     await migrate_surface_db()
-
     # load controllers
     controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft", "auth", "surface"])
     controller_loader.detect(app)

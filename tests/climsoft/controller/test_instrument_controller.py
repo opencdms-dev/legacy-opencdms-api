@@ -126,4 +126,5 @@ def test_should_delete_instrument(test_app: TestClient, get_instrument):
     assert response.status_code == 200
 
     response = test_app.get(f"/api/climsoft/v1/instruments/{instrument_id}")
+
     assert response.status_code == 404

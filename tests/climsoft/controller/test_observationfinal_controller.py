@@ -137,7 +137,6 @@ def test_should_update_observation_final(test_app: TestClient, get_observation_f
     obs_datetime = observation_final_data.pop("obs_datetime")
 
     updates = {**observation_final_data, "period": 100}
-
     response = test_app.put(f"/api/climsoft/v1/observation-finals/{get_observation_final.recordedFrom}/{get_observation_final.describedBy}/{get_observation_final.obsDatetime}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
@@ -151,9 +150,9 @@ def test_should_delete_observation_final(test_app: TestClient, get_observation_f
     recorded_from = observation_final_data.pop("recorded_from")
     described_by = observation_final_data.pop("described_by")
     obs_datetime = observation_final_data.pop("obs_datetime")
-
     response = test_app.delete(f"/api/climsoft/v1/observation-finals/{get_observation_final.recordedFrom}/{get_observation_final.describedBy}/{get_observation_final.obsDatetime}")
     assert response.status_code == 200
 
     response = test_app.get(f"/api/climsoft/v1/observation-finals/{get_observation_final.recordedFrom}/{get_observation_final.describedBy}/{get_observation_final.obsDatetime}")
+
     assert response.status_code == 404

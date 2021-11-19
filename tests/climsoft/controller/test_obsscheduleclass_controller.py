@@ -110,7 +110,6 @@ def test_should_update_obs_schedule_class(test_app: TestClient, get_obs_schedule
     obs_schedule_class_data = obsscheduleclass_schema.ObsScheduleClass.from_orm(get_obs_schedule_class).dict(by_alias=True)
     obs_schedule_class_id = obs_schedule_class_data.pop("schedule_class")
     updates = {**obs_schedule_class_data, "description": "updated description"}
-
     response = test_app.put(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
@@ -126,4 +125,5 @@ def test_should_delete_obs_schedule_class(test_app: TestClient, get_obs_schedule
     assert response.status_code == 200
 
     response = test_app.get(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}")
+
     assert response.status_code == 404

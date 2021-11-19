@@ -64,6 +64,7 @@ def test_should_return_first_five_obselements(test_app: TestClient):
 
 def test_should_return_single_station(test_app: TestClient, get_obselement: climsoft_models.Obselement):
     response = test_app.get(f"/api/climsoft/v1/obselements/{get_obselement.elementId}")
+
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -91,7 +92,6 @@ def test_should_update_station(test_app: TestClient, get_obselement):
     obselement_data = obselement_schema.ObsElement.from_orm(get_obselement).dict(by_alias=True)
     element_id = obselement_data.pop("element_id")
     updates = {**obselement_data, "element_name": "updated name"}
-
     response = test_app.put(f"/api/climsoft/v1/obselements/{element_id}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
@@ -107,4 +107,5 @@ def test_should_delete_station(test_app: TestClient, get_obselement):
     assert response.status_code == 200
 
     response = test_app.get(f"/api/climsoft/v1/obselements/{element_id}")
+
     assert response.status_code == 404

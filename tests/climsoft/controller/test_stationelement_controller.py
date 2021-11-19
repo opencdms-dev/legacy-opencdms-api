@@ -144,7 +144,6 @@ def test_should_return_single_station_element(test_app: TestClient, get_station_
     response = test_app.get(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
     assert response.status_code == 200
     response_data = response.json()
-    print(response_data)
     assert len(response_data["result"]) == 1
     for s in response_data["result"]:
         isinstance(s, stationelement_schema.StationElement)
