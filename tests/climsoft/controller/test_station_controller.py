@@ -54,7 +54,7 @@ def get_station():
 
 
 def test_should_return_first_five_stations(test_app: TestClient):
-    response = test_app.get("/api/v1/climsoft/stations", params={"limit": 5})
+    response = test_app.get("/api/climsoft/v1/stations", params={"limit": 5})
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 5
@@ -63,7 +63,7 @@ def test_should_return_first_five_stations(test_app: TestClient):
 
 
 def test_should_return_single_station(test_app: TestClient, get_station: climsoft_models.Station):
-    response = test_app.get(f"/api/v1/climsoft/stations/{get_station.stationId}")
+    response = test_app.get(f"/api/climsoft/v1/stations/{get_station.stationId}")
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -73,7 +73,7 @@ def test_should_return_single_station(test_app: TestClient, get_station: climsof
 
 def test_should_create_a_station(test_app: TestClient):
     station_data = climsoft_station.get_valid_station_input().dict(by_alias=True)
-    response = test_app.post("/api/v1/climsoft/stations", data=json.dumps(station_data, default=str))
+    response = test_app.post("/api/climsoft/v1/stations", data=json.dumps(station_data, default=str))
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -83,7 +83,7 @@ def test_should_create_a_station(test_app: TestClient):
 
 def test_should_raise_validation_error(test_app: TestClient):
     station_data = climsoft_station.get_valid_station_input().dict()
-    response = test_app.post("/api/v1/climsoft/stations", data=json.dumps(station_data, default=str))
+    response = test_app.post("/api/climsoft/v1/stations", data=json.dumps(station_data, default=str))
     assert response.status_code == 422
 
 
@@ -92,7 +92,7 @@ def test_should_update_station(test_app: TestClient, get_station):
     station_id = station_data.pop("station_id")
     updates = {**station_data, "station_name": "updated name"}
 
-    response = test_app.put(f"/api/v1/climsoft/stations/{station_id}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/stations/{station_id}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
     assert response.status_code == 200
@@ -103,8 +103,8 @@ def test_should_delete_station(test_app: TestClient, get_station):
     station_data = station_schema.Station.from_orm(get_station).dict(by_alias=True)
     station_id = station_data.pop("station_id")
 
-    response = test_app.delete(f"/api/v1/climsoft/stations/{station_id}")
+    response = test_app.delete(f"/api/climsoft/v1/stations/{station_id}")
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/v1/climsoft/stations/{station_id}")
+    response = test_app.get(f"/api/climsoft/v1/stations/{station_id}")
     assert response.status_code == 404

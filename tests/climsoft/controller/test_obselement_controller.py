@@ -54,7 +54,7 @@ def get_obselement():
 
 
 def test_should_return_first_five_obselements(test_app: TestClient):
-    response = test_app.get("/api/v1/climsoft/obselements", params={"limit": 5})
+    response = test_app.get("/api/climsoft/v1/obselements", params={"limit": 5})
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 5
@@ -63,7 +63,7 @@ def test_should_return_first_five_obselements(test_app: TestClient):
 
 
 def test_should_return_single_station(test_app: TestClient, get_obselement: climsoft_models.Obselement):
-    response = test_app.get(f"/api/v1/climsoft/obselements/{get_obselement.elementId}")
+    response = test_app.get(f"/api/climsoft/v1/obselements/{get_obselement.elementId}")
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -73,7 +73,7 @@ def test_should_return_single_station(test_app: TestClient, get_obselement: clim
 
 def test_should_create_a_station(test_app: TestClient):
     obselement_data = climsoft_obselement.get_valid_obselement_input().dict(by_alias=True)
-    response = test_app.post("/api/v1/climsoft/obselements", data=json.dumps(obselement_data, default=str))
+    response = test_app.post("/api/climsoft/v1/obselements", data=json.dumps(obselement_data, default=str))
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -83,7 +83,7 @@ def test_should_create_a_station(test_app: TestClient):
 
 def test_should_raise_validation_error(test_app: TestClient):
     obselement_data = climsoft_obselement.get_valid_obselement_input().dict()
-    response = test_app.post("/api/v1/climsoft/obselements", data=json.dumps(obselement_data, default=str))
+    response = test_app.post("/api/climsoft/v1/obselements", data=json.dumps(obselement_data, default=str))
     assert response.status_code == 422
 
 
@@ -92,7 +92,7 @@ def test_should_update_station(test_app: TestClient, get_obselement):
     element_id = obselement_data.pop("element_id")
     updates = {**obselement_data, "element_name": "updated name"}
 
-    response = test_app.put(f"/api/v1/climsoft/obselements/{element_id}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/obselements/{element_id}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
     assert response.status_code == 200
@@ -103,8 +103,8 @@ def test_should_delete_station(test_app: TestClient, get_obselement):
     obselement_data = obselement_schema.ObsElement.from_orm(get_obselement).dict(by_alias=True)
     element_id = obselement_data.pop("element_id")
 
-    response = test_app.delete(f"/api/v1/climsoft/obselements/{element_id}")
+    response = test_app.delete(f"/api/climsoft/v1/obselements/{element_id}")
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/v1/climsoft/obselements/{element_id}")
+    response = test_app.get(f"/api/climsoft/v1/obselements/{element_id}")
     assert response.status_code == 404

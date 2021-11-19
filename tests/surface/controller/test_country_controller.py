@@ -77,7 +77,7 @@ def get_country():
 
 def test_should_return_single_country(test_app: TestClient, get_country):
     from src.apps.surface.schemas import country_schema
-    response = test_app.get(f"/api/v1/climsoft/countries/{get_country.countryId}")
+    response = test_app.get(f"/api/climsoft/v1/countries/{get_country.countryId}")
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -88,7 +88,7 @@ def test_should_return_single_country(test_app: TestClient, get_country):
 def test_should_create_a_country(test_app: TestClient):
     from src.apps.surface.schemas import country_schema
     country_data = country.get_valid_country_input().dict(by_alias=True)
-    response = test_app.post("/api/v1/climsoft/countries", data=json.dumps(country_data, default=str))
+    response = test_app.post("/api/climsoft/v1/countries", data=json.dumps(country_data, default=str))
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -98,7 +98,7 @@ def test_should_create_a_country(test_app: TestClient):
 
 def test_should_raise_validation_error(test_app: TestClient):
     country_data = country.get_valid_country_input().dict()
-    response = test_app.post("/api/v1/climsoft/countries", data=json.dumps(country_data, default=str))
+    response = test_app.post("/api/climsoft/v1/countries", data=json.dumps(country_data, default=str))
     assert response.status_code == 422
 
 
@@ -108,7 +108,7 @@ def test_should_update_country(test_app: TestClient, get_country):
     name = country_data.pop("name")
     updates = {**country_data, "name": fake.country()}
 
-    response = test_app.put(f"/api/v1/climsoft/countries/{name}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/countries/{name}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
     assert response.status_code == 200
@@ -120,8 +120,8 @@ def test_should_delete_country(test_app: TestClient, get_country):
     country_data = country_schema.Country.from_django(get_country).dict(by_alias=True)
     name = country_data.pop("name")
 
-    response = test_app.delete(f"/api/v1/climsoft/countries/{name}")
+    response = test_app.delete(f"/api/climsoft/v1/countries/{name}")
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/v1/climsoft/countries/{name}")
+    response = test_app.get(f"/api/climsoft/v1/countries/{name}")
     assert response.status_code == 404

@@ -2,11 +2,13 @@ from fastapi import APIRouter, Depends
 from src.apps.surface.services import country_service
 from src.apps.surface.schemas import country_schema
 from src.utils.response import get_success_response, get_error_response
+from src.dependencies import auth
 
 
 router = APIRouter(
-    prefix="/api/v1/surface",
-    tags=["surface"]
+    prefix="/api/surface/v1",
+    tags=["surface"],
+    dependencies=[Depends(auth.get_current_user)]
 )
 
 

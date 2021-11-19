@@ -4,11 +4,13 @@ from src.apps.climsoft.schemas import observationinitial_schema
 from src.utils.response import get_success_response, get_error_response
 from sqlalchemy.orm.session import Session
 from src.apps.climsoft.db.engine import SessionLocal
+from src.dependencies import auth
 
 
 router = APIRouter(
-    prefix="/api/v1/climsoft",
-    tags=["climsoft"]
+    prefix="/api/climsoft/v1",
+    tags=["climsoft"],
+    dependencies=[Depends(auth.get_current_user)]
 )
 
 

@@ -16,5 +16,6 @@ pydantic~=1.8.2
 pydantic[email]
 git+https://github.com/opencdms/pyopencdms@main#egg=opencdms
 djantic
+python-multipart
 pytz~=2021.3
 asgiref~=3.4.1

@@ -73,7 +73,7 @@ def get_obs_schedule_class(get_station: climsoft_models.Station):
 
 
 def test_should_return_first_five_obs_schedule_classs(test_app: TestClient):
-    response = test_app.get("/api/v1/climsoft/obs-schedule-class", params={"limit": 5})
+    response = test_app.get("/api/climsoft/v1/obs-schedule-class", params={"limit": 5})
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 5
@@ -82,7 +82,7 @@ def test_should_return_first_five_obs_schedule_classs(test_app: TestClient):
 
 
 def test_should_return_single_obs_schedule_class(test_app: TestClient, get_obs_schedule_class: climsoft_models.Obsscheduleclas):
-    response = test_app.get(f"/api/v1/climsoft/obs-schedule-class/{get_obs_schedule_class.scheduleClass}")
+    response = test_app.get(f"/api/climsoft/v1/obs-schedule-class/{get_obs_schedule_class.scheduleClass}")
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -92,7 +92,7 @@ def test_should_return_single_obs_schedule_class(test_app: TestClient, get_obs_s
 
 def test_should_create_a_obs_schedule_class(test_app: TestClient, get_station: climsoft_models.Station):
     obs_schedule_class_data = climsoft_obs_schedule_class.get_valid_obs_schedule_class_input(station_id=get_station.stationId).dict(by_alias=True)
-    response = test_app.post("/api/v1/climsoft/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str))
+    response = test_app.post("/api/climsoft/v1/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str))
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -102,7 +102,7 @@ def test_should_create_a_obs_schedule_class(test_app: TestClient, get_station: c
 
 def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station):
     obs_schedule_class_data = climsoft_obs_schedule_class.get_valid_obs_schedule_class_input(station_id=get_station.stationId).dict()
-    response = test_app.post("/api/v1/climsoft/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str))
+    response = test_app.post("/api/climsoft/v1/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str))
     assert response.status_code == 422
 
 
@@ -111,7 +111,7 @@ def test_should_update_obs_schedule_class(test_app: TestClient, get_obs_schedule
     obs_schedule_class_id = obs_schedule_class_data.pop("schedule_class")
     updates = {**obs_schedule_class_data, "description": "updated description"}
 
-    response = test_app.put(f"/api/v1/climsoft/obs-schedule-class/{obs_schedule_class_id}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
     assert response.status_code == 200
@@ -122,8 +122,8 @@ def test_should_delete_obs_schedule_class(test_app: TestClient, get_obs_schedule
     obs_schedule_class_data = obsscheduleclass_schema.ObsScheduleClass.from_orm(get_obs_schedule_class).dict(by_alias=True)
     obs_schedule_class_id = obs_schedule_class_data.pop("schedule_class")
 
-    response = test_app.delete(f"/api/v1/climsoft/obs-schedule-class/{obs_schedule_class_id}")
+    response = test_app.delete(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}")
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/v1/climsoft/obs-schedule-class/{obs_schedule_class_id}")
+    response = test_app.get(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}")
     assert response.status_code == 404

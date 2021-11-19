@@ -11,6 +11,7 @@ from src.apps.auth.db.engine import SessionLocal
 from src.utils import response
 from jose import jwt
 from src.config import app_config
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 
 router = APIRouter(
@@ -41,7 +42,7 @@ def sign_up(data: auth_schema.SignUpRequest, db_session: Session = Depends(get_d
 
 
 @router.post("/sign-in")
-def sign_in(data: auth_schema.SignInRequest, db_session: Session = Depends(get_db)):
+def sign_in(data: OAuth2PasswordRequestForm = Depends(), db_session: Session = Depends(get_db)):
     try:
         user = user_service.get(db_session=db_session, username=data.username)
         if not handler.verify(data.password, user.password):
@@ -59,7 +60,7 @@ def sign_in(data: auth_schema.SignInRequest, db_session: Session = Depends(get_d
         )
         return auth_schema.SignInSuccessResponse(access_token=access_token)
     except Exception as e:
-        logger.error(str(e))
+        logger.exception(e)
         return response.get_error_response(message=str(e))
 
 

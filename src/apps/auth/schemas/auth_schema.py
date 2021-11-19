@@ -16,5 +16,6 @@ class SignInRequest(BaseModel):
 
 class SignInSuccessResponse(BaseModel):
     access_token: str
+    token_type: str = "bearer"
 
 

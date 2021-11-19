@@ -73,7 +73,7 @@ def get_instrument(get_station: climsoft_models.Station):
 
 
 def test_should_return_first_five_instruments(test_app: TestClient):
-    response = test_app.get("/api/v1/climsoft/instruments", params={"limit": 5})
+    response = test_app.get("/api/climsoft/v1/instruments", params={"limit": 5})
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 5
@@ -82,7 +82,7 @@ def test_should_return_first_five_instruments(test_app: TestClient):
 
 
 def test_should_return_single_instrument(test_app: TestClient, get_instrument: climsoft_models.Instrument):
-    response = test_app.get(f"/api/v1/climsoft/instruments/{get_instrument.instrumentId}")
+    response = test_app.get(f"/api/climsoft/v1/instruments/{get_instrument.instrumentId}")
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -92,7 +92,7 @@ def test_should_return_single_instrument(test_app: TestClient, get_instrument: c
 
 def test_should_create_a_instrument(test_app: TestClient, get_station: climsoft_models.Station):
     instrument_data = climsoft_instrument.get_valid_instrument_input(station_id=get_station.stationId).dict(by_alias=True)
-    response = test_app.post("/api/v1/climsoft/instruments", data=json.dumps(instrument_data, default=str))
+    response = test_app.post("/api/climsoft/v1/instruments", data=json.dumps(instrument_data, default=str))
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -102,7 +102,7 @@ def test_should_create_a_instrument(test_app: TestClient, get_station: climsoft_
 
 def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station):
     instrument_data = climsoft_instrument.get_valid_instrument_input(station_id=get_station.stationId).dict()
-    response = test_app.post("/api/v1/climsoft/instruments", data=json.dumps(instrument_data, default=str))
+    response = test_app.post("/api/climsoft/v1/instruments", data=json.dumps(instrument_data, default=str))
     assert response.status_code == 422
 
 
@@ -111,7 +111,7 @@ def test_should_update_instrument(test_app: TestClient, get_instrument: climsoft
     instrument_id = instrument_data.pop("instrument_id")
     updates = {**instrument_data, "instrument_name": "updated name"}
 
-    response = test_app.put(f"/api/v1/climsoft/instruments/{instrument_id}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/instruments/{instrument_id}", data=json.dumps(updates, default=str))
     response_data = response.json()
 
     assert response.status_code == 200
@@ -122,8 +122,8 @@ def test_should_delete_instrument(test_app: TestClient, get_instrument):
     instrument_data = instrument_schema.Instrument.from_orm(get_instrument).dict(by_alias=True)
     instrument_id = instrument_data.pop("instrument_id")
 
-    response = test_app.delete(f"/api/v1/climsoft/instruments/{instrument_id}")
+    response = test_app.delete(f"/api/climsoft/v1/instruments/{instrument_id}")
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/v1/climsoft/instruments/{instrument_id}")
+    response = test_app.get(f"/api/climsoft/v1/instruments/{instrument_id}")
     assert response.status_code == 404
