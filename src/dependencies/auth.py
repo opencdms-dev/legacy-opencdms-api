@@ -22,12 +22,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, app_config.APP_SECRET, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
+            db_session.close()
             raise credentials_exception
     except JWTError:
+        db_session.close()
         raise credentials_exception
     user = user_service.get(db_session, username=username)
     if user is None:
+        db_session.close()
         raise credentials_exception
+    db_session.close()
     return user
 
 #

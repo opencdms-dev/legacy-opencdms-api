@@ -9,11 +9,19 @@ from src.apps.climsoft.schemas import stationelement_schema
 from tests.datagen.climsoft import stationelement as climsoft_station_element, obsscheduleclass as climsoft_obsscheduleclass, obselement as climsoft_obselement, station as climsoft_station, instrument as climsoft_instrument
 from faker import Faker
 from fastapi.testclient import TestClient
+from src.apps.auth.db.engine import db_engine as auth_db_engine
+from src.apps.auth.db.models import user_model
+from passlib.hash import django_pbkdf2_sha256 as handler
 
 fake = Faker()
 
 
 def setup_module(module):
+    with auth_db_engine.connect().execution_options(autocommit=True) as connection:
+        with connection.begin():
+            auth_db_engine.execute(sa_text(f'''
+                TRUNCATE TABLE {user_model.AuthUser.__tablename__} RESTART IDENTITY CASCADE
+            ''').execution_options(autocommit=True))
     with db_engine.connect().execution_options(autocommit=True) as connection:
         with connection.begin():
             db_engine.execute(sa_text(f"""
@@ -60,8 +68,26 @@ def setup_module(module):
         db_session.commit()
     db_session.close()
 
+    AuthSession = sessionmaker(bind=auth_db_engine)
+    auth_session = AuthSession()
+    user = user_model.AuthUser(
+        username="testuser",
+        password=handler.hash("password"),
+        first_name=fake.first_name(),
+        last_name=fake.last_name(),
+        email=fake.email()
+    )
+    auth_session.add(user)
+    auth_session.commit()
+    auth_session.close()
+
 
 def teardown_module(module):
+    with auth_db_engine.connect().execution_options(autocommit=True) as connection:
+        with connection.begin():
+            auth_db_engine.execute(sa_text(f'''
+                TRUNCATE TABLE {user_model.AuthUser.__tablename__} RESTART IDENTITY CASCADE
+            ''').execution_options(autocommit=True))
     with db_engine.connect().execution_options(autocommit=True) as connection:
         with connection.begin():
             db_engine.execute(sa_text(f"""
@@ -73,6 +99,14 @@ def teardown_module(module):
                 TRUNCATE TABLE {climsoft_models.Stationelement.__tablename__};
                 SET FOREIGN_KEY_CHECKS = 1;
             """))
+
+
+@pytest.fixture
+def get_access_token(test_app: TestClient):
+    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
+    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
+    response_data = response.json()
+    return response_data['access_token']
 
 
 @pytest.fixture
@@ -131,8 +165,10 @@ def get_station_element(get_station: climsoft_models.Station, get_instrument: cl
     session.close()
 
 
-def test_should_return_first_five_station_elements(test_app: TestClient):
-    response = test_app.get("/api/climsoft/v1/station-elements", params={"limit": 5})
+def test_should_return_first_five_station_elements(test_app: TestClient, get_access_token: str):
+    response = test_app.get("/api/climsoft/v1/station-elements", params={"limit": 5}, headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 5
@@ -140,8 +176,10 @@ def test_should_return_first_five_station_elements(test_app: TestClient):
         isinstance(s, stationelement_schema.StationElement)
 
 
-def test_should_return_single_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement):
-    response = test_app.get(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
+def test_should_return_single_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement, get_access_token: str):
+    response = test_app.get(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -149,9 +187,11 @@ def test_should_return_single_station_element(test_app: TestClient, get_station_
         isinstance(s, stationelement_schema.StationElement)
 
 
-def test_should_create_a_station_element(test_app: TestClient, get_station: climsoft_models.Station, get_instrument, get_obselement, get_obs_schedule_class):
+def test_should_create_a_station_element(test_app: TestClient, get_station: climsoft_models.Station, get_instrument, get_obselement, get_obs_schedule_class, get_access_token: str):
     station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/station-elements", data=json.dumps(station_element_data, default=str))
+    response = test_app.post("/api/climsoft/v1/station-elements", data=json.dumps(station_element_data, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -159,13 +199,15 @@ def test_should_create_a_station_element(test_app: TestClient, get_station: clim
         isinstance(s, stationelement_schema.StationElement)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_instrument, get_obselement, get_obs_schedule_class):
+def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_instrument, get_obselement, get_obs_schedule_class, get_access_token: str):
     station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station.stationId, element_id=get_obselement.elementId, schedule_class=get_obs_schedule_class.scheduleClass, instrument_id=get_instrument.instrumentId).dict()
-    response = test_app.post("/api/climsoft/v1/station-elements", data=json.dumps(station_element_data, default=str))
+    response = test_app.post("/api/climsoft/v1/station-elements", data=json.dumps(station_element_data, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 422
 
 
-def test_should_update_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement):
+def test_should_update_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement, get_access_token: str):
     station_element_data = climsoft_station_element.get_valid_station_element_input(station_id=get_station_element.recordedFrom, element_id=get_station_element.describedBy, schedule_class=get_station_element.scheduledFor, instrument_id=get_station_element.recordedWith).dict(by_alias=True)
 
     recorded_from = station_element_data.pop("recorded_from")
@@ -175,22 +217,28 @@ def test_should_update_station_element(test_app: TestClient, get_station_element
 
     updates = {**station_element_data, "height": 100}
 
-    response = test_app.put(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}", data=json.dumps(updates, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     response_data = response.json()
 
     assert response.status_code == 200
     assert response_data["result"][0]["height"] == updates["height"]
 
 
-def test_should_delete_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement):
+def test_should_delete_station_element(test_app: TestClient, get_station_element: climsoft_models.Stationelement, get_access_token: str):
     station_element_data = stationelement_schema.StationElement.from_orm(get_station_element).dict(by_alias=True)
     recorded_from = station_element_data.pop("recorded_from")
     described_by = station_element_data.pop("described_by")
     recorded_with = station_element_data.pop("recorded_with")
     begin_date = station_element_data.pop("begin_date")
 
-    response = test_app.delete(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
+    response = test_app.delete(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}")
+    response = test_app.get(f"/api/climsoft/v1/station-elements/{get_station_element.recordedFrom}/{get_station_element.describedBy}/{get_station_element.recordedWith}/{get_station_element.beginDate}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 404

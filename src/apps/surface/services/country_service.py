@@ -45,13 +45,9 @@ def create(data: country_schema.CreateCountry) -> country_schema.Country:
 def get(name: str) -> country_schema.Country:
     try:
         country = models.Country.objects.get(name=name)
-
-        if not country:
-            raise HTTPException(status_code=404, detail="Country does not exist.")
-
         return country_schema.Country.from_django(country)
-    except HTTPException:
-        raise
+    except models.Country.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Country does not exist.")
     except Exception as e:
         logger.exception(e)
         raise FailedGettingCountry("Failed getting country.")
@@ -90,7 +86,7 @@ def query(
 
 def update(name: str, updates: country_schema.UpdateCountry) -> country_schema.Country:
     try:
-        models.Country.objects.get(name=name).update(updates.dict())
+        models.Country.objects.filter(name=name).update(**updates.dict())
         updated_country = models.Country.objects.get(name=name)
         return country_schema.Country.from_django(updated_country)
     except Exception as e:
@@ -100,7 +96,7 @@ def update(name: str, updates: country_schema.UpdateCountry) -> country_schema.C
 
 def delete(name: str) -> bool:
     try:
-        models.Country.objects.get(name=name).delete()
+        models.Country.objects.filter(name=name).delete()
         return True
     except Exception as e:
         logger.exception(e)

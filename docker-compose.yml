@@ -23,11 +23,7 @@ services:
 
 
   surfacedb:
-<<<<<<< HEAD
     image: timescale/timescaledb-postgis:latest-pg12
-=======
-    image: postgres
->>>>>>> 1477004f4c26c3d68d0183b3503c27dd39b388f4
     container_name: surfacedb
     hostname: surfacedb
     ports:
@@ -52,7 +48,4 @@ services:
     environment:
       - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
       - AUTH_DB_URI=postgresql+psycopg2://postgres:password@authdb/auth
-<<<<<<< HEAD
       - SURFACE_DB_URI=postgresql+psycopg2://postgres:password@surfacedb/surface
-=======
->>>>>>> 1477004f4c26c3d68d0183b3503c27dd39b388f4

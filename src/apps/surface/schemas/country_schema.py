@@ -10,8 +10,8 @@ class CreateCountry(BaseModel):
     name: constr(max_length=255)
 
 
-class UpdateCountry(CreateCountry):
-    pass
+class UpdateCountry(BaseModel):
+    code: constr(max_length=2)
 
 
 class Country(ModelSchema):

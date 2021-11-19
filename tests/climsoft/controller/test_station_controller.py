@@ -8,11 +8,19 @@ from src.apps.climsoft.schemas import station_schema
 from tests.datagen.climsoft import station as climsoft_station
 from faker import Faker
 from fastapi.testclient import TestClient
+from src.apps.auth.db.engine import db_engine as auth_db_engine
+from src.apps.auth.db.models import user_model
+from passlib.hash import django_pbkdf2_sha256 as handler
 
 fake = Faker()
 
 
 def setup_module(module):
+    with auth_db_engine.connect().execution_options(autocommit=True) as connection:
+        with connection.begin():
+            auth_db_engine.execute(sa_text(f'''
+                TRUNCATE TABLE {user_model.AuthUser.__tablename__} RESTART IDENTITY CASCADE
+            ''').execution_options(autocommit=True))
     with db_engine.connect().execution_options(autocommit=True) as connection:
         with connection.begin():
             db_engine.execute(sa_text(f"""
@@ -31,8 +39,26 @@ def setup_module(module):
     db_session.commit()
     db_session.close()
 
+    AuthSession = sessionmaker(bind=auth_db_engine)
+    auth_session = AuthSession()
+    user = user_model.AuthUser(
+        username="testuser",
+        password=handler.hash("password"),
+        first_name=fake.first_name(),
+        last_name=fake.last_name(),
+        email=fake.email()
+    )
+    auth_session.add(user)
+    auth_session.commit()
+    auth_session.close()
+
 
 def teardown_module(module):
+    with auth_db_engine.connect().execution_options(autocommit=True) as connection:
+        with connection.begin():
+            auth_db_engine.execute(sa_text(f'''
+                TRUNCATE TABLE {user_model.AuthUser.__tablename__} RESTART IDENTITY CASCADE
+            ''').execution_options(autocommit=True))
     with db_engine.connect().execution_options(autocommit=True) as connection:
         with connection.begin():
             db_engine.execute(sa_text(f"""
@@ -40,6 +66,14 @@ def teardown_module(module):
                 TRUNCATE TABLE {climsoft_models.Station.__tablename__};
                 SET FOREIGN_KEY_CHECKS = 1;
             """))
+
+
+@pytest.fixture
+def get_access_token(test_app: TestClient):
+    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
+    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
+    response_data = response.json()
+    return response_data['access_token']
 
 
 @pytest.fixture
@@ -53,8 +87,10 @@ def get_station():
     session.close()
 
 
-def test_should_return_first_five_stations(test_app: TestClient):
-    response = test_app.get("/api/climsoft/v1/stations", params={"limit": 5})
+def test_should_return_first_five_stations(test_app: TestClient, get_access_token: str):
+    response = test_app.get("/api/climsoft/v1/stations", params={"limit": 5}, headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 5
@@ -62,8 +98,10 @@ def test_should_return_first_five_stations(test_app: TestClient):
         isinstance(s, station_schema.Station)
 
 
-def test_should_return_single_station(test_app: TestClient, get_station: climsoft_models.Station):
-    response = test_app.get(f"/api/climsoft/v1/stations/{get_station.stationId}")
+def test_should_return_single_station(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+    response = test_app.get(f"/api/climsoft/v1/stations/{get_station.stationId}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -71,9 +109,11 @@ def test_should_return_single_station(test_app: TestClient, get_station: climsof
         isinstance(s, station_schema.Station)
 
 
-def test_should_create_a_station(test_app: TestClient):
+def test_should_create_a_station(test_app: TestClient, get_access_token: str):
     station_data = climsoft_station.get_valid_station_input().dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/stations", data=json.dumps(station_data, default=str))
+    response = test_app.post("/api/climsoft/v1/stations", data=json.dumps(station_data, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -81,30 +121,38 @@ def test_should_create_a_station(test_app: TestClient):
         isinstance(s, station_schema.Station)
 
 
-def test_should_raise_validation_error(test_app: TestClient):
+def test_should_raise_validation_error(test_app: TestClient, get_access_token: str):
     station_data = climsoft_station.get_valid_station_input().dict()
-    response = test_app.post("/api/climsoft/v1/stations", data=json.dumps(station_data, default=str))
+    response = test_app.post("/api/climsoft/v1/stations", data=json.dumps(station_data, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 422
 
 
-def test_should_update_station(test_app: TestClient, get_station):
+def test_should_update_station(test_app: TestClient, get_station, get_access_token: str):
     station_data = station_schema.Station.from_orm(get_station).dict(by_alias=True)
     station_id = station_data.pop("station_id")
     updates = {**station_data, "station_name": "updated name"}
 
-    response = test_app.put(f"/api/climsoft/v1/stations/{station_id}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/stations/{station_id}", data=json.dumps(updates, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     response_data = response.json()
 
     assert response.status_code == 200
     assert response_data["result"][0]["station_name"] == updates["station_name"]
 
 
-def test_should_delete_station(test_app: TestClient, get_station):
+def test_should_delete_station(test_app: TestClient, get_station, get_access_token: str):
     station_data = station_schema.Station.from_orm(get_station).dict(by_alias=True)
     station_id = station_data.pop("station_id")
 
-    response = test_app.delete(f"/api/climsoft/v1/stations/{station_id}")
+    response = test_app.delete(f"/api/climsoft/v1/stations/{station_id}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/stations/{station_id}")
+    response = test_app.get(f"/api/climsoft/v1/stations/{station_id}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 404

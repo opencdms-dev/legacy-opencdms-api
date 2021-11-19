@@ -2,7 +2,6 @@ mysqlclient~=2.0.3
 SQLAlchemy~=1.4.23
 uvicorn~=0.15.0
 alembic~=1.6.5
-<<<<<<< HEAD
 pytest~=6.2.5
 starlette~=0.14.2
 django~=3.2.9
@@ -20,16 +19,3 @@ djantic
 python-multipart
 pytz~=2021.3
 asgiref~=3.4.1
-=======
-fastapi
-fastapi-sqlalchemy
-pytest~=6.2.5
-starlette~=0.14.2
-Faker
-requests
-passlib
-python-jose[cryptography]
-pydantic
-pydantic[email]
-git+https://github.com/opencdms/pyopencdms@main#egg=opencdms
->>>>>>> 1477004f4c26c3d68d0183b3503c27dd39b388f4

@@ -8,11 +8,19 @@ from src.apps.climsoft.schemas import obsscheduleclass_schema
 from tests.datagen.climsoft import obsscheduleclass as climsoft_obs_schedule_class, station as climsoft_station
 from faker import Faker
 from fastapi.testclient import TestClient
+from src.apps.auth.db.engine import db_engine as auth_db_engine
+from src.apps.auth.db.models import user_model
+from passlib.hash import django_pbkdf2_sha256 as handler
 
 fake = Faker()
 
 
 def setup_module(module):
+    with auth_db_engine.connect().execution_options(autocommit=True) as connection:
+        with connection.begin():
+            auth_db_engine.execute(sa_text(f'''
+                TRUNCATE TABLE {user_model.AuthUser.__tablename__} RESTART IDENTITY CASCADE
+            ''').execution_options(autocommit=True))
     with db_engine.connect().execution_options(autocommit=True) as connection:
         with connection.begin():
             db_engine.execute(sa_text(f"""
@@ -38,8 +46,34 @@ def setup_module(module):
         db_session.commit()
     db_session.close()
 
+    AuthSession = sessionmaker(bind=auth_db_engine)
+    auth_session = AuthSession()
+    user = user_model.AuthUser(
+        username="testuser",
+        password=handler.hash("password"),
+        first_name=fake.first_name(),
+        last_name=fake.last_name(),
+        email=fake.email()
+    )
+    auth_session.add(user)
+    auth_session.commit()
+    auth_session.close()
+
+
+@pytest.fixture
+def get_access_token(test_app: TestClient):
+    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
+    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
+    response_data = response.json()
+    return response_data['access_token']
+
 
 def teardown_module(module):
+    with auth_db_engine.connect().execution_options(autocommit=True) as connection:
+        with connection.begin():
+            auth_db_engine.execute(sa_text(f'''
+                TRUNCATE TABLE {user_model.AuthUser.__tablename__} RESTART IDENTITY CASCADE
+            ''').execution_options(autocommit=True))
     with db_engine.connect().execution_options(autocommit=True) as connection:
         with connection.begin():
             db_engine.execute(sa_text(f"""
@@ -72,8 +106,10 @@ def get_obs_schedule_class(get_station: climsoft_models.Station):
     session.close()
 
 
-def test_should_return_first_five_obs_schedule_classs(test_app: TestClient):
-    response = test_app.get("/api/climsoft/v1/obs-schedule-class", params={"limit": 5})
+def test_should_return_first_five_obs_schedule_classs(test_app: TestClient, get_access_token: str):
+    response = test_app.get("/api/climsoft/v1/obs-schedule-class", params={"limit": 5}, headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 5
@@ -81,8 +117,10 @@ def test_should_return_first_five_obs_schedule_classs(test_app: TestClient):
         isinstance(s, obsscheduleclass_schema.ObsScheduleClass)
 
 
-def test_should_return_single_obs_schedule_class(test_app: TestClient, get_obs_schedule_class: climsoft_models.Obsscheduleclas):
-    response = test_app.get(f"/api/climsoft/v1/obs-schedule-class/{get_obs_schedule_class.scheduleClass}")
+def test_should_return_single_obs_schedule_class(test_app: TestClient, get_obs_schedule_class: climsoft_models.Obsscheduleclas, get_access_token: str):
+    response = test_app.get(f"/api/climsoft/v1/obs-schedule-class/{get_obs_schedule_class.scheduleClass}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -90,9 +128,11 @@ def test_should_return_single_obs_schedule_class(test_app: TestClient, get_obs_s
         isinstance(s, obsscheduleclass_schema.ObsScheduleClass)
 
 
-def test_should_create_a_obs_schedule_class(test_app: TestClient, get_station: climsoft_models.Station):
+def test_should_create_a_obs_schedule_class(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     obs_schedule_class_data = climsoft_obs_schedule_class.get_valid_obs_schedule_class_input(station_id=get_station.stationId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str))
+    response = test_app.post("/api/climsoft/v1/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data["result"]) == 1
@@ -100,30 +140,38 @@ def test_should_create_a_obs_schedule_class(test_app: TestClient, get_station: c
         isinstance(s, obsscheduleclass_schema.ObsScheduleClass)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station):
+def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     obs_schedule_class_data = climsoft_obs_schedule_class.get_valid_obs_schedule_class_input(station_id=get_station.stationId).dict()
-    response = test_app.post("/api/climsoft/v1/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str))
+    response = test_app.post("/api/climsoft/v1/obs-schedule-class", data=json.dumps(obs_schedule_class_data, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 422
 
 
-def test_should_update_obs_schedule_class(test_app: TestClient, get_obs_schedule_class: climsoft_models.Obsscheduleclas):
+def test_should_update_obs_schedule_class(test_app: TestClient, get_obs_schedule_class: climsoft_models.Obsscheduleclas, get_access_token: str):
     obs_schedule_class_data = obsscheduleclass_schema.ObsScheduleClass.from_orm(get_obs_schedule_class).dict(by_alias=True)
     obs_schedule_class_id = obs_schedule_class_data.pop("schedule_class")
     updates = {**obs_schedule_class_data, "description": "updated description"}
-    response = test_app.put(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}", data=json.dumps(updates, default=str))
+    response = test_app.put(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}", data=json.dumps(updates, default=str), headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     response_data = response.json()
 
     assert response.status_code == 200
     assert response_data["result"][0]["description"] == updates["description"]
 
 
-def test_should_delete_obs_schedule_class(test_app: TestClient, get_obs_schedule_class):
+def test_should_delete_obs_schedule_class(test_app: TestClient, get_obs_schedule_class, get_access_token: str):
     obs_schedule_class_data = obsscheduleclass_schema.ObsScheduleClass.from_orm(get_obs_schedule_class).dict(by_alias=True)
     obs_schedule_class_id = obs_schedule_class_data.pop("schedule_class")
 
-    response = test_app.delete(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}")
+    response = test_app.delete(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}")
+    response = test_app.get(f"/api/climsoft/v1/obs-schedule-class/{obs_schedule_class_id}", headers={
+        "Authorization": f"Bearer {get_access_token}"
+    })
 
     assert response.status_code == 404
