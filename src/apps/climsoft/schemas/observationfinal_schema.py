@@ -1,6 +1,6 @@
 import datetime
 from typing import List, Optional
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, StrictStr
 from src.apps.climsoft.schemas import Response, obselement_schema, station_schema
 
 
@@ -31,7 +31,7 @@ field_names_all = {
 class CreateObservationFinal(BaseModel):
     recordedFrom: constr(max_length=255)
     describedBy: int
-    obsDatetime: str
+    obsDatetime: StrictStr
     qcStatus: int
     acquisitionType: int
     obsLevel: constr(max_length=255)

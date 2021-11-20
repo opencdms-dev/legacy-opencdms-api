@@ -14,8 +14,8 @@ class CreateStation(BaseModel):
     elevation: constr(max_length=255)
     geoLocationMethod: Optional[constr(max_length=255)]
     geoLocationAccuracy: Optional[float]
-    openingDatetime: Optional[datetime.datetime]
-    closingDatetime: datetime.datetime
+    openingDatetime: Optional[str]
+    closingDatetime: str
     country: constr(max_length=50)
     authority: Optional[constr(max_length=255)]
     adminRegion: Optional[constr(max_length=255)]
@@ -50,8 +50,8 @@ class UpdateStation(BaseModel):
     elevation: constr(max_length=255)
     geoLocationMethod: Optional[constr(max_length=255)]
     geoLocationAccuracy: Optional[float]
-    openingDatetime: Optional[datetime.datetime]
-    closingDatetime: datetime.datetime
+    openingDatetime: Optional[str]
+    closingDatetime: str
     country: constr(max_length=50)
     authority: Optional[constr(max_length=255)]
     adminRegion: Optional[constr(max_length=255)]
