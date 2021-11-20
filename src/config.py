@@ -1,5 +1,6 @@
 import os
 
+
 class AppConfig:
     BASE_DIR: str = os.path.dirname(os.path.abspath(__file__))
     APP_SECRET: str = os.getenv(

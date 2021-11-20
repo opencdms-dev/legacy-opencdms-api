@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, constr
 from src.apps.climsoft.schemas import Response, obselement_schema, station_schema
 
@@ -37,15 +37,15 @@ class CreateObservationFinal(BaseModel):
     obsLevel: constr(max_length=255)
     obsValue: constr(max_length=255)
     flag: constr(max_length=255)
-    period: int
-    qcTypeLog: str
-    dataForm: constr(max_length=255)
-    capturedBy: constr(max_length=255)
-    mark: bool
-    temperatureUnits: constr(max_length=255)
-    precipitationUnits: constr(max_length=255)
-    cloudHeightUnits: constr(max_length=255)
-    visUnits: constr(max_length=255)
+    period: Optional[int]
+    qcTypeLog: Optional[str]
+    dataForm: Optional[constr(max_length=255)]
+    capturedBy: Optional[constr(max_length=255)]
+    mark: Optional[bool]
+    temperatureUnits: Optional[constr(max_length=255)]
+    precipitationUnits: Optional[constr(max_length=255)]
+    cloudHeightUnits: Optional[constr(max_length=255)]
+    visUnits: Optional[constr(max_length=255)]
     dataSourceTimeZone: int
 
     class Config:
@@ -58,15 +58,15 @@ class UpdateObservationFinal(BaseModel):
     obsLevel: constr(max_length=255)
     obsValue: constr(max_length=255)
     flag: constr(max_length=255)
-    period: int
-    qcTypeLog: str
-    dataForm: constr(max_length=255)
-    capturedBy: constr(max_length=255)
-    mark: bool
-    temperatureUnits: constr(max_length=255)
-    precipitationUnits: constr(max_length=255)
-    cloudHeightUnits: constr(max_length=255)
-    visUnits: constr(max_length=255)
+    period: Optional[int]
+    qcTypeLog: Optional[str]
+    dataForm: Optional[constr(max_length=255)]
+    capturedBy: Optional[constr(max_length=255)]
+    mark: Optional[bool]
+    temperatureUnits: Optional[constr(max_length=255)]
+    precipitationUnits: Optional[constr(max_length=255)]
+    cloudHeightUnits: Optional[constr(max_length=255)]
+    visUnits: Optional[constr(max_length=255)]
     dataSourceTimeZone: int
 
     class Config:

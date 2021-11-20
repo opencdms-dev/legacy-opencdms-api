@@ -1,25 +1,25 @@
 import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, constr
 
 
 class CreateStation(BaseModel):
     stationId: constr(max_length=255)
     stationName: constr(max_length=255)
-    wmoid: constr(max_length=20)
-    icaoid: constr(max_length=20)
+    wmoid: Optional[constr(max_length=20)]
+    icaoid: Optional[constr(max_length=20)]
     latitude: float
-    qualifier: constr(max_length=20)
+    qualifier: Optional[constr(max_length=20)]
     longitude: float
     elevation: constr(max_length=255)
-    geoLocationMethod: constr(max_length=255)
-    geoLocationAccuracy: float
-    openingDatetime: datetime.datetime
+    geoLocationMethod: Optional[constr(max_length=255)]
+    geoLocationAccuracy: Optional[float]
+    openingDatetime: Optional[datetime.datetime]
     closingDatetime: datetime.datetime
     country: constr(max_length=50)
-    authority: constr(max_length=255)
-    adminRegion: constr(max_length=255)
-    drainageBasin: constr(max_length=255)
+    authority: Optional[constr(max_length=255)]
+    adminRegion: Optional[constr(max_length=255)]
+    drainageBasin: Optional[constr(max_length=255)]
     wacaSelection: bool
     cptSelection: bool
     stationOperational: bool
@@ -42,20 +42,20 @@ class CreateStation(BaseModel):
 
 class UpdateStation(BaseModel):
     stationName: constr(max_length=255)
-    wmoid: constr(max_length=20)
-    icaoid: constr(max_length=20)
+    wmoid: Optional[constr(max_length=20)]
+    icaoid: Optional[constr(max_length=20)]
     latitude: float
-    qualifier: constr(max_length=20)
+    qualifier: Optional[constr(max_length=20)]
     longitude: float
     elevation: constr(max_length=255)
-    geoLocationMethod: constr(max_length=255)
-    geoLocationAccuracy: float
-    openingDatetime: datetime.datetime
+    geoLocationMethod: Optional[constr(max_length=255)]
+    geoLocationAccuracy: Optional[float]
+    openingDatetime: Optional[datetime.datetime]
     closingDatetime: datetime.datetime
     country: constr(max_length=50)
-    authority: constr(max_length=255)
-    adminRegion: constr(max_length=255)
-    drainageBasin: constr(max_length=255)
+    authority: Optional[constr(max_length=255)]
+    adminRegion: Optional[constr(max_length=255)]
+    drainageBasin: Optional[constr(max_length=255)]
     wacaSelection: bool
     cptSelection: bool
     stationOperational: bool
@@ -76,6 +76,9 @@ class UpdateStation(BaseModel):
 
 
 class Station(CreateStation):
+    openingDatetime: Optional[str]
+    closingDatetime: str
+
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
