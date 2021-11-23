@@ -7,7 +7,7 @@ from src.apps.climsoft.db.engine import SessionLocal
 
 
 router = APIRouter(
-    prefix="/api/v1/climsoft",
+    prefix="/api/climsoft/v1",
     tags=["climsoft"]
 )
 
