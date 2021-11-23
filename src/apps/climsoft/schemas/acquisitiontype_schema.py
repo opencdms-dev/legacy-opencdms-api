@@ -1,4 +1,6 @@
+from typing import List
 from pydantic import BaseModel
+from src.common_schemas import Response
 
 
 class CreateAcquisitionType(BaseModel):
@@ -15,5 +17,8 @@ class AcquisitionType(CreateAcquisitionType):
     class Config:
         orm_mode = True
 
+
+class AcquisitionTypeResponse(Response):
+    result: List[AcquisitionType]
 
 
