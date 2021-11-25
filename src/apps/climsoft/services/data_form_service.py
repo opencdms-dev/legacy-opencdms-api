@@ -45,9 +45,9 @@ def create(db_session: Session, data: data_form_schema.CreateDataForm) -> data_f
         raise FailedCreatingDataForm("Failed creating data_form.")
 
 
-def get(db_session: Session, data_form_id: str) -> data_form_schema.DataForm:
+def get(db_session: Session, form_name: str) -> data_form_schema.DataForm:
     try:
-        data_form = db_session.query(models.DataForm).filter_by(data_formId=data_form_id).first()
+        data_form = db_session.query(models.DataForm).filter_by(data_formId=form_name).first()
 
         if not data_form:
             raise HTTPException(status_code=404, detail="DataForm does not exist.")
