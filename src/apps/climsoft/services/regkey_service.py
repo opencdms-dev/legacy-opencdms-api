@@ -45,9 +45,9 @@ def create(db_session: Session, data: regkey_schema.CreateRegKey) -> regkey_sche
         raise FailedCreatingRegKey("Failed creating reg_key.")
 
 
-def get(db_session: Session, code: str) -> regkey_schema.RegKey:
+def get(db_session: Session, key_name: str) -> regkey_schema.RegKey:
     try:
-        reg_key = db_session.query(models.Regkey).filter_by(code=code).first()
+        reg_key = db_session.query(models.Regkey).filter_by(key_name=key_name).first()
 
         if not reg_key:
             raise HTTPException(status_code=404, detail="RegKey does not exist.")
@@ -91,11 +91,11 @@ def query(
         raise FailedGettingRegKeyList("Failed getting reg key list.")
 
 
-def update(db_session: Session, code: str, updates: regkey_schema.UpdateRegKey) -> regkey_schema.RegKey:
+def update(db_session: Session, key_name: str, updates: regkey_schema.UpdateRegKey) -> regkey_schema.RegKey:
     try:
-        db_session.query(models.Regkey).filter_by(code=code).update(updates.dict())
+        db_session.query(models.Regkey).filter_by(key_name=key_name).update(updates.dict())
         db_session.commit()
-        updated_reg_key = db_session.query(models.Regkey).filter_by(code=code).first()
+        updated_reg_key = db_session.query(models.Regkey).filter_by(key_name=key_name).first()
         return regkey_schema.RegKey.from_orm(updated_reg_key)
     except Exception as e:
         db_session.rollback()
@@ -103,9 +103,9 @@ def update(db_session: Session, code: str, updates: regkey_schema.UpdateRegKey) 
         raise FailedUpdatingRegKey("Failed updating reg key")
 
 
-def delete(db_session: Session, code: str) -> bool:
+def delete(db_session: Session, key_name: str) -> bool:
     try:
-        db_session.query(models.Regkey).filter_by(code=code).delete()
+        db_session.query(models.Regkey).filter_by(key_name=key_name).delete()
         db_session.commit()
         return True
     except Exception as e:
