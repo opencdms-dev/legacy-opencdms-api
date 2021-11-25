@@ -35,7 +35,7 @@ class QCStatusDefinitionDoesNotExist(Exception):
 
 def create(db_session: Session, data: qcstatusdefinition_schema.CreateQCStatusDefinition) -> qcstatusdefinition_schema.QCStatusDefinition:
     try:
-        qc_status_definition = models.Paperarchivedefinition(**data.dict())
+        qc_status_definition = models.Qcstatusdefinition(**data.dict())
         db_session.add(qc_status_definition)
         db_session.commit()
         return qcstatusdefinition_schema.QCStatusDefinition.from_orm(qc_status_definition)
@@ -47,7 +47,7 @@ def create(db_session: Session, data: qcstatusdefinition_schema.CreateQCStatusDe
 
 def get(db_session: Session, code: str) -> qcstatusdefinition_schema.QCStatusDefinition:
     try:
-        qc_status_definition = db_session.query(models.Paperarchivedefinition).filter_by(code=code).first()
+        qc_status_definition = db_session.query(models.Qcstatusdefinition).filter_by(code=code).first()
 
         if not qc_status_definition:
             raise HTTPException(status_code=404, detail="QCStatusDefinition does not exist.")
@@ -73,13 +73,13 @@ def query(
 
     """
     try:
-        q = db_session.query(models.Paperarchivedefinition)
+        q = db_session.query(models.Qcstatusdefinition)
 
         if code is not None:
             q = q.filter_by(code=code)
 
         if description is not None:
-            q = q.filter(models.Paperarchivedefinition.description.ilike(f"%{description}%"))
+            q = q.filter(models.Qcstatusdefinition.description.ilike(f"%{description}%"))
 
         return [qcstatusdefinition_schema.QCStatusDefinition.from_orm(s) for s in q.offset(offset).limit(limit).all()]
     except Exception as e:
@@ -89,9 +89,9 @@ def query(
 
 def update(db_session: Session, code: str, updates: qcstatusdefinition_schema.UpdateQCStatusDefinition) -> qcstatusdefinition_schema.QCStatusDefinition:
     try:
-        db_session.query(models.Paperarchivedefinition).filter_by(code=code).update(updates.dict())
+        db_session.query(models.Qcstatusdefinition).filter_by(code=code).update(updates.dict())
         db_session.commit()
-        updated_qc_status_definition = db_session.query(models.Paperarchivedefinition).filter_by(code=code).first()
+        updated_qc_status_definition = db_session.query(models.Qcstatusdefinition).filter_by(code=code).first()
         return qcstatusdefinition_schema.QCStatusDefinition.from_orm(updated_qc_status_definition)
     except Exception as e:
         db_session.rollback()
@@ -101,7 +101,7 @@ def update(db_session: Session, code: str, updates: qcstatusdefinition_schema.Up
 
 def delete(db_session: Session, code: str) -> bool:
     try:
-        db_session.query(models.Paperarchivedefinition).filter_by(code=code).delete()
+        db_session.query(models.Qcstatusdefinition).filter_by(code=code).delete()
         db_session.commit()
         return True
     except Exception as e:
