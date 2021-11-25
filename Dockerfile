@@ -4,6 +4,7 @@ RUN apt-get update -y \
     && apt-get install -y build-essential gcc git python3-dev g++ libffi-dev
 
 RUN apt-get install -y libssl-dev libmariadb-dev libpq-dev
+RUN apt-get install -y binutils libproj-dev gdal-bin
 
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt

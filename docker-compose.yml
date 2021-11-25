@@ -48,4 +48,8 @@ services:
     environment:
       - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
       - AUTH_DB_URI=postgresql+psycopg2://postgres:password@authdb/auth
-      - SURFACE_DB_URI=postgresql+psycopg2://postgres:password@surfacedb/surface
+      - SURFACE_DB_NAME=surface
+      - SURFACE_DB_USER=postgres
+      - SURFACE_DB_PASSWORD=password
+      - SURFACE_DB_HOST=surfacedb
+      - SURFACE_DB_PORT=5432
