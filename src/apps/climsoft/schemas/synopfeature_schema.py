@@ -4,7 +4,7 @@ from src.common_schemas import Response
 
 
 class CreateSynopFeature(BaseModel):
-    abbreviation: int
+    abbreviation: str
     description: constr(max_length=255)
 
 
