@@ -25,16 +25,9 @@ async def get_db() -> Session:
 @router.get("/feature-geographical-positions", response_model=featuregeographicalposition_schema.FeatureGeographicalPositionResponse)
 def get_feature_geographical_positions(
         belongs_to: str = None,
-        feature_geographical_position_name: str = None,
-        serial_number: str = None,
-        abbreviation: str = None,
-        model: str = None,
-        manufacturer: str = None,
-        feature_geographical_position_uncertainty: float = None,
-        installation_datetime: str = None,
-        uninstallation_datetime: str = None,
-        height: str = None,
-        station_id: str = None,
+        observed_on: str = None,
+        latitude: float = None,
+        longitude: float = None,
         limit: int = 25,
         offset: int = 0,
         db_session: Session = Depends(get_db)
@@ -43,16 +36,9 @@ def get_feature_geographical_positions(
         feature_geographical_positions = featuregeographicalposition_service.query(
             db_session=db_session,
             belongs_to=belongs_to,
-            feature_geographical_position_name=feature_geographical_position_name,
-            serial_number=serial_number,
-            abbreviation=abbreviation,
-            model=model,
-            manufacturer=manufacturer,
-            feature_geographical_position_uncertainty=feature_geographical_position_uncertainty,
-            installation_datetime=installation_datetime,
-            uninstallation_datetime=uninstallation_datetime,
-            height=height,
-            station_id=station_id,
+            observed_on=observed_on,
+            latitude=latitude,
+            longitude=longitude,
             limit=limit,
             offset=offset
         )
