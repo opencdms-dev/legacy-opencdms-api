@@ -22,18 +22,11 @@ async def get_db() -> Session:
         db.close()
 
 
-@router.get("/data-forms", response_model=flag_schema.FlagResponse)
+@router.get("/flags", response_model=flag_schema.FlagResponse)
 def get_flags(
-        order_num: int = None,
-        table_name: str = None,
-        form_name: str = None,
+        character_symbol: str = None,
+        num_symbol: int = None,
         description: str = None,
-        selected: bool = None,
-        val_start_position: int = None,
-        val_end_position: int = None,
-        elem_code_location: str = None,
-        sequencer: str = None,
-        entry_mode: bool = None,
         limit: int = 25,
         offset: int = 0,
         db_session: Session = Depends(get_db)
@@ -41,16 +34,9 @@ def get_flags(
     try:
         flags = flag_service.query(
             db_session=db_session,
-            order_num=order_num,
-            table_name=table_name,
-            form_name=form_name,
+            character_symbol=character_symbol,
+            num_symbol=num_symbol,
             description=description,
-            selected=selected,
-            val_start_position=val_start_position,
-            val_end_position=val_end_position,
-            elem_code_location=elem_code_location,
-            sequencer=sequencer,
-            entry_mode=entry_mode,
             limit=limit,
             offset=offset
         )
@@ -60,11 +46,11 @@ def get_flags(
         return get_error_response(message=str(e))
 
 
-@router.get("/data-forms/{form_name}", response_model=flag_schema.FlagResponse)
-def get_flag_by_id(form_name: str, db_session: Session = Depends(get_db)):
+@router.get("/flags/{character_symbol}", response_model=flag_schema.FlagResponse)
+def get_flag_by_id(character_symbol: str, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[flag_service.get(db_session=db_session, form_name=form_name)],
+            result=[flag_service.get(db_session=db_session, character_symbol=character_symbol)],
             message="Successfully fetched flag."
         )
     except flag_service.FailedGettingFlag as e:
@@ -73,7 +59,7 @@ def get_flag_by_id(form_name: str, db_session: Session = Depends(get_db)):
         )
 
 
-@router.post("/data-forms", response_model=flag_schema.FlagResponse)
+@router.post("/flags", response_model=flag_schema.FlagResponse)
 def create_flag(data: flag_schema.CreateFlag, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
@@ -86,11 +72,11 @@ def create_flag(data: flag_schema.CreateFlag, db_session: Session = Depends(get_
         )
 
 
-@router.put("/data-forms/{form_name}", response_model=flag_schema.FlagResponse)
-def update_flag(form_name: str, data: flag_schema.UpdateFlag, db_session: Session = Depends(get_db)):
+@router.put("/flags/{character_symbol}", response_model=flag_schema.FlagResponse)
+def update_flag(character_symbol: str, data: flag_schema.UpdateFlag, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
-            result=[flag_service.update(db_session=db_session, form_name=form_name, updates=data)],
+            result=[flag_service.update(db_session=db_session, character_symbol=character_symbol, updates=data)],
             message="Successfully updated flag."
         )
     except flag_service.FailedUpdatingFlag as e:
@@ -99,10 +85,10 @@ def update_flag(form_name: str, data: flag_schema.UpdateFlag, db_session: Sessio
         )
 
 
-@router.delete("/data-forms/{form_name}", response_model=flag_schema.FlagResponse)
-def delete_flag(form_name: str, db_session: Session = Depends(get_db)):
+@router.delete("/flags/{character_symbol}", response_model=flag_schema.FlagResponse)
+def delete_flag(character_symbol: str, db_session: Session = Depends(get_db)):
     try:
-        flag_service.delete(db_session=db_session, form_name=form_name)
+        flag_service.delete(db_session=db_session, character_symbol=character_symbol)
         return get_success_response(
             result=[],
             message="Successfully deleted flag."

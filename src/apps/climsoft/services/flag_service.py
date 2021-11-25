@@ -63,8 +63,8 @@ def get(db_session: Session, character_symbol: str) -> flag_schema.Flag:
 def query(
         db_session: Session,
         character_symbol: str = None,
-        num_symbol: str = None,
-        description: bool = None,
+        num_symbol: int = None,
+        description: str = None,
         limit: int = 25,
         offset: int = 0
 ) -> List[flag_schema.Flag]:
