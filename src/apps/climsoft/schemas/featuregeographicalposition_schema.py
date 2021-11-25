@@ -29,8 +29,6 @@ class UpdateFeatureGeographicalPosition(BaseModel):
 
 
 class FeatureGeographicalPosition(CreateFeatureGeographicalPosition):
-    synopfeature: synopfeature_schema.SynopFeature
-
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
@@ -38,4 +36,16 @@ class FeatureGeographicalPosition(CreateFeatureGeographicalPosition):
             "belongsTo": "belongs_to",
             "observedOn": "observed_on"
         }
+
+
+class FeatureGeographicalPositionWithSynopFeature(FeatureGeographicalPosition):
+    synopfeature: synopfeature_schema.SynopFeature
+
+
+class FeatureGeographicalPositionResponse(Response):
+    result: List[FeatureGeographicalPosition]
+
+
+class FeatureGeographicalPositionWithSynopFeatureResponse(Response):
+    result: List[FeatureGeographicalPositionWithSynopFeature]
 
