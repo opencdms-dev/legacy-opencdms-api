@@ -22,7 +22,7 @@ async def get_db() -> Session:
         db.close()
 
 
-@router.get("/station-location-history", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
+@router.get("/station-location-histories", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
 def get_station_location_history(
     belongs_to: str = None,
     station_type: str = None,
@@ -64,7 +64,7 @@ def get_station_location_history(
         return get_error_response(message=str(e))
 
 
-@router.get("/station-location-history/{belongs_to}/{opening_datetime}", response_model=stationlocationhistory_schema.StationLocationHistoryWithStationResponse)
+@router.get("/station-location-histories/{belongs_to}/{opening_datetime}", response_model=stationlocationhistory_schema.StationLocationHistoryWithStationResponse)
 def get_station_location_history_by_id(belongs_to: str, opening_datetime: str, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
@@ -77,7 +77,7 @@ def get_station_location_history_by_id(belongs_to: str, opening_datetime: str, d
         )
 
 
-@router.post("/station-location-history", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
+@router.post("/station-location-histories", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
 def create_station_location_history(data: stationlocationhistory_schema.CreateStationLocationHistory, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
@@ -90,7 +90,7 @@ def create_station_location_history(data: stationlocationhistory_schema.CreateSt
         )
 
 
-@router.put("/station-location-history/{belongs_to}/{opening_datetime}", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
+@router.put("/station-location-histories/{belongs_to}/{opening_datetime}", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
 def update_station_location_history(belongs_to: str, opening_datetime: str, data: stationlocationhistory_schema.UpdateStationLocationHistory, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
@@ -103,7 +103,7 @@ def update_station_location_history(belongs_to: str, opening_datetime: str, data
         )
 
 
-@router.delete("/station-location-history/{belongs_to}/{opening_datetime}", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
+@router.delete("/station-location-histories/{belongs_to}/{opening_datetime}", response_model=stationlocationhistory_schema.StationLocationHistoryResponse)
 def delete_station_location_history(belongs_to: str, opening_datetime: str, db_session: Session = Depends(get_db)):
     try:
         stationlocationhistory_service.delete(db_session=db_session, belongs_to=belongs_to, opening_datetime=opening_datetime)
