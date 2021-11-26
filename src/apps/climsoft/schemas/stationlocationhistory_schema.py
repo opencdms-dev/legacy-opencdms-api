@@ -1,3 +1,5 @@
+import datetime
+
 from src.apps.climsoft.schemas import station_schema
 from pydantic import BaseModel, constr
 from src.common_schemas import Response
@@ -53,10 +55,12 @@ class UpdateStationLocationHistory(BaseModel):
 
 
 class StationLocationHistory(BaseModel):
+    belongsTo: constr(max_length=255)
+    openingDatetime: datetime.datetime
     stationType: constr(max_length=255)
     geoLocationMethod: constr(max_length=255)
     geoLocationAccuracy: float
-    closingDatetime: str
+    closingDatetime: datetime.datetime
     latitude: float
     longitude: float
     elevation: int
