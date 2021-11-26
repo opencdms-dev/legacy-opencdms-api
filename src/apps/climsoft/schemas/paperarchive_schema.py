@@ -8,15 +8,15 @@ from typing import List
 
 class CreatePaperArchive(BaseModel):
     belongsTo: constr(max_length=255)
-    fromDatetime: datetime.datetime
+    formDatetime: str
     image: constr(max_length=255)
-    classifiedInfo: constr(max_length=50)
+    classifiedInto: constr(max_length=50)
 
     class Config:
         fields = {
             "belongsTo": "belongs_to",
-            "fromDatetime": "from_datetime",
-            "classifiedInfo": "classified_info"
+            "formDatetime": "form_datetime",
+            "classifiedInto": "classified_into"
         }
 
 
@@ -25,13 +25,15 @@ class UpdatePaperArchive(BaseModel):
 
 
 class PaperArchive(CreatePaperArchive):
+    formDatetime: datetime.datetime
+
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
         fields = {
             "belongsTo": "belongs_to",
-            "fromDatetime": "from_datetime",
-            "classifiedInfo": "classified_info"
+            "formDatetime": "form_datetime",
+            "classifiedInto": "classified_into"
         }
 
 
