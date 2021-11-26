@@ -48,7 +48,7 @@ def create(db_session: Session, data: stationlocationhistory_schema.CreateStatio
 
 def get(db_session: Session, belongs_to: str, opening_datetime: str) -> stationlocationhistory_schema.StationLocationHistory:
     try:
-        station_location_history = db_session.query(models.Stationlocationhistory).filter_by(featureClass=feature_class).options(joinedload('station')).first()
+        station_location_history = db_session.query(models.Stationlocationhistory).filter_by(belongsTo=belongs_to, openingDatetime=opening_datetime).options(joinedload('station')).first()
 
         if not station_location_history:
             raise HTTPException(status_code=404, detail="StationLocationHistory does not exist.")
