@@ -46,9 +46,9 @@ def create(db_session: Session, data: physicalfeatureclass_schema.CreatePhysical
         raise FailedCreatingPhysicalFeatureClass("Failed creating physical_feature_class.")
 
 
-def get(db_session: Session, belongs_to: str) -> physicalfeatureclass_schema.PhysicalFeatureClass:
+def get(db_session: Session, feature_class: str) -> physicalfeatureclass_schema.PhysicalFeatureClass:
     try:
-        physical_feature_class = db_session.query(models.Physicalfeatureclas).filter_by(belongsTo=belongs_to).options(joinedload('station')).first()
+        physical_feature_class = db_session.query(models.Physicalfeatureclas).filter_by(featureClass=feature_class).options(joinedload('station')).first()
 
         if not physical_feature_class:
             raise HTTPException(status_code=404, detail="PhysicalFeatureClass does not exist.")
@@ -63,10 +63,9 @@ def get(db_session: Session, belongs_to: str) -> physicalfeatureclass_schema.Phy
 
 def query(
         db_session: Session,
-        belongs_to: str = None,
-        observed_on: str = None,
-        latitude: str = None,
-        longitude: str = None,
+        feature_class: str = None,
+        description: str = None,
+        refers_to: str = None,
         limit: int = 25,
         offset: int = 0
 ) -> List[physicalfeatureclass_schema.PhysicalFeatureClass]:
@@ -77,17 +76,14 @@ def query(
     try:
         q = db_session.query(models.Physicalfeatureclas)
 
-        if belongs_to is not None:
-            q = q.filter_by(belongsTo=belongs_to)
+        if feature_class is not None:
+            q = q.filter_by(featureClass=feature_class)
 
-        if observed_on is not None:
-            q = q.filter_by(observedOn=observed_on)
+        if description is not None:
+            q = q.filter(models.Physicalfeatureclas.description.ilike(f"%{description}%"))
 
-        if latitude is not None:
-            q = q.filter_by(latitude=latitude)
-
-        if longitude is not None:
-            q = q.filter_by(longitude=longitude)
+        if refers_to is not None:
+            q = q.filter_by(refers_to=refers_to)
 
         return [physicalfeatureclass_schema.PhysicalFeatureClass.from_orm(s) for s in q.offset(offset).limit(limit).all()]
     except Exception as e:
@@ -95,11 +91,11 @@ def query(
         raise FailedGettingPhysicalFeatureClassList("Failed getting physical_feature_class list.")
 
 
-def update(db_session: Session, belongs_to: str, updates: physicalfeatureclass_schema.UpdatePhysicalFeatureClass) -> physicalfeatureclass_schema.PhysicalFeatureClass:
+def update(db_session: Session, feature_class: str, updates: physicalfeatureclass_schema.UpdatePhysicalFeatureClass) -> physicalfeatureclass_schema.PhysicalFeatureClass:
     try:
-        db_session.query(models.Physicalfeatureclas).filter_by(belongsTo=belongs_to).update(updates.dict())
+        db_session.query(models.Physicalfeatureclas).filter_by(featureClass=feature_class).update(updates.dict())
         db_session.commit()
-        updated_physical_feature_class = db_session.query(models.Physicalfeatureclas).filter_by(belongsTo=belongs_to).first()
+        updated_physical_feature_class = db_session.query(models.Physicalfeatureclas).filter_by(featureClass=feature_class).first()
         return physicalfeatureclass_schema.PhysicalFeatureClass.from_orm(updated_physical_feature_class)
     except Exception as e:
         db_session.rollback()
@@ -107,9 +103,9 @@ def update(db_session: Session, belongs_to: str, updates: physicalfeatureclass_s
         raise FailedUpdatingPhysicalFeatureClass("Failed updating physical_feature_class")
 
 
-def delete(db_session: Session, belongs_to: str) -> bool:
+def delete(db_session: Session, feature_class: str) -> bool:
     try:
-        db_session.query(models.Physicalfeatureclas).filter_by(belongsTo=belongs_to).delete()
+        db_session.query(models.Physicalfeatureclas).filter_by(featureClass=feature_class).delete()
         db_session.commit()
         return True
     except Exception as e:
