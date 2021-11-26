@@ -21,15 +21,7 @@ class CreatePaperArchive(BaseModel):
 
 
 class UpdatePaperArchive(BaseModel):
-    fromDatetime: datetime.datetime
     image: constr(max_length=255)
-    classifiedInfo: constr(max_length=50)
-
-    class Config:
-        fields = {
-            "fromDatetime": "from_datetime",
-            "classifiedInfo": "classified_info"
-        }
 
 
 class PaperArchive(CreatePaperArchive):
