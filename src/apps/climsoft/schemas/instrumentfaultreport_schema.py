@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import BaseModel, constr
 from src.common_schemas import Response
 from typing import List
@@ -6,7 +8,7 @@ from src.apps.climsoft.schemas import station_schema, instrument_schema
 
 class CreateInstrumentFaultReport(BaseModel):
     refersTo: constr(max_length=255)
-    reportId: constr(max_length=255)
+    reportId: int
     reportDatetime: constr(max_length=50)
     faultDescription: constr(max_length=255)
     reportedBy: constr(max_length=255)
@@ -49,6 +51,9 @@ class UpdateInstrumentFaultReport(BaseModel):
 
 
 class InstrumentFaultReport(CreateInstrumentFaultReport):
+    reportDatetime: datetime.datetime
+    receivedDatetime: datetime.datetime
+
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
