@@ -58,6 +58,8 @@ def get(db_session: Session, qualifier: str, qualifier_begin_date: str, qualifie
         if not station_qualifier:
             raise HTTPException(status_code=404, detail="StationQualifier does not exist.")
 
+        print(stationqualifier_schema.StationQualifierWithStation.schema(by_alias=True))
+
         return stationqualifier_schema.StationQualifierWithStation.from_orm(station_qualifier)
     except HTTPException:
         raise
@@ -117,7 +119,12 @@ def update(db_session: Session, qualifier: str, qualifier_begin_date: str, quali
             belongsTo=belongs_to
         ).update(updates.dict())
         db_session.commit()
-        updated_station_qualifier = db_session.query(models.Stationqualifier).filter_by(belongsTo=belongs_to, openingDatetime=opening_datetime).first()
+        updated_station_qualifier = db_session.query(models.Stationqualifier).filter_by(
+            qualifier=qualifier,
+            qualifierBeginDate=qualifier_begin_date,
+            qualifierEndDate=qualifier_end_date,
+            belongsTo=belongs_to
+        ).first()
         return stationqualifier_schema.StationQualifier.from_orm(updated_station_qualifier)
     except Exception as e:
         db_session.rollback()

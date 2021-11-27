@@ -9,7 +9,7 @@ from src.apps.climsoft.schemas import stationqualifier_schema
 fake = Faker()
 
 
-def get_valid_station_location_history_input(station_id: str):
+def get_valid_station_qualifier_input(station_id: str):
     return stationqualifier_schema.StationQualifier(
         qualifier=uuid.uuid4().hex,
         qualifierBeginDate=datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ"),

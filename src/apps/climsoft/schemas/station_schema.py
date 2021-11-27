@@ -82,6 +82,19 @@ class Station(CreateStation):
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
+        fields = {
+            "stationId": "station_id",
+            "stationName": "station_name",
+            "geoLocationMethod": "geolocation_method",
+            "geoLocationAccuracy": "geolocation_accuracy",
+            "openingDatetime": "opening_datetime",
+            "closingDatetime": "closing_datetime",
+            "adminRegion": "admin_region",
+            "drainageBasin": "drainage_basin",
+            "wacaSelection": "waca_selection",
+            "cptSelection": "cpt_selection",
+            "stationOperational": "station_operational"
+        }
 
 
 class StationResponse(BaseModel):
