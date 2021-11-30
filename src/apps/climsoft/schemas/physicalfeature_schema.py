@@ -47,11 +47,11 @@ class PhysicalFeature(CreatePhysicalFeature):
             "endDate": "end_date",
             "classifiedInto": "classified_into",
         }
-        
+
 
 class PhysicalFeatureWithStationAndPhysicalFeatureClass(PhysicalFeature):
     station: station_schema.Station
-    instrument: physicalfeatureclass_schema.PhysicalFeatureClass
+    physicalfeatureclas: physicalfeatureclass_schema.PhysicalFeatureClass
 
 
 class PhysicalFeatureResponse(Response):
