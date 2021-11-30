@@ -48,7 +48,10 @@ def create(db_session: Session, data: faultresolution_schema.CreateFaultResoluti
 
 def get(db_session: Session, resolved_datetime: str, associated_with: str) -> faultresolution_schema.FaultResolution:
     try:
-        fault_resolution = db_session.query(models.Faultresolution).filter_by(resolvedDatetime=resolved_datetime, associatedWith=associated_with).options(joinedload('station')).first()
+        fault_resolution = db_session.query(models.Faultresolution).filter_by(
+            resolvedDatetime=resolved_datetime, 
+            associatedWith=associated_with
+        ).options(joinedload('instrumentfaultreport')).first()
 
         if not fault_resolution:
             raise HTTPException(status_code=404, detail="FaultResolution does not exist.")

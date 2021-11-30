@@ -48,7 +48,7 @@ def get_instrument_inspection(
         return get_error_response(message=str(e))
 
 
-@router.get("/fault-resolutions/{resolved_datetime}/{associated_with}", response_model=faultresolution_schema.FaultResolutionWithStationAndInstrumentResponse)
+@router.get("/fault-resolutions/{resolved_datetime}/{associated_with}", response_model=faultresolution_schema.FaultResolutionWithInstrumentFaultReportResponse)
 def get_instrument_inspection_by_id(resolved_datetime: str, associated_with: str, db_session: Session = Depends(get_db)):
     try:
         return get_success_response(
