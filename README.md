@@ -104,7 +104,7 @@ Additionally, you can run snapshot tests. We have collected a subset of data fro
   - `docker-compose down -v`
   - `docker-compose up climsoft-4.1.1 --build`
   - Go to the project root `opencdms-server`
-  - source venv/bin/activate
-  - export CLIMSOFT_DB_URI=mysql+mysqldb://root:password@127.0.0.1:33308/mariadb_climsoft_test_db_v4
-  - run `pytest tests/snapshot`
+  - `source venv/bin/activate`
+  - `export CLIMSOFT_DB_URI=mysql+mysqldb://root:password@127.0.0.1:33308/mariadb_climsoft_test_db_v4`
+  - `pytest tests/snapshot`
 
