@@ -46,9 +46,16 @@ def create(db_session: Session, data: physicalfeature_schema.CreatePhysicalFeatu
         raise FailedCreatingPhysicalFeature("Failed creating physical_feature.")
 
 
-def get(db_session: Session, performed_on: str, inspection_datetime: str) -> physicalfeature_schema.PhysicalFeature:
+def get(db_session: Session, associated_with: str, begin_date: str, classified_into: str, description: str) -> physicalfeature_schema.PhysicalFeature:
     try:
-        physical_feature = db_session.query(models.Physicalfeature).filter_by(performedOn=performed_on, inspectionDatetime=inspection_datetime).options(joinedload('station')).first()
+        physical_feature = db_session.query(models.Physicalfeature).filter_by(
+            associatedWith=associated_with,
+            beginDate=begin_date,
+            classifiedInto=classified_into,
+            description=description
+        ).options(
+            joinedload('station')
+        ).first()
 
         if not physical_feature:
             raise HTTPException(status_code=404, detail="PhysicalFeature does not exist.")
