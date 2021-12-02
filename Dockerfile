@@ -10,6 +10,8 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
 COPY src /app/src
+COPY mch.dbn /app/mch.dbn
+COPY MCHtablasycampos.def /app/MCHtablasycampos.def
 
 WORKDIR /app
 

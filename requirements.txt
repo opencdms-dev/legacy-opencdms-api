@@ -19,3 +19,4 @@ djantic
 python-multipart
 pytz~=2021.3
 asgiref~=3.4.1
+git+https://github.com/opencdms/mch-api@main#egg=mch_api

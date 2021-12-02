@@ -6,8 +6,14 @@ from src.apps.surface.db.migration import migrate as migrate_surface_db
 from src.utils.controllers import ControllerLoader
 from src.config import app_config
 from src.apps.surface.settings import setup as setup_surface
+from mch_api.api_mch import app as mch_api_application
+from starlette.middleware.wsgi import WSGIMiddleware
+from src.middlewares.auth import WSGIAuthMiddleWare
+
 
 app = FastAPI()
+
+app.mount("/mch", WSGIAuthMiddleWare(WSGIMiddleware(mch_api_application)))
 
 # setup surface
 setup_surface()
