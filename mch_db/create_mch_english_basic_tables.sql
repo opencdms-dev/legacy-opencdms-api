@@ -1,5 +1,3 @@
-CREATE DATABASE IF NOT EXISTS mch_english;
-USE mch_english;
 CREATE TABLE Codes(
     Codee char(10) NOT NULL default "",
     Message char(150),

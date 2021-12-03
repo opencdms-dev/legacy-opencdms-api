@@ -41,8 +41,7 @@ services:
       - "23306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=mch_english
-
+      - MYSQL_DATABASE=mch
 
   opencdms-server:
     build:
@@ -67,7 +66,7 @@ services:
       - SURFACE_DB_PORT=5432
       - MCH_DB_PORT=3306
       - MCH_DB_HOST=mchdb
-      - MCH_DB_NAME=mch_english
+      - MCH_DB_NAME=mch
       - MCH_DB_PASSWORD=password
       - MCH_DB_USER=root
 

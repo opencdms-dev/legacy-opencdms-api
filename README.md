@@ -68,6 +68,13 @@ Services directory contains the business logic
 
 The easiest way to go is running `docker-compose up -d --build`
 
+The MCH database cannot be populated automatically. To populate the MCH database, do the following:
+
+```bash
+$ docker exec -it mchdb bash
+$ mysql -u root -p mch < /scripts/create_mch_english_basic_tables.sql
+```
+
 Also, you can do the following:
 
 ```bash
