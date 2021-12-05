@@ -43,12 +43,12 @@ services:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=mch
 
-  opencdms-server:
+  opencdms-api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: opencdms-server
-    hostname: opencdms-server
+    container_name: opencdms-api
+    hostname: opencdms-api
     ports:
       - "80:5000"
     depends_on:
