@@ -17,10 +17,11 @@ jobs:
 
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME}
-          cd /home/ubuntu/opencdms-api
-          git pull origin master
-          docker-compose up -d --build
-          docker-compose stop opencdms-api
-          sleep 30
-          docker-compose up -d --build
+          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
+            cd /home/ubuntu/opencdms-api
+            git pull origin master
+            docker-compose up -d --build
+            docker-compose stop opencdms-api
+            sleep 30
+            docker-compose up -d --build
+          '
