@@ -21,7 +21,8 @@ jobs:
           rm -rf /home/ubuntu/opencdms-api
           git clone https://github.com/opencdms/opencdms-api.git
           cd /home/ubuntu/opencdms-api
-          docker-compose -f docker-compose.yml up -d --build
+          docker-compose down
+          docker-compose up -d --build
           docker-compose stop opencdms-api
           sleep 30
-          docker-compose -f docker-compose.tml up -d --build
+          docker-compose up -d --build
