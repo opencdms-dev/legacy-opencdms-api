@@ -11,17 +11,18 @@ jobs:
       - uses: actions/checkout@v2
       - name: Deploy in EC2
         env:
-            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-            HOSTNAME : ${{ secrets.HOSTNAME  }}
-            USERNAME : ${{ secrets.USERNAME  }}
+            PRIVATE_KEY: ${{secrets.AWS_PRIVATE_KEY}}
+            HOSTNAME : ${{secrets.HOSTNAME}}
+            USERNAME : ${{secrets.USERNAME}}
 
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME}'
+          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME}
           rm -rf /home/ubuntu/opencdms-api
           git clone https://github.com/opencdms/opencdms-api.git
           cd /home/ubuntu/opencdms-api
-          docker-compose -f docker-compose.yml up -d --build
+          docker-compose down
+          docker-compose up -d --build
           docker-compose stop opencdms-api
           sleep 30
-          docker-compose -f docker-compose.tml up -d --build
+          docker-compose up -d --build
