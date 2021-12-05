@@ -10,6 +10,8 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=auth
+    volumes:
+      - authdb-data:/var/lib/postgresql/data
 
   climsoftdb:
     image: mariadb:10.1
@@ -20,6 +22,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=climsoft
+    volumes:
+      - climsoftdb-data:/var/lib/mysql
 
 
   surfacedb:
@@ -31,6 +35,8 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=surface
+    volumes:
+      - surfacedb-data:/var/lib/postgresql/data
 
   mchdb:
     build:
@@ -42,6 +48,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=mch
+    volumes:
+      - mchdb-data:/var/lib/mysql
 
   opencdms-api:
     build:
@@ -50,7 +58,7 @@ services:
     container_name: opencdms-api
     hostname: opencdms-api
     ports:
-      - "80:5000"
+      - "5000:5000"
     depends_on:
       - authdb
       - climsoftdb
@@ -70,4 +78,25 @@ services:
       - MCH_DB_PASSWORD=password
       - MCH_DB_USER=root
       - APP_SECRET=MGExYmQ4ZDRiNjQ5NGE1YzkxMDFmM2IxMTcxMTYyNjMxOTA5MGQxZGVmYzI0Njk3OWRlNWYyYjZmY2YxNDQ0Y2NiNGYzYzY0ZTg0NjQ0NjU4NzQ4YmJkYTVkZjQzMWI3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+
+  traefik:
+    image: traefik:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
+
+volumes:
+  authdb-data:
+  climsoftdb-data:
+  surfacedb-data:
+  mchdb-data:
+
 
