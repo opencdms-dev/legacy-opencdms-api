@@ -1,4 +1,4 @@
-name: CI/CD counter app
+name: Deploy on EC2
 
 on:
   push:
