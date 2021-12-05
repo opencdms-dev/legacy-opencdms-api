@@ -4,11 +4,14 @@ RUN apt-get update -y \
     && apt-get install -y build-essential gcc git python3-dev g++ libffi-dev
 
 RUN apt-get install -y libssl-dev libmariadb-dev libpq-dev
+RUN apt-get install -y binutils libproj-dev gdal-bin
 
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
 COPY src /app/src
+COPY mch.dbn /app/mch.dbn
+COPY MCHtablasycampos.def /app/MCHtablasycampos.def
 
 WORKDIR /app
 

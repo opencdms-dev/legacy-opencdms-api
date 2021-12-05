@@ -1,4 +1,5 @@
 from faker import Faker
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from src.apps.auth.schemas import auth_schema
 
 
@@ -16,7 +17,8 @@ def get_valid_signup_input():
 
 
 def get_valid_signin_input(username: str, password: str = "password"):
-    return auth_schema.SignInRequest(
+    return OAuth2PasswordRequestForm(
         username=username,
-        password=password
+        password=password,
+        scope=""
     )

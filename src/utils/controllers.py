@@ -3,7 +3,7 @@ import os
 from typing import List
 
 
-class Controllers:
+class ControllerLoader:
     def __init__(self, base_dir: str, apps: List[str]):
         self.base_dirs = {
             app_name: os.path.join(base_dir, f"apps/{app_name}/controllers")

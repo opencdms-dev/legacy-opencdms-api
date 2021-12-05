@@ -23,7 +23,7 @@ services:
 
 
   surfacedb:
-    image: postgres
+    image: timescale/timescaledb-postgis:latest-pg12
     container_name: surfacedb
     hostname: surfacedb
     ports:
@@ -32,6 +32,16 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=surface
 
+  mchdb:
+    build:
+      context: ./mch_db
+      dockerfile: Dockerfile
+    container_name: mchdb
+    ports:
+      - "23306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mch
 
   opencdms-server:
     build:
@@ -40,11 +50,24 @@ services:
     container_name: opencdms-server
     hostname: opencdms-server
     ports:
-      - "8000:5000"
+      - "80:5000"
     depends_on:
       - authdb
       - climsoftdb
       - surfacedb
+      - mchdb
     environment:
       - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
       - AUTH_DB_URI=postgresql+psycopg2://postgres:password@authdb/auth
+      - SURFACE_DB_NAME=surface
+      - SURFACE_DB_USER=postgres
+      - SURFACE_DB_PASSWORD=password
+      - SURFACE_DB_HOST=surfacedb
+      - SURFACE_DB_PORT=5432
+      - MCH_DB_PORT=3306
+      - MCH_DB_HOST=mchdb
+      - MCH_DB_NAME=mch
+      - MCH_DB_PASSWORD=password
+      - MCH_DB_USER=root
+      - APP_SECRET=MGExYmQ4ZDRiNjQ5NGE1YzkxMDFmM2IxMTcxMTYyNjMxOTA5MGQxZGVmYzI0Njk3OWRlNWYyYjZmY2YxNDQ0Y2NiNGYzYzY0ZTg0NjQ0NjU4NzQ4YmJkYTVkZjQzMWI3
+
