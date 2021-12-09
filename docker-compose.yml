@@ -67,6 +67,26 @@ services:
     environment:
       - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
       - AUTH_DB_URI=postgresql+psycopg2://postgres:password@authdb/auth
+      - OPENCDMS_API=True
+      - ENTL_PRIMARY_SERVER_PORT=0
+      - TIMEZONE_OFFSET=0
+      - MAP_LATITUDE=0
+      - MAP_LONGITUDE=0
+      - MAP_ZOOM=6
+      - SPATIAL_ANALYSIS_INITIAL_LATITUDE=-180
+      - SPATIAL_ANALYSIS_INITIAL_LONGITUDE=-180
+      - SPATIAL_ANALYSIS_FINAL_LATITUDE=180
+      - SPATIAL_ANALYSIS_FINAL_LONGITUDE=180
+      - STATION_MAP_WIND_SPEED_ID=0
+      - STATION_MAP_WIND_GUST_ID=0
+      - STATION_MAP_WIND_DIRECTION_ID=0
+      - STATION_MAP_TEMP_MAX_ID=0
+      - STATION_MAP_TEMP_MIN_ID=0
+      - STATION_MAP_TEMP_AVG_ID=0
+      - STATION_MAP_ATM_PRESSURE_ID=0
+      - STATION_MAP_PRECIPITATION_ID=0
+      - STATION_MAP_RELATIVE_HUMIDITY_ID=0
+      - STATION_MAP_SOLAR_RADIATION_ID=0
       - SURFACE_DB_NAME=surface
       - SURFACE_DB_USER=postgres
       - SURFACE_DB_PASSWORD=password
@@ -78,20 +98,21 @@ services:
       - MCH_DB_PASSWORD=password
       - MCH_DB_USER=root
       - APP_SECRET=MGExYmQ4ZDRiNjQ5NGE1YzkxMDFmM2IxMTcxMTYyNjMxOTA5MGQxZGVmYzI0Njk3OWRlNWYyYjZmY2YxNDQ0Y2NiNGYzYzY0ZTg0NjQ0NjU4NzQ4YmJkYTVkZjQzMWI3
+      - SURFACE_SECRET_KEY=MGExYmQ4ZDRiNjQ5NGE1YzkxMDFmM2IxMTcxMTYyNjMxOTA5MGQxZGVmYzI0Njk3OWRlNWYyYjZmY2YxNDQ0Y2NiNGYzYzY0ZTg0NjQ0NjU4NzQ4YmJkYTVkZjQzMWI3
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
-
-  traefik:
-    image: traefik:latest
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
+#
+#  traefik:
+#    image: traefik:latest
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
 
 volumes:
   authdb-data:

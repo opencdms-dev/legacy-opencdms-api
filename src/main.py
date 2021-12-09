@@ -9,11 +9,14 @@ from src.apps.surface.settings import setup as setup_surface
 from mch_api.api_mch import app as mch_api_application
 from starlette.middleware.wsgi import WSGIMiddleware
 from src.middlewares.auth import WSGIAuthMiddleWare
+from surface.api.tempestas_api.wsgi import application as surface_application
 
 
 app = FastAPI()
 
 app.mount("/mch", WSGIAuthMiddleWare(WSGIMiddleware(mch_api_application)))
+app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(surface_application)))
+
 
 # setup surface
 setup_surface()
