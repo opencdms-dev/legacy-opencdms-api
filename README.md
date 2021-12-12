@@ -1,45 +1,117 @@
 # opencdms-server
 
-OpenCDMS server uses Python FastAPI to expose a web interface for `opencdms-app` and other applications.
+OpenCDMS server uses Python FastAPI to expose a web interface for `opencdms-app` and other supported CDMSs.
 
-## Requirements
+### Application architecture
 
-- Docker
-- Docker compose
-- Python 3.9
-- Python virtualenvironment (I use `pyenv`)
+The application is designed to contain smaller child applications with separate set of configuration, i.e. separate database conenction.
+Routes from this child applications will be combined in `src/main.py`
 
-## Dev
+***Directory structure***
 
-- create `.env`, `.surface_db.env` and `.mch_db.env` files
-- Copy contents from `.example.env` to `.env`
-- Copy contents from `.surface_db.example.env` to `.surface_db.env`
-- Copy contents from `.mch_db.example.env` to `.mch_db.env`
-- Activate virtual environment
-- make install
-- make surface_db_upgrade (To run the surface db migration)
-- make surface_db_load_initial_data (To load the surface db with initial data)
-- make serve (To start development server)
-- visit `localhost:5070/docs` for swagger api documentation
-- Surface api is mounted on path `localhost:5070/surface/*`
-- Mch api is mounted on path `localhost:5070/mch/*`
+The root directory has two main directories:
+- `src` : Contains all the applications/CDMS wrappers
+- `tests` : Contains all the tests
 
-`.surface_db.env` file sets the credentials for the surface postgres database
-`.mch_db.env` file sets the credentials for the mch mysql database
+Apart from these two directories we also have a docker-compose file contianing:
 
-### NOTE
+- `auth-db` service which is used for authentication
+- `climsoft-db` service which should be used for storing Climsoft CDMS data
+- `surface-db` service which should be used for storing Surface CDMS data
+- `opencdms-server` is the application we are developing
 
-In `docker-compose.yml` , `opencdms_api` service mounts the code directory into the container. Therefore the work directory
-in the container will match your code structure. This means, if you don't have the `surface` project cloned, it would be removed
-from the container once your volume is mounted.
-For the surface api to work, with volume mounting, run `git clone https://github.com/Shaibujnr/surface.git surface`.
-This will create a surface folder and clone the surface django project into it.
+There is also a `Dockerfile` where we have defined the docker image for `opencdms-server` service
 
-Alternatively: comment out the volume mounting (This will prevent reload on code change) and the cloned `surface` project
-from the image would still be in the workdir.
+*Project root*
+```
+.
+├── docker-compose.yml
+├── Dockerfile
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── src
+│   ├── apps
+│   ├── db
+│   ├── main.py
+│   └── utils
+└── tests
+    ├── app-name
+    ├── ...other apps...
+    ├── conftest.py
+    └── datagen
 
-## Serve
+```
 
-Run `make serve` to start dev server
-Visit `http://localhost:5070/docs`
-Run `make test` to run test
+In the app specific directory, the file structure is like below
+
+*App root*
+
+```
+.
+├── controllers
+├── db
+├── schemas
+└── services
+
+```
+
+Controllers directory holds all the routes that we define. Routes are meant to handle application logic, i.e. authorization, data validation etc.
+
+DB directory contains the DB configuration for respective app
+
+Schemas directory contains all the DTOs defined as Pydantic Model
+
+Services directory contains the business logic
+
+### Running Development Server
+
+The easiest way to go is running `docker-compose up -d --build`
+
+The MCH database cannot be populated automatically. To populate the MCH database, do the following:
+
+```bash
+$ docker exec -it mchdb bash
+$ mysql -u root -p mch < /scripts/create_mch_english_basic_tables.sql
+```
+
+Also, you can do the following:
+
+```bash
+$ pip3 install virtualenv 
+$ virtualenv venv 
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Note: You have to run database instance separately. Go to this repository for detail. https://github.com/opencdms/opencdms-test-data
+
+
+### Running The Tests
+
+Each master release should pass all the tests. To check if the tests are as expected or to add new feature or to fix some issue, you can run the tests on your own.
+
+Follow these steps:
+
+```bash
+$ pip3 install virtualenv 
+$ virtualenv venv 
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ docker-compose down -v
+$ docker-compose up -d --build
+$ pytest tests/integration
+```
+
+Additionally, you can run snapshot tests. We have collected a subset of data from production climsoft instance and we will run query on them to check if we are getting expected result.
+
+  - From outside your project, run `git clone https://github.com/opencdms/opencdms-test-data`
+  - `cd opencdms-test-data`
+  - `docker-compose down -v`
+  - `docker-compose up climsoft-4.1.1 --build`
+  - Go to the project root `opencdms-server`
+  - `source venv/bin/activate`
+  - `export CLIMSOFT_DB_URI=mysql+mysqldb://root:password@127.0.0.1:33308/mariadb_climsoft_test_db_v4`
+  - `pytest tests/snapshot`
+

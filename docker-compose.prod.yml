@@ -1,0 +1,74 @@
+version: "3"
+
+services:
+  opencdms_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: opencdms_api
+    ports:
+      - "5070:5000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/code/surface/api
+    depends_on:
+      - opencdms_surfacedb
+      - opencdms_mchdb
+    volumes:
+      - ./src:/code/src
+      - ./surface:/code/surface
+    networks:
+      - opencdms_api_dev_network
+    command:
+      [
+        "uvicorn",
+        "opencdms_api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5000",
+        "--reload",
+        "--use-colors",
+      ]
+
+  opencdms_surfacedb:
+    image: timescale/timescaledb-postgis:2.3.0-pg13
+    container_name: opencdms_surface_db
+    volumes:
+      - opencdms_surface_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=dba
+      - POSTGRES_DB=surface
+      - POSTGRES_USER=dba
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "10"
+    networks:
+      - opencdms_api_dev_network
+
+  opencdms_mchdb:
+    build:
+      context: ./mch_db
+      dockerfile: Dockerfile
+    container_name: opencdms_mch_db
+    volumes:
+      - opencdms_mch_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=mch
+      - MYSQL_ROOT_PASSWORD=root_password
+    networks:
+      - opencdms_api_dev_network
+
+volumes:
+  opencdms_surface_data:
+  opencdms_mch_data:
+
+networks:
+  opencdms_api_dev_network:

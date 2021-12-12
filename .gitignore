@@ -134,3 +134,10 @@ surface
 *.env
 !*.example.env
 data
+.idea
+
+# docker volumes
+authdb-data
+surfacedb-data
+climsoftdb-data
+mchdb-data

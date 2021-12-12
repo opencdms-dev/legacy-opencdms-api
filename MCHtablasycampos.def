@@ -9,7 +9,7 @@
 #     del desarrollo como valor para ese mensaje.
 # La columna 8 es un comentario que puede existir para explicar algo acerca del mensaje
 #
-# Los mensajes pueden ser de tres tipos: 
+# Los mensajes pueden ser de tres tipos:
 #   1) de men�s en la forma principal del sistema,
 #   2) de mensajes en botones de comando, etiquetas o desplegados en la formas
 #   3) de contenidos de algunas cajas compuestas en algunas formas
@@ -464,9 +464,9 @@
 471	campo	ncfechafinh	fechafinh	enddateh	datefin		x
 
 
-################							
-# nombres de tablas							
-################							
+################
+# nombres de tablas
+################
 
 8	tabla	ntCodigos	Codigos	Codes	Codes		x
 9	tabla	ntCuencas	Cuencas	Catchments	BassinVersant		x
@@ -483,7 +483,7 @@
 30	tabla	ntIsolinbitac	Isolinbitac	IsolineLog	IsoligneHabitac		x
 31	tabla	ntLogbitacproc	Logbitacproc	LogProcLog	LogHabProc		x
 32	tabla	ntMapas	Mapas	Maps	Cartes		x
-114	tabla	ntMapasCroquis	MapasCroquis	SketchMaps	CartesCroquis		
+114	tabla	ntMapasCroquis	MapasCroquis	SketchMaps	CartesCroquis
 33	tabla	ntMapasestac	Mapasestac	StationMaps	Cartesstations		x
 34	tabla	ntMapasgrupos	Mapasgrupos	GroupMaps	Cartegroupe		x
 35	tabla	ntMapaspixelgeogr	Mapaspixelgeogr	GeogPixelMaps	Cartepixelgeogr		x
