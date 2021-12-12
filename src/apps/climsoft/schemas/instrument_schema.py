@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel, constr
-from src.apps.climsoft.schemas import station_schema
-from src.apps.climsoft.schemas import Response
+from apps.climsoft.schemas import station_schema
+from apps.climsoft.schemas import Response
 
 
 field_names = {

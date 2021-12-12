@@ -6,9 +6,9 @@ from passlib.hash import django_pbkdf2_sha256 as handler
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.sql import text as sa_text
 
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
-from src.apps.climsoft.schemas import station_schema
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
+from apps.climsoft.schemas import station_schema
 
 fake = Faker()
 

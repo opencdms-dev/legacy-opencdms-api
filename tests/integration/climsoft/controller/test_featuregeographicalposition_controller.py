@@ -4,13 +4,13 @@ import pytest
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
-from src.apps.climsoft.db.engine import db_engine
-from src.apps.climsoft.schemas import featuregeographicalposition_schema
+from apps.climsoft.db.engine import db_engine
+from apps.climsoft.schemas import featuregeographicalposition_schema
 from tests.datagen.climsoft import featuregeographicalposition as climsoft_feature_geographical_position, synopfeature as climsoft_synop_feature
 from faker import Faker
 from fastapi.testclient import TestClient
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 

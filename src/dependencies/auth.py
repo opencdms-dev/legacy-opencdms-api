@@ -1,10 +1,10 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from src.config import app_config
-from src.apps.auth.services import user_service
-from src.apps.auth.db.engine import SessionLocal
-from src.apps.auth.schemas import auth_schema
+from config import app_config
+from apps.auth.services import user_service
+from apps.auth.db.engine import SessionLocal
+from apps.auth.schemas import auth_schema
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/v1/sign-in")

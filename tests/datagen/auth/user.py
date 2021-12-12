@@ -1,6 +1,6 @@
 from faker import Faker
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from src.apps.auth.schemas import auth_schema
+from apps.auth.schemas import auth_schema
 
 
 fake = Faker()

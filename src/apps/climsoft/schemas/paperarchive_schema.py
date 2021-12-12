@@ -1,8 +1,8 @@
 import datetime
 
 from pydantic import BaseModel, constr
-from src.common_schemas import Response
-from src.apps.climsoft.schemas import station_schema, paperarchivedefinition_schema
+from common_schemas import Response
+from apps.climsoft.schemas import station_schema, paperarchivedefinition_schema
 from typing import List
 
 

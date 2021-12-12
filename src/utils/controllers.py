@@ -16,7 +16,7 @@ class ControllerLoader:
             files = [f for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f)) and f != "__init__.py"]
             for f in files:
                 _controller_name = os.path.splitext(f)[0]
-                _module = __import__(f"src.apps.{app_name}.controllers", fromlist=[_controller_name])
+                _module = __import__(f"apps.{app_name}.controllers", fromlist=[_controller_name])
 
                 try:
                     logging.info(f"Loading {_module}, {_controller_name}")

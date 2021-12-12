@@ -75,7 +75,7 @@ services:
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
-    command: ["pytest", "tests/integration"]
+    command: ["pytest", "-s"]
 
     networks:
       - test_opencdms_api_test_network

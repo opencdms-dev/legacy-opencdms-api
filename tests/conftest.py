@@ -1,9 +1,12 @@
 from fastapi.applications import FastAPI
 import pytest
+import sys
 from datetime import datetime, timedelta
 from jose import jwt
 from typing import Dict, Generator
-
+print("\n\n\n")
+print(sys.path)
+print("\n\n\n")
 from sqlalchemy.orm.session import Session
 from opencdms_api.db import SessionLocal
 from opencdms_api.models import AuthUser

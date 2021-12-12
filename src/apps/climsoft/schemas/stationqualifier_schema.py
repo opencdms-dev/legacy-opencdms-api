@@ -1,7 +1,7 @@
 from pydantic import BaseModel, constr
-from src.common_schemas import Response
+from common_schemas import Response
 from typing import List
-from src.apps.climsoft.schemas import station_schema
+from apps.climsoft.schemas import station_schema
 
 
 class CreateStationQualifier(BaseModel):

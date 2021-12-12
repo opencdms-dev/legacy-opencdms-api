@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel
-from src.common_schemas import Response
+from common_schemas import Response
 
 
 class CreateAcquisitionType(BaseModel):

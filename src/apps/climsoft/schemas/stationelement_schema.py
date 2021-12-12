@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, constr
-from src.apps.climsoft.schemas import instrument_schema, obselement_schema, station_schema, Response, \
+from apps.climsoft.schemas import instrument_schema, obselement_schema, station_schema, Response, \
     obsscheduleclass_schema
 
 field_names = {
