@@ -1,16 +1,16 @@
 from starlette.middleware.wsgi import WSGIMiddleware
 from typing import List
 from opencdms.models.climsoft.v4_1_1_core import Station
-from surface.api.tempestas_api.wsgi import application as surface_application
+from tempestas_api.wsgi import application as surface_application
 
 from mch_api.api_mch import app as mch_api_application
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm.session import Session
 
-from opencdms_server.middelware import WSGIAuthMiddleWare
-from opencdms_server.schema import StationSchema
-from opencdms_server.deps import get_session
-from opencdms_server.router import router
+from opencdms_api.middelware import WSGIAuthMiddleWare
+from opencdms_api.schema import StationSchema
+from opencdms_api.deps import get_session
+from opencdms_api.router import router
 
 
 def get_app():

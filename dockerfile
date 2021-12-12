@@ -1,19 +1,46 @@
-FROM python:3.8-slim
+FROM python:3.9.7-slim-bullseye
 
-RUN apt-get update -y \
-    && apt-get install -y build-essential gcc git python3-dev g++ libffi-dev
+# https://docs.python.org/3/using/cmdline.html#envvar
+# https://pip.pypa.io/en/stable/user_guide/#environment-variables
+# https://python-poetry.org/docs/configuration/
+ENV PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DEFAULT_TIMEOUT=100 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    POETRY_VERSION=1.1.11 \
+    POETRY_VIRTUALENVS_CREATE=0
 
-RUN apt-get install -y libssl-dev libmariadb-dev libpq-dev
-RUN apt-get install -y binutils libproj-dev gdal-bin
+RUN apt-get update --fix-missing
+RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it
+RUN apt-get install -y curl git && pip install --upgrade pip "poetry==${POETRY_VERSION}"
 
-COPY requirements.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
+WORKDIR /code
 
-COPY src /app/src
-COPY mch.dbn /app/mch.dbn
-COPY MCHtablasycampos.def /app/MCHtablasycampos.def
+# TODO replace with actual surface repo
+RUN git clone --branch refactor-for-opencdms-server https://github.com/Shaibujnr/surface.git surface
 
-WORKDIR /app
+RUN pip install numpy==1.21.2 --no-warn-script-location
+RUN pip install -r surface/api/requirements.txt
 
-ENTRYPOINT ["uvicorn", "src.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
+# Install Python dependencies.
+COPY pyproject.toml poetry.lock ./
 
+
+RUN poetry install -v
+
+
+COPY . .
+
+
+RUN poetry install
+
+RUN useradd -m opencdms_api_user && chown -R opencdms_api_user /code
+
+RUN ["chmod", "+x", "/code/scripts/load_initial_surface_data.sh"]
+
+USER opencdms_api_user
+
+ENTRYPOINT [ "/bin/sh", "entrypoint.sh" ]

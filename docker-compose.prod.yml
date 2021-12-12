@@ -54,7 +54,7 @@ services:
   opencdms-api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: opencdms-api
     hostname: opencdms-api
     ports:

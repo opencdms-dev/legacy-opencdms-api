@@ -1,7 +1,7 @@
 from sqlalchemy.orm.session import Session
 from starlette.testclient import TestClient
 from passlib.hash import django_pbkdf2_sha256 as handler
-from opencdms_server.models import AuthUser
+from opencdms_api.models import AuthUser
 
 
 def test_register_new_user(client: TestClient, session: Session):

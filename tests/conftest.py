@@ -5,11 +5,11 @@ from jose import jwt
 from typing import Dict, Generator
 
 from sqlalchemy.orm.session import Session
-from opencdms_server.db import SessionLocal
-from opencdms_server.models import AuthUser
+from opencdms_api.db import SessionLocal
+from opencdms_api.models import AuthUser
 from passlib.hash import django_pbkdf2_sha256 as handler
-from opencdms_server.config import settings
-from opencdms_server.main import get_app
+from opencdms_api.config import settings
+from opencdms_api.main import get_app
 from fastapi.testclient import TestClient
 
 

@@ -29,5 +29,11 @@ install:
 test:
 	docker-compose -f docker-compose.test.yml run test_opencdms_api; docker-compose -f docker-compose.test.yml down
 
-make test-down:
+test_down:
 	docker-compose -f docker-compose.test.yml down
+
+test_build:
+	docker-compose -f docker-compose.test.yml build
+
+test_bash:
+	docker-compose -f docker-compose.test.yml run test_opencdms_api bash

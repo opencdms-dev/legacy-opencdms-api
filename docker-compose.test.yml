@@ -2,7 +2,7 @@ version: "3"
 
 services:
   test_opencdms_api:
-    image: opencdms_server:0.1.0
+    image: opencdms_api:0.1.0
     build:
       context: .
       dockerfile: dockerfile
@@ -71,14 +71,14 @@ services:
       - MCH_DB_PASSWORD=test_mch_db_password
       - MCH_DB_NAME=test_mch_db
       - MCH_DB_PORT=3306
-      - SECRET_KEY=test_opencdms_server_secret_key
+      - SECRET_KEY=test_opencdms_api_secret_key
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
-    command: ["pytest", "-s"]
+    command: ["pytest", "tests/integration"]
 
     networks:
-      - test_opencdms_server_test_network
+      - test_opencdms_api_test_network
 
   test_opencdms_surface_db:
     image: timescale/timescaledb-postgis:2.3.0-pg13
@@ -90,7 +90,7 @@ services:
       - POSTGRES_USER=dba
       - POSTGRES_DB=test_surface_db
     networks:
-      - test_opencdms_server_test_network
+      - test_opencdms_api_test_network
 
   test_opencdms_mch_db:
     image: mysql:8.0.27
@@ -103,7 +103,7 @@ services:
       - MYSQL_PASSWORD=test_mch_db_password
       - MYSQL_ROOT_PASSWORD=test_root_password
     networks:
-      - test_opencdms_server_test_network
+      - test_opencdms_api_test_network
 
 networks:
-  test_opencdms_server_test_network:
+  test_opencdms_api_test_network:
