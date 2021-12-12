@@ -1,4 +1,4 @@
-from src.middlewares import auth
+from middlewares import auth
 from fastapi import FastAPI
 from config import app_config
 from apps.climsoft.db.migration import migrate

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
-from src.apps.surface.services import country_service
-from src.apps.surface.schemas import country_schema
-from src.utils.response import get_success_response, get_error_response
-from src.dependencies import auth
+from apps.surface.services import country_service
+from apps.surface.schemas import country_schema
+from utils.response import get_success_response, get_error_response
+from dependencies import auth
 
 
 router = APIRouter(

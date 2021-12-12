@@ -9,10 +9,10 @@ from sqlalchemy.orm.session import sessionmaker
 from faker import Faker
 from fastapi.testclient import TestClient
 from sqlalchemy import text as sa_text
-from src.config import app_config
-from tests.datagen.surface import country
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from config import app_config
+from datagen.surface import country
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 fake = Faker()
@@ -53,7 +53,7 @@ def setup_module(module):
             DEFAULT_AUTO_FIELD="django.db.models.AutoField",
             BASE_DIR=app_config.BASE_DIR,
             INSTALLED_APPS=(
-                "src.apps.surface",
+                "apps.surface",
                 "django.contrib.auth",
                 "django.contrib.gis",
                 "django.contrib.contenttypes"
@@ -74,7 +74,7 @@ def setup_module(module):
         "migrate"
     ])
 
-    from src.apps.surface import models
+    from apps.surface import models
 
     with connection.cursor() as cursor:
         cursor.execute(f'''
@@ -83,7 +83,7 @@ def setup_module(module):
 
 
 def teardown_module(module):
-    from src.apps.surface import models
+    from apps.surface import models
     with auth_db_engine.connect().execution_options(autocommit=True) as _connection:
         with _connection.begin():
             auth_db_engine.execute(sa_text(f'''
@@ -105,14 +105,14 @@ def get_access_token(test_app: TestClient):
 
 @pytest.fixture
 def get_country():
-    from src.apps.surface import models
+    from apps.surface import models
     _country = models.Country(**country.get_valid_country_input().dict())
     _country.save()
     yield _country
 
 
 def test_should_return_single_country(test_app: TestClient, get_country, get_access_token: str):
-    from src.apps.surface.schemas import country_schema
+    from apps.surface.schemas import country_schema
     response = test_app.get(f"/api/surface/v1/countries/{get_country.name}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
@@ -124,7 +124,7 @@ def test_should_return_single_country(test_app: TestClient, get_country, get_acc
 
 
 def test_should_create_a_country(test_app: TestClient, get_access_token: str):
-    from src.apps.surface.schemas import country_schema
+    from apps.surface.schemas import country_schema
     country_data = country.get_valid_country_input().dict()
     response = test_app.post("/api/surface/v1/countries", data=json.dumps(country_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
@@ -145,7 +145,7 @@ def test_should_raise_validation_error(test_app: TestClient, get_access_token: s
 
 
 def test_should_update_country(test_app: TestClient, get_country, get_access_token: str):
-    from src.apps.surface.schemas import country_schema
+    from apps.surface.schemas import country_schema
     country_data = country_schema.Country.from_django(get_country).dict(by_alias=True)
     name = country_data.pop("name")
     updates = {"code": "ab"}
@@ -160,7 +160,7 @@ def test_should_update_country(test_app: TestClient, get_country, get_access_tok
 
 
 def test_should_delete_country(test_app: TestClient, get_country, get_access_token: str):
-    from src.apps.surface.schemas import country_schema
+    from apps.surface.schemas import country_schema
     country_data = country_schema.Country.from_django(get_country).dict(by_alias=True)
     name = country_data.pop("name")
 

@@ -6,7 +6,7 @@ from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from apps.climsoft.db.engine import db_engine
 from apps.climsoft.schemas import observationinitial_schema
-from tests.datagen.climsoft import observationinitial as climsoft_observation_initial, obsscheduleclass as climsoft_obsscheduleclass, obselement as climsoft_obselement, station as climsoft_station, instrument as climsoft_instrument
+from datagen.climsoft import observationinitial as climsoft_observation_initial, obsscheduleclass as climsoft_obsscheduleclass, obselement as climsoft_obselement, station as climsoft_station, instrument as climsoft_instrument
 from faker import Faker
 from fastapi.testclient import TestClient
 from apps.auth.db.engine import db_engine as auth_db_engine

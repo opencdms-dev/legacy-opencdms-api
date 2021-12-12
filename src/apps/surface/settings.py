@@ -1,6 +1,6 @@
 import django
 from django.conf import settings
-from src.config import app_config
+from config import app_config
 
 
 def setup():

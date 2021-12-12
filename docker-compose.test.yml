@@ -10,7 +10,7 @@ services:
     expose:
       - "5000"
     environment:
-      - PYTHONPATH=/code/surface/api
+      - PYTHONPATH=/code/surface/api:/code/tests
       - TIMESCALEDB_TELEMETRY=off
       - PGDATA=/var/lib/postgresql/data/pgdata
       - SURFACE_SECRET_KEY=test_surface_secret_key
@@ -75,7 +75,9 @@ services:
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
-    command: ["pytest", "-s"]
+      - test_opencdms_climsoft_db
+      - test_opencdms_auth_db
+    command: ["pytest", "tests/integration/auth/controller/test_auth_controller.py"]
 
     networks:
       - test_opencdms_api_test_network
@@ -105,5 +107,35 @@ services:
     networks:
       - test_opencdms_api_test_network
 
+  test_opencdms_auth_db:
+    image: postgres
+    container_name: test_opencdms_auth_db
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=auth
+    networks:
+      - test_opencdms_api_test_network
+    volumes:
+      - test_opencdms_auth_db_data:/var/lib/postgresql/data
+
+  test_opencdms_climsoft_db:
+    image: mariadb:10.1
+    container_name: test_opencdms_climsoft_db
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=climsoft
+    networks:
+      - test_opencdms_api_test_network
+    volumes:
+      - test_opencdms_climsoft_db_data:/var/lib/mysql
+
 networks:
   test_opencdms_api_test_network:
+
+volumes:
+  test_opencdms_auth_db_data:
+  test_opencdms_climsoft_db_data:

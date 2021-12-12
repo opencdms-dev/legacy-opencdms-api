@@ -1,7 +1,7 @@
 import logging
 from typing import List
-from src.apps.surface import models
-from src.apps.surface.schemas import country_schema
+from apps.surface import models
+from apps.surface.schemas import country_schema
 from fastapi.exceptions import HTTPException
 
 logger = logging.getLogger("SurfaceCountryService")

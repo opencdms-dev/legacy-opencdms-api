@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import sessionmaker
 from apps.auth.db.models import user_model
 from apps.auth.db.engine import db_engine
 from passlib.hash import django_pbkdf2_sha256 as handler
-from tests.datagen.auth import user as auth_user
+from datagen.auth import user as auth_user
 from faker import Faker
 from fastapi.testclient import TestClient
 

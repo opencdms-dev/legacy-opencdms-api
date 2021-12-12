@@ -5,7 +5,7 @@ from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from apps.climsoft.db.engine import db_engine
 from apps.climsoft.schemas import regkey_schema
-from tests.datagen.climsoft import regkey as climsoft_regkey
+from datagen.climsoft import regkey as climsoft_regkey
 from faker import Faker
 from fastapi.testclient import TestClient
 from apps.auth.db.engine import db_engine as auth_db_engine

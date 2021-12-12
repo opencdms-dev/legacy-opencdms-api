@@ -8,7 +8,7 @@ from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from apps.climsoft.db.engine import db_engine
 from apps.climsoft.schemas import stationlocationhistory_schema
-from tests.datagen.climsoft import stationlocationhistory as climsoft_station_location_history, station as climsoft_station
+from datagen.climsoft import stationlocationhistory as climsoft_station_location_history, station as climsoft_station
 from faker import Faker
 from fastapi.testclient import TestClient
 from apps.auth.db.engine import db_engine as auth_db_engine

@@ -90,7 +90,7 @@ Note: You have to run database instance separately. Go to this repository for de
 
 ### Running The Tests
 
-Each master release should pass all the tests. To check if the tests are as expected or to add new feature or to fix some issue, you can run the tests on your own.
+Each master release should pass all the  To check if the tests are as expected or to add new feature or to fix some issue, you can run the tests on your own.
 
 Follow these steps:
 
@@ -104,7 +104,7 @@ $ docker-compose up -d --build
 $ pytest tests/integration
 ```
 
-Additionally, you can run snapshot tests. We have collected a subset of data from production climsoft instance and we will run query on them to check if we are getting expected result.
+Additionally, you can run snapshot  We have collected a subset of data from production climsoft instance and we will run query on them to check if we are getting expected result.
 
   - From outside your project, run `git clone https://github.com/opencdms/opencdms-test-data`
   - `cd opencdms-test-data`

@@ -8,7 +8,7 @@ from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from apps.climsoft.db.engine import db_engine
 from apps.climsoft.schemas import paperarchive_schema
-from tests.datagen.climsoft import (
+from datagen.climsoft import (
     paperarchive as climsoft_paper_archive,
     paperarchivedefinition as climsoft_paper_archive_definition,
     station as climsoft_station

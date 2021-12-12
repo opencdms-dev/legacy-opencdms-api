@@ -15,6 +15,8 @@ inflection = "^0.5.1"
 python-jose = "^3.3.0"
 pydantic = {extras = ["email"], version = "^1.8.2"}
 mch-api = {git = "https://github.com/Shaibujnr/mch-api.git", rev = "make_mch_api_installable"}
+Faker = "^10.0.0"
+python-multipart = "^0.0.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

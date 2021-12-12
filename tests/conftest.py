@@ -1,12 +1,9 @@
 from fastapi.applications import FastAPI
 import pytest
-import sys
 from datetime import datetime, timedelta
 from jose import jwt
 from typing import Dict, Generator
-print("\n\n\n")
-print(sys.path)
-print("\n\n\n")
+
 from sqlalchemy.orm.session import Session
 from opencdms_api.db import SessionLocal
 from opencdms_api.models import AuthUser
@@ -14,12 +11,16 @@ from passlib.hash import django_pbkdf2_sha256 as handler
 from opencdms_api.config import settings
 from opencdms_api.main import get_app
 from fastapi.testclient import TestClient
-
+from main import app as oapp
 
 @pytest.fixture
 def app() -> FastAPI:
     return get_app()
 
+
+@pytest.fixture(scope='module')
+def other_app() -> FastAPI:
+    return oapp
 
 @pytest.fixture
 def client(app: FastAPI) -> TestClient:
@@ -59,3 +60,8 @@ def user_auth_header(user: AuthUser) -> Dict[str, str]:
         key=settings.SECRET_KEY,
     )
     return {"Authorization": f"Bearer {access_token}"}
+
+@pytest.fixture(scope="module")
+def test_app(other_app):
+    client = TestClient(other_app)
+    yield client

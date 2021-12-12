@@ -25,7 +25,6 @@ services:
     volumes:
       - climsoftdb-data:/var/lib/mysql
 
-
   surfacedb:
     image: timescale/timescaledb-postgis:latest-pg12
     container_name: surfacedb

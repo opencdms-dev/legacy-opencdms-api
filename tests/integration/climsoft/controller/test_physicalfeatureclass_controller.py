@@ -6,7 +6,7 @@ from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from apps.climsoft.db.engine import db_engine
 from apps.climsoft.schemas import physicalfeatureclass_schema
-from tests.datagen.climsoft import physicalfeatureclass as climsoft_physical_feature_class, station as climsoft_station
+from datagen.climsoft import physicalfeatureclass as climsoft_physical_feature_class, station as climsoft_station
 from faker import Faker
 from fastapi.testclient import TestClient
 from apps.auth.db.engine import db_engine as auth_db_engine

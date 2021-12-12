@@ -8,7 +8,7 @@ from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from apps.climsoft.db.engine import db_engine
 from apps.climsoft.schemas import physicalfeature_schema
-from tests.datagen.climsoft import physicalfeature as climsoft_physical_feature, \
+from datagen.climsoft import physicalfeature as climsoft_physical_feature, \
     station as climsoft_station, physicalfeatureclass as climsoft_physical_feature_class
 from faker import Faker
 from fastapi.testclient import TestClient
