@@ -13,7 +13,7 @@ from opencdms_api.db import db_session_scope
 
 class AuthMiddleWare:
     """Middleware for authenticating a request before passing it on
-    to the mounted django application.
+    to the mounted application.
     """
 
     def __init__(self, app: ASGIApp):

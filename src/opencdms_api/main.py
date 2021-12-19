@@ -17,7 +17,7 @@ from opencdms_api.router import router
 
 def get_app():
     app = FastAPI()
-    climsoft_app.add_middleware(AuthMiddleWare)
+    # climsoft_app.add_middleware(AuthMiddleWare)
     app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
     app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
     app.mount("/climsoft", climsoft_app)

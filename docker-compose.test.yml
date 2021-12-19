@@ -78,7 +78,6 @@ services:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
       - test_opencdms_climsoft_db
-      - test_opencdms_auth_db
     command: ["pytest", "tests/integration", "-s"]
 
     networks:
@@ -108,19 +107,6 @@ services:
       - MYSQL_ROOT_PASSWORD=test_root_password
     networks:
       - test_opencdms_api_test_network
-
-  test_opencdms_auth_db:
-    image: postgres
-    container_name: test_opencdms_auth_db
-    expose:
-      - "5432"
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=auth
-    networks:
-      - test_opencdms_api_test_network
-    volumes:
-      - test_opencdms_auth_db_data:/var/lib/postgresql/data
 
   test_opencdms_climsoft_db:
     image: mariadb:10.1
