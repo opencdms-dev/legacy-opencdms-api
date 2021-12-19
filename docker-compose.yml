@@ -66,6 +66,7 @@ services:
       - mchdb
     environment:
       - PYGEOAPI_CONFIG=/app/src/pygeoapi-config.yml
+      - PYGEOAPI_OPENAPI=/app/src/pygeoapi-openapi.yml
       - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
       - AUTH_DB_URI=postgresql+psycopg2://postgres:password@authdb/auth
       - OPENCDMS_API=True
@@ -107,6 +108,7 @@ services:
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
     volumes:
       - ./pygeoapi-config.yml:/app/src/pygeoapi-config.yml
+      - ./pygeoapi-openapi.yml:/app/src/pygeoapi-openapi.yml
 #
 #  traefik:
 #    image: traefik:latest
