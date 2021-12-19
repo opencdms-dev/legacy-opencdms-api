@@ -57,7 +57,7 @@ services:
     build:
       context: ./mch_db
       dockerfile: Dockerfile
-    container_name: opencdms_mch_db
+    container_name: opencdms_mchdb
     volumes:
       - opencdms_mch_data:/var/lib/mysql
     ports:
