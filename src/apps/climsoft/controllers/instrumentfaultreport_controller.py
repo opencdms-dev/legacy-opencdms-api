@@ -8,7 +8,7 @@ from dependencies import auth
 
 
 router = APIRouter(
-    prefix="/api/climsoft/v1",
+    prefix="/v1",
     tags=["climsoft"],
     dependencies=[Depends(auth.get_current_user)]
 )

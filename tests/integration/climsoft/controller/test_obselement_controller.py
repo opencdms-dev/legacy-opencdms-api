@@ -69,11 +69,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -87,8 +84,8 @@ def get_obselement():
     session.close()
 
 
-def test_should_return_first_five_obselements(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/obselements", params={"limit": 5}, headers={
+def test_should_return_first_five_obselements(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/obselements", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -98,8 +95,8 @@ def test_should_return_first_five_obselements(test_app: TestClient, get_access_t
         isinstance(s, obselement_schema.ObsElement)
 
 
-def test_should_return_single_station(test_app: TestClient, get_obselement: climsoft_models.Obselement, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/obselements/{get_obselement.elementId}", headers={
+def test_should_return_single_station(client: TestClient, get_obselement: climsoft_models.Obselement, get_access_token: str):
+    response = client.get(f"/climsoft/v1/obselements/{get_obselement.elementId}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 
@@ -110,9 +107,9 @@ def test_should_return_single_station(test_app: TestClient, get_obselement: clim
         isinstance(s, obselement_schema.ObsElement)
 
 
-def test_should_create_a_station(test_app: TestClient, get_access_token: str):
+def test_should_create_a_station(client: TestClient, get_access_token: str):
     obselement_data = climsoft_obselement.get_valid_obselement_input().dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/obselements", data=json.dumps(obselement_data, default=str), headers={
+    response = client.post("/climsoft/v1/obselements", data=json.dumps(obselement_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -122,19 +119,19 @@ def test_should_create_a_station(test_app: TestClient, get_access_token: str):
         isinstance(s, obselement_schema.ObsElement)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_access_token: str):
     obselement_data = climsoft_obselement.get_valid_obselement_input().dict()
-    response = test_app.post("/api/climsoft/v1/obselements", data=json.dumps(obselement_data, default=str), headers={
+    response = client.post("/climsoft/v1/obselements", data=json.dumps(obselement_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_station(test_app: TestClient, get_obselement, get_access_token: str):
+def test_should_update_station(client: TestClient, get_obselement, get_access_token: str):
     obselement_data = obselement_schema.ObsElement.from_orm(get_obselement).dict(by_alias=True)
     element_id = obselement_data.pop("element_id")
     updates = {**obselement_data, "element_name": "updated name"}
-    response = test_app.put(f"/api/climsoft/v1/obselements/{element_id}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/obselements/{element_id}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -143,16 +140,16 @@ def test_should_update_station(test_app: TestClient, get_obselement, get_access_
     assert response_data["result"][0]["element_name"] == updates["element_name"]
 
 
-def test_should_delete_station(test_app: TestClient, get_obselement, get_access_token: str):
+def test_should_delete_station(client: TestClient, get_obselement, get_access_token: str):
     obselement_data = obselement_schema.ObsElement.from_orm(get_obselement).dict(by_alias=True)
     element_id = obselement_data.pop("element_id")
 
-    response = test_app.delete(f"/api/climsoft/v1/obselements/{element_id}", headers={
+    response = client.delete(f"/climsoft/v1/obselements/{element_id}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/obselements/{element_id}", headers={
+    response = client.get(f"/climsoft/v1/obselements/{element_id}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

@@ -81,11 +81,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -110,8 +107,8 @@ def get_physical_feature_class(get_station: climsoft_models.Station):
     session.close()
 
 
-def test_should_return_first_five_physical_feature_class(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/physical-feature-class", params={"limit": 5}, headers={
+def test_should_return_first_five_physical_feature_class(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/physical-feature-class", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -119,8 +116,8 @@ def test_should_return_first_five_physical_feature_class(test_app: TestClient, g
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_physical_feature_class(test_app: TestClient, get_physical_feature_class: climsoft_models.Physicalfeatureclas, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/physical-feature-class/{get_physical_feature_class.featureClass}", headers={
+def test_should_return_single_physical_feature_class(client: TestClient, get_physical_feature_class: climsoft_models.Physicalfeatureclas, get_access_token: str):
+    response = client.get(f"/climsoft/v1/physical-feature-class/{get_physical_feature_class.featureClass}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -128,9 +125,9 @@ def test_should_return_single_physical_feature_class(test_app: TestClient, get_p
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_physical_feature_class(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_create_a_physical_feature_class(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     physical_feature_class_data = climsoft_physical_feature_class.get_valid_physical_feature_class_input(station_id=get_station.stationId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/physical-feature-class", data=json.dumps(physical_feature_class_data, default=str), headers={
+    response = client.post("/climsoft/v1/physical-feature-class", data=json.dumps(physical_feature_class_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -138,20 +135,20 @@ def test_should_create_a_physical_feature_class(test_app: TestClient, get_statio
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     physical_feature_class_data = climsoft_physical_feature_class.get_valid_physical_feature_class_input(station_id=get_station.stationId).dict()
-    response = test_app.post("/api/climsoft/v1/physical-feature-class", data=json.dumps(physical_feature_class_data, default=str), headers={
+    response = client.post("/climsoft/v1/physical-feature-class", data=json.dumps(physical_feature_class_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_physical_feature_class(test_app: TestClient, get_physical_feature_class: climsoft_models.Physicalfeatureclas, get_access_token: str):
+def test_should_update_physical_feature_class(client: TestClient, get_physical_feature_class: climsoft_models.Physicalfeatureclas, get_access_token: str):
     physical_feature_class_data = physicalfeatureclass_schema.PhysicalFeatureClass.from_orm(get_physical_feature_class).dict(by_alias=True)
     feature_class = physical_feature_class_data.pop("feature_class")
     updates = {**physical_feature_class_data, "description": "updated description"}
 
-    response = test_app.put(f"/api/climsoft/v1/physical-feature-class/{feature_class}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/physical-feature-class/{feature_class}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -160,16 +157,16 @@ def test_should_update_physical_feature_class(test_app: TestClient, get_physical
     assert response_data["result"][0]["description"] == updates["description"]
 
 
-def test_should_delete_physical_feature_class(test_app: TestClient, get_physical_feature_class, get_access_token: str):
+def test_should_delete_physical_feature_class(client: TestClient, get_physical_feature_class, get_access_token: str):
     physical_feature_class_data = physicalfeatureclass_schema.PhysicalFeatureClass.from_orm(get_physical_feature_class).dict(by_alias=True)
     feature_class = physical_feature_class_data.pop("feature_class")
 
-    response = test_app.delete(f"/api/climsoft/v1/physical-feature-class/{feature_class}", headers={
+    response = client.delete(f"/climsoft/v1/physical-feature-class/{feature_class}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/physical-feature-class/{feature_class}", headers={
+    response = client.get(f"/climsoft/v1/physical-feature-class/{feature_class}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

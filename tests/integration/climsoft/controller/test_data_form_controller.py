@@ -69,11 +69,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -87,8 +84,8 @@ def get_data_form():
     session.close()
 
 
-def test_should_return_first_five_data_forms(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/data-forms", params={"limit": 5}, headers={
+def test_should_return_first_five_data_forms(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/data-forms", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -98,8 +95,8 @@ def test_should_return_first_five_data_forms(test_app: TestClient, get_access_to
         isinstance(s, data_form_schema.DataForm)
 
 
-def test_should_return_single_data_form(test_app: TestClient, get_data_form: climsoft_models.DataForm, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/data-forms/{get_data_form.form_name}", headers={
+def test_should_return_single_data_form(client: TestClient, get_data_form: climsoft_models.DataForm, get_access_token: str):
+    response = client.get(f"/climsoft/v1/data-forms/{get_data_form.form_name}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -109,9 +106,9 @@ def test_should_return_single_data_form(test_app: TestClient, get_data_form: cli
         isinstance(s, data_form_schema.DataForm)
 
 
-def test_should_create_a_data_form(test_app: TestClient, get_access_token: str):
+def test_should_create_a_data_form(client: TestClient, get_access_token: str):
     data_form_data = climsoft_data_form.get_valid_data_form_input().dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/data-forms", data=json.dumps(data_form_data, default=str), headers={
+    response = client.post("/climsoft/v1/data-forms", data=json.dumps(data_form_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -121,20 +118,20 @@ def test_should_create_a_data_form(test_app: TestClient, get_access_token: str):
         isinstance(s, data_form_schema.DataForm)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_access_token: str):
     data_form_data = climsoft_data_form.get_valid_data_form_input().dict().pop("form_name")
-    response = test_app.post("/api/climsoft/v1/data-forms", data=json.dumps(data_form_data, default=str), headers={
+    response = client.post("/climsoft/v1/data-forms", data=json.dumps(data_form_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_data_form(test_app: TestClient, get_data_form, get_access_token: str):
+def test_should_update_data_form(client: TestClient, get_data_form, get_access_token: str):
     data_form_data = data_form_schema.DataForm.from_orm(get_data_form).dict(by_alias=True)
     form_name = data_form_data.pop("form_name")
     updates = {**data_form_data, "table_name": "updated name"}
 
-    response = test_app.put(f"/api/climsoft/v1/data-forms/{form_name}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/data-forms/{form_name}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -143,16 +140,16 @@ def test_should_update_data_form(test_app: TestClient, get_data_form, get_access
     assert response_data["result"][0]["table_name"] == updates["table_name"]
 
 
-def test_should_delete_data_form(test_app: TestClient, get_data_form, get_access_token: str):
+def test_should_delete_data_form(client: TestClient, get_data_form, get_access_token: str):
     data_form_data = data_form_schema.DataForm.from_orm(get_data_form).dict(by_alias=True)
     form_name = data_form_data.pop("form_name")
 
-    response = test_app.delete(f"/api/climsoft/v1/data-forms/{form_name}", headers={
+    response = client.delete(f"/climsoft/v1/data-forms/{form_name}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/data-forms/{form_name}", headers={
+    response = client.get(f"/climsoft/v1/data-forms/{form_name}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 404

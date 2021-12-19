@@ -69,11 +69,8 @@ def setup_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 def teardown_module(module):
@@ -127,8 +124,8 @@ def get_observation_initial(get_station: climsoft_models.Station, get_obselement
     session.close()
 
 
-def test_should_return_first_five_observation_initials(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/observation-initials", params={"limit": 5}, headers={
+def test_should_return_first_five_observation_initials(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/observation-initials", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -138,8 +135,8 @@ def test_should_return_first_five_observation_initials(test_app: TestClient, get
         isinstance(s, observationinitial_schema.ObservationInitial)
 
 
-def test_should_return_single_observation_initial(test_app: TestClient, get_observation_initial: climsoft_models.Observationinitial, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", headers={
+def test_should_return_single_observation_initial(client: TestClient, get_observation_initial: climsoft_models.Observationinitial, get_access_token: str):
+    response = client.get(f"/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -150,9 +147,9 @@ def test_should_return_single_observation_initial(test_app: TestClient, get_obse
         isinstance(s, observationinitial_schema.ObservationInitial)
 
 
-def test_should_create_a_observation_initial(test_app: TestClient, get_station: climsoft_models.Station, get_obselement: climsoft_models.Obselement, get_access_token: str):
+def test_should_create_a_observation_initial(client: TestClient, get_station: climsoft_models.Station, get_obselement: climsoft_models.Obselement, get_access_token: str):
     observation_initial_data = climsoft_observation_initial.get_valid_observation_initial_input(station_id=get_station.stationId, element_id=get_obselement.elementId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/observation-initials", data=json.dumps(observation_initial_data, default=lambda x: x.strftime("%Y-%m-%d %H:%M:%S")), headers={
+    response = client.post("/climsoft/v1/observation-initials", data=json.dumps(observation_initial_data, default=lambda x: x.strftime("%Y-%m-%d %H:%M:%S")), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -163,15 +160,15 @@ def test_should_create_a_observation_initial(test_app: TestClient, get_station: 
         isinstance(s, observationinitial_schema.ObservationInitial)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_obselement: climsoft_models.Obselement, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station, get_obselement: climsoft_models.Obselement, get_access_token: str):
     observation_initial_data = climsoft_observation_initial.get_valid_observation_initial_input(station_id=get_station.stationId, element_id=get_obselement.elementId).dict()
-    response = test_app.post("/api/climsoft/v1/observation-initials", data=json.dumps(observation_initial_data, default=str), headers={
+    response = client.post("/climsoft/v1/observation-initials", data=json.dumps(observation_initial_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_observation_initial(test_app: TestClient, get_observation_initial: climsoft_models.Observationinitial, get_access_token: str):
+def test_should_update_observation_initial(client: TestClient, get_observation_initial: climsoft_models.Observationinitial, get_access_token: str):
     observation_initial_data = climsoft_observation_initial.get_valid_observation_initial_input(station_id=get_observation_initial.recordedFrom, element_id=get_observation_initial.describedBy, obs_datetime=str(get_observation_initial.obsDatetime), qc_status=get_observation_initial.qcStatus, acquisition_type=get_observation_initial.acquisitionType).dict(by_alias=True)
 
     recorded_from = observation_initial_data.pop("recorded_from")
@@ -182,7 +179,7 @@ def test_should_update_observation_initial(test_app: TestClient, get_observation
 
     updates = {**observation_initial_data, "period": 100}
 
-    response = test_app.put(f"/api/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -191,7 +188,7 @@ def test_should_update_observation_initial(test_app: TestClient, get_observation
     assert response_data["result"][0]["period"] == updates["period"]
 
 
-def test_should_delete_observation_initial(test_app: TestClient, get_observation_initial: climsoft_models.Observationinitial, get_access_token: str):
+def test_should_delete_observation_initial(client: TestClient, get_observation_initial: climsoft_models.Observationinitial, get_access_token: str):
     observation_initial_data = observationinitial_schema.ObservationInitial.from_orm(get_observation_initial).dict(by_alias=True)
 
     recorded_from = observation_initial_data.pop("recorded_from")
@@ -200,12 +197,12 @@ def test_should_delete_observation_initial(test_app: TestClient, get_observation
     qc_status = observation_initial_data.pop("qc_status")
     acquisition_type = observation_initial_data.pop("acquisition_type")
 
-    response = test_app.delete(f"/api/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", headers={
+    response = client.delete(f"/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", headers={
+    response = client.get(f"/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 404

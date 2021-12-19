@@ -17,11 +17,6 @@ from main import app as oapp
 def app() -> FastAPI:
     return get_app()
 
-
-@pytest.fixture(scope='module')
-def other_app() -> FastAPI:
-    return oapp
-
 @pytest.fixture
 def client(app: FastAPI) -> TestClient:
     return TestClient(app)
@@ -54,14 +49,13 @@ def user(session: Session) -> Generator[AuthUser, None, None]:
 
 
 @pytest.fixture
-def user_auth_header(user: AuthUser) -> Dict[str, str]:
+def user_access_token(user: AuthUser) -> str:
     access_token = jwt.encode(
         {"sub": user.username, "exp": datetime.utcnow() + timedelta(hours=24)},
-        key=settings.SECRET_KEY,
+        key=settings.SURFACE_SECRET_KEY,
     )
-    return {"Authorization": f"Bearer {access_token}"}
+    return access_token
 
-@pytest.fixture(scope="module")
-def test_app(other_app):
-    client = TestClient(other_app)
-    yield client
+@pytest.fixture
+def user_auth_header(user_access_token: str) -> Dict[str, str]:
+    return {"Authorization": f"Bearer {user_access_token}"}

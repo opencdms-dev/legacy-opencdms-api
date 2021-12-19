@@ -83,11 +83,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -112,8 +109,8 @@ def get_station_qualifier(get_station: climsoft_models.Station):
     session.close()
 
 
-def test_should_return_first_five_station_qualifiers(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/station-qualifiers", params={"limit": 5}, headers={
+def test_should_return_first_five_station_qualifiers(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/station-qualifiers", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -121,8 +118,8 @@ def test_should_return_first_five_station_qualifiers(test_app: TestClient, get_a
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_station_qualifier(test_app: TestClient, get_station_qualifier: climsoft_models.Stationqualifier, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/station-qualifiers/{get_station_qualifier.qualifier}/{get_station_qualifier.qualifierBeginDate}/{get_station_qualifier.qualifierEndDate}/{get_station_qualifier.belongsTo}", headers={
+def test_should_return_single_station_qualifier(client: TestClient, get_station_qualifier: climsoft_models.Stationqualifier, get_access_token: str):
+    response = client.get(f"/climsoft/v1/station-qualifiers/{get_station_qualifier.qualifier}/{get_station_qualifier.qualifierBeginDate}/{get_station_qualifier.qualifierEndDate}/{get_station_qualifier.belongsTo}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -130,9 +127,9 @@ def test_should_return_single_station_qualifier(test_app: TestClient, get_statio
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_station_qualifier(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_create_a_station_qualifier(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     station_qualifier_data = climsoft_station_qualifier.get_valid_station_qualifier_input(station_id=get_station.stationId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/station-qualifiers", data=json.dumps(station_qualifier_data, default=str), headers={
+    response = client.post("/climsoft/v1/station-qualifiers", data=json.dumps(station_qualifier_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -140,15 +137,15 @@ def test_should_create_a_station_qualifier(test_app: TestClient, get_station: cl
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     station_qualifier_data = climsoft_station_qualifier.get_valid_station_qualifier_input(station_id=get_station.stationId).dict()
-    response = test_app.post("/api/climsoft/v1/station-qualifiers", data=json.dumps(station_qualifier_data, default=str), headers={
+    response = client.post("/climsoft/v1/station-qualifiers", data=json.dumps(station_qualifier_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_station_qualifier(test_app: TestClient, get_station_qualifier: climsoft_models.Stationqualifier, get_access_token: str):
+def test_should_update_station_qualifier(client: TestClient, get_station_qualifier: climsoft_models.Stationqualifier, get_access_token: str):
     station_qualifier_data = stationqualifier_schema.StationQualifier.from_orm(get_station_qualifier).dict(by_alias=True)
     belongs_to = station_qualifier_data.pop("belongs_to")
     qualifier_begin_date = station_qualifier_data.pop("qualifier_begin_date")
@@ -156,7 +153,7 @@ def test_should_update_station_qualifier(test_app: TestClient, get_station_quali
     qualifier = station_qualifier_data.pop("qualifier")
     updates = {**station_qualifier_data, "station_timezone": 1}
 
-    response = test_app.put(f"/api/climsoft/v1/station-qualifiers/{qualifier}/{qualifier_begin_date}/{qualifier_end_date}/{belongs_to}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/station-qualifiers/{qualifier}/{qualifier_begin_date}/{qualifier_end_date}/{belongs_to}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -165,18 +162,18 @@ def test_should_update_station_qualifier(test_app: TestClient, get_station_quali
     assert response_data["result"][0]["station_timezone"] == updates["station_timezone"]
 
 
-def test_should_delete_station_qualifier(test_app: TestClient, get_station_qualifier: stationqualifier_schema.StationQualifier, get_access_token: str):
+def test_should_delete_station_qualifier(client: TestClient, get_station_qualifier: stationqualifier_schema.StationQualifier, get_access_token: str):
     station_qualifier_data = stationqualifier_schema.StationQualifier.from_orm(get_station_qualifier).dict(by_alias=True)
     belongs_to = station_qualifier_data.pop("belongs_to")
     qualifier_begin_date = station_qualifier_data.pop("qualifier_begin_date")
     qualifier_end_date = station_qualifier_data.pop("qualifier_end_date")
     qualifier = station_qualifier_data.pop("qualifier")
-    response = test_app.delete(f"/api/climsoft/v1/station-qualifiers/{qualifier}/{qualifier_begin_date}/{qualifier_end_date}/{belongs_to}", headers={
+    response = client.delete(f"/climsoft/v1/station-qualifiers/{qualifier}/{qualifier_begin_date}/{qualifier_end_date}/{belongs_to}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/station-qualifiers/{qualifier}/{qualifier_begin_date}/{qualifier_end_date}/{belongs_to}", headers={
+    response = client.get(f"/climsoft/v1/station-qualifiers/{qualifier}/{qualifier_begin_date}/{qualifier_end_date}/{belongs_to}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

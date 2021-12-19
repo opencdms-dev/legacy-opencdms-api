@@ -11,7 +11,7 @@ from opencdms_api.config import settings
 from opencdms_api.db import db_session_scope
 
 
-class WSGIAuthMiddleWare:
+class AuthMiddleWare:
     """Middleware for authenticating a request before passing it on
     to the mounted django application.
     """

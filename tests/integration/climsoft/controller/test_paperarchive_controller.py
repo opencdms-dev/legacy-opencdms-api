@@ -95,11 +95,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -154,8 +151,8 @@ def get_paper_archive():
     session.close()
 
 
-def test_should_return_first_five_paper_archives(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/paper-archives", params={"limit": 5}, headers={
+def test_should_return_first_five_paper_archives(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/paper-archives", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -165,9 +162,9 @@ def test_should_return_first_five_paper_archives(test_app: TestClient, get_acces
         isinstance(s, paperarchive_schema.PaperArchive)
 
 
-def test_should_return_single_paper_archive(test_app: TestClient, get_paper_archive: climsoft_models.Paperarchive, get_access_token: str):
+def test_should_return_single_paper_archive(client: TestClient, get_paper_archive: climsoft_models.Paperarchive, get_access_token: str):
     print(get_paper_archive.belongsTo)
-    response = test_app.get(f"/api/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", headers={
+    response = client.get(f"/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     print(response.json())
@@ -178,9 +175,9 @@ def test_should_return_single_paper_archive(test_app: TestClient, get_paper_arch
         isinstance(s, paperarchive_schema.PaperArchive)
 
 
-def test_should_create_a_paper_archive(test_app: TestClient, get_station: climsoft_models.Station, get_paper_archive_definition: climsoft_models.Paperarchivedefinition, get_access_token: str):
+def test_should_create_a_paper_archive(client: TestClient, get_station: climsoft_models.Station, get_paper_archive_definition: climsoft_models.Paperarchivedefinition, get_access_token: str):
     paper_archive_data = climsoft_paper_archive.get_valid_paper_archive_input(station_id=get_station.stationId, paper_archive_definition_id=get_paper_archive_definition.formId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/paper-archives", data=json.dumps(paper_archive_data, default=str), headers={
+    response = client.post("/climsoft/v1/paper-archives", data=json.dumps(paper_archive_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -190,15 +187,15 @@ def test_should_create_a_paper_archive(test_app: TestClient, get_station: climso
         isinstance(s, paperarchive_schema.PaperArchive)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_paper_archive_definition: climsoft_models.Paperarchivedefinition, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station, get_paper_archive_definition: climsoft_models.Paperarchivedefinition, get_access_token: str):
     paper_archive_data = climsoft_paper_archive.get_valid_paper_archive_input(station_id=get_station.stationId, paper_archive_definition_id=get_paper_archive_definition.formId).dict()
-    response = test_app.post("/api/climsoft/v1/paper-archives", data=json.dumps(paper_archive_data, default=str), headers={
+    response = client.post("/climsoft/v1/paper-archives", data=json.dumps(paper_archive_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_paper_archive(test_app: TestClient, get_paper_archive: climsoft_models.Paperarchive, get_access_token: str):
+def test_should_update_paper_archive(client: TestClient, get_paper_archive: climsoft_models.Paperarchive, get_access_token: str):
     paper_archive_data = climsoft_paper_archive.get_valid_paper_archive_input(station_id=get_paper_archive.belongsTo, paper_archive_definition_id=get_paper_archive.classifiedInto).dict(by_alias=True)
 
     belongs_to = paper_archive_data.pop("belongs_to")
@@ -207,7 +204,7 @@ def test_should_update_paper_archive(test_app: TestClient, get_paper_archive: cl
 
     updates = {**paper_archive_data, "image": uuid.uuid4().hex}
 
-    response = test_app.put(f"/api/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -216,20 +213,20 @@ def test_should_update_paper_archive(test_app: TestClient, get_paper_archive: cl
     assert response_data["result"][0]["image"] == updates["image"]
 
 
-def test_should_delete_paper_archive(test_app: TestClient, get_paper_archive: climsoft_models.Paperarchive, get_access_token: str):
+def test_should_delete_paper_archive(client: TestClient, get_paper_archive: climsoft_models.Paperarchive, get_access_token: str):
     paper_archive_data = paperarchive_schema.PaperArchive.from_orm(get_paper_archive).dict(by_alias=True)
     print(paper_archive_data)
     belongs_to = paper_archive_data.pop("belongs_to")
     classified_into = paper_archive_data.pop("classified_into")
     form_datetime = paper_archive_data.pop("form_datetime")
 
-    response = test_app.delete(f"/api/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", headers={
+    response = client.delete(f"/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     print(response.json())
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", headers={
+    response = client.get(f"/climsoft/v1/paper-archives/{get_paper_archive.belongsTo}/{get_paper_archive.formDatetime}/{get_paper_archive.classifiedInto}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 404

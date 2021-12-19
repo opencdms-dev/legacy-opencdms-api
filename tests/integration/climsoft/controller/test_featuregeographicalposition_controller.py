@@ -81,11 +81,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -110,8 +107,8 @@ def get_feature_geographical_position(get_synop_feature: climsoft_models.Synopfe
     session.close()
 
 
-def test_should_return_first_five_feature_geographical_positions(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/feature-geographical-positions", params={"limit": 5}, headers={
+def test_should_return_first_five_feature_geographical_positions(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/feature-geographical-positions", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -119,8 +116,8 @@ def test_should_return_first_five_feature_geographical_positions(test_app: TestC
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_feature_geographical_position(test_app: TestClient, get_feature_geographical_position: climsoft_models.Featuregeographicalposition, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/feature-geographical-positions/{get_feature_geographical_position.belongsTo}", headers={
+def test_should_return_single_feature_geographical_position(client: TestClient, get_feature_geographical_position: climsoft_models.Featuregeographicalposition, get_access_token: str):
+    response = client.get(f"/climsoft/v1/feature-geographical-positions/{get_feature_geographical_position.belongsTo}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -128,9 +125,9 @@ def test_should_return_single_feature_geographical_position(test_app: TestClient
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_feature_geographical_position(test_app: TestClient, get_synop_feature: climsoft_models.Synopfeature, get_access_token: str):
+def test_should_create_a_feature_geographical_position(client: TestClient, get_synop_feature: climsoft_models.Synopfeature, get_access_token: str):
     feature_geographical_position_data = climsoft_feature_geographical_position.get_valid_feature_geographical_position_input(synop_feature_abbreviation=get_synop_feature.abbreviation).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/feature-geographical-positions", data=json.dumps(feature_geographical_position_data, default=str), headers={
+    response = client.post("/climsoft/v1/feature-geographical-positions", data=json.dumps(feature_geographical_position_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -138,20 +135,20 @@ def test_should_create_a_feature_geographical_position(test_app: TestClient, get
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_synop_feature: climsoft_models.Synopfeature, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_synop_feature: climsoft_models.Synopfeature, get_access_token: str):
     feature_geographical_position_data = climsoft_feature_geographical_position.get_valid_feature_geographical_position_input(synop_feature_abbreviation=get_synop_feature.abbreviation).dict()
-    response = test_app.post("/api/climsoft/v1/feature-geographical-positions", data=json.dumps(feature_geographical_position_data, default=str), headers={
+    response = client.post("/climsoft/v1/feature-geographical-positions", data=json.dumps(feature_geographical_position_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_feature_geographical_position(test_app: TestClient, get_feature_geographical_position: climsoft_models.Featuregeographicalposition, get_access_token: str):
+def test_should_update_feature_geographical_position(client: TestClient, get_feature_geographical_position: climsoft_models.Featuregeographicalposition, get_access_token: str):
     feature_geographical_position_data = featuregeographicalposition_schema.FeatureGeographicalPosition.from_orm(get_feature_geographical_position).dict(by_alias=True)
     belongs_to = feature_geographical_position_data.pop("belongs_to")
     updates = {**feature_geographical_position_data, "observed_on": datetime.datetime.utcnow().isoformat()}
 
-    response = test_app.put(f"/api/climsoft/v1/feature-geographical-positions/{belongs_to}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/feature-geographical-positions/{belongs_to}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -160,16 +157,16 @@ def test_should_update_feature_geographical_position(test_app: TestClient, get_f
     assert response_data["result"][0]["observed_on"] == updates["observed_on"]
 
 
-def test_should_delete_feature_geographical_position(test_app: TestClient, get_feature_geographical_position, get_access_token: str):
+def test_should_delete_feature_geographical_position(client: TestClient, get_feature_geographical_position, get_access_token: str):
     feature_geographical_position_data = featuregeographicalposition_schema.FeatureGeographicalPosition.from_orm(get_feature_geographical_position).dict(by_alias=True)
     belongs_to = feature_geographical_position_data.pop("belongs_to")
 
-    response = test_app.delete(f"/api/climsoft/v1/feature-geographical-positions/{belongs_to}", headers={
+    response = client.delete(f"/climsoft/v1/feature-geographical-positions/{belongs_to}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/feature-geographical-positions/{belongs_to}", headers={
+    response = client.get(f"/climsoft/v1/feature-geographical-positions/{belongs_to}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

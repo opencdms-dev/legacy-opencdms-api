@@ -7,7 +7,7 @@ from utils.controllers import ControllerLoader
 
 app = FastAPI()
 migrate()
-app.add_middleware(auth.AuthMiddleWare)
+# app.add_middleware(auth.AuthMiddleWare)
 controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft"])
 controller_loader.detect(app)
 

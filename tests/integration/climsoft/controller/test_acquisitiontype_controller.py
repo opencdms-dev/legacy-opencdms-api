@@ -69,11 +69,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -87,8 +84,8 @@ def get_acquisition_type():
     session.close()
 
 
-def test_should_return_first_five_acquisition_types(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/acquisition-types", params={"limit": 5}, headers={
+def test_should_return_first_five_acquisition_types(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/acquisition-types", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -98,8 +95,8 @@ def test_should_return_first_five_acquisition_types(test_app: TestClient, get_ac
         isinstance(s, acquisitiontype_schema.AcquisitionType)
 
 
-def test_should_return_single_acquisition_type(test_app: TestClient, get_acquisition_type: climsoft_models.Acquisitiontype, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/acquisition-types/{get_acquisition_type.code}", headers={
+def test_should_return_single_acquisition_type(client: TestClient, get_acquisition_type: climsoft_models.Acquisitiontype, get_access_token: str):
+    response = client.get(f"/climsoft/v1/acquisition-types/{get_acquisition_type.code}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -109,9 +106,9 @@ def test_should_return_single_acquisition_type(test_app: TestClient, get_acquisi
         isinstance(s, acquisitiontype_schema.AcquisitionType)
 
 
-def test_should_create_a_acquisition_type(test_app: TestClient, get_access_token: str):
+def test_should_create_a_acquisition_type(client: TestClient, get_access_token: str):
     acquisition_type_data = climsoft_acquisition_type.get_valid_acquisition_type_input().dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/acquisition-types", data=json.dumps(acquisition_type_data, default=str), headers={
+    response = client.post("/climsoft/v1/acquisition-types", data=json.dumps(acquisition_type_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -121,20 +118,20 @@ def test_should_create_a_acquisition_type(test_app: TestClient, get_access_token
         isinstance(s, acquisitiontype_schema.AcquisitionType)
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_access_token: str):
     acquisition_type_data = {"code": "asd", "description": "aa aa a"}
-    response = test_app.post("/api/climsoft/v1/acquisition-types", data=json.dumps(acquisition_type_data, default=str), headers={
+    response = client.post("/climsoft/v1/acquisition-types", data=json.dumps(acquisition_type_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_acquisition_type(test_app: TestClient, get_acquisition_type, get_access_token: str):
+def test_should_update_acquisition_type(client: TestClient, get_acquisition_type, get_access_token: str):
     acquisition_type_data = acquisitiontype_schema.AcquisitionType.from_orm(get_acquisition_type).dict(by_alias=True)
     code = acquisition_type_data.pop("code")
     updates = {**acquisition_type_data, "description": "updated description"}
 
-    response = test_app.put(f"/api/climsoft/v1/acquisition-types/{code}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/acquisition-types/{code}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -143,16 +140,16 @@ def test_should_update_acquisition_type(test_app: TestClient, get_acquisition_ty
     assert response_data["result"][0]["description"] == updates["description"]
 
 
-def test_should_delete_acquisition_type(test_app: TestClient, get_acquisition_type, get_access_token: str):
+def test_should_delete_acquisition_type(client: TestClient, get_acquisition_type, get_access_token: str):
     acquisition_type_data = acquisitiontype_schema.AcquisitionType.from_orm(get_acquisition_type).dict(by_alias=True)
     code = acquisition_type_data.pop("code")
 
-    response = test_app.delete(f"/api/climsoft/v1/acquisition-types/{code}", headers={
+    response = client.delete(f"/climsoft/v1/acquisition-types/{code}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/acquisition-types/{code}", headers={
+    response = client.get(f"/climsoft/v1/acquisition-types/{code}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 404

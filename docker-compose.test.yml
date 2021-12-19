@@ -72,13 +72,14 @@ services:
       - MCH_DB_NAME=test_mch_db
       - MCH_DB_PORT=3306
       - SECRET_KEY=test_opencdms_api_secret_key
-      - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4
+      - AUTH_DB_URI=postgresql+psycopg2://dba:dba@test_opencdms_surface_db:5432/test_surface_db
+      # - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4 # uncomment this for snapshot test
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
       - test_opencdms_climsoft_db
       - test_opencdms_auth_db
-    command: ["pytest", "tests/integration"]
+    command: ["pytest", "tests/integration", "-s"]
 
     networks:
       - test_opencdms_api_test_network

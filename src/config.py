@@ -36,5 +36,7 @@ class AppConfig:
         "25432"
     )
 
+    SURFACE_SECRET_KEY: str = os.getenv("SURFACE_SECRET_KEY")
+
 
 app_config = AppConfig()

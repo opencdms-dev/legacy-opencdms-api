@@ -99,11 +99,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -161,8 +158,8 @@ def get_fault_resolution(get_instrument_fault_report):
     session.close()
 
 
-def test_should_return_first_five_station_location_histories(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/fault-resolutions", params={"limit": 5}, headers={
+def test_should_return_first_five_station_location_histories(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/fault-resolutions", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -171,12 +168,12 @@ def test_should_return_first_five_station_location_histories(test_app: TestClien
 
 
 def test_should_return_single_fault_resolution(
-    test_app: TestClient,
+    client: TestClient,
     get_fault_resolution: climsoft_models.Faultresolution,
     get_access_token: str
 ):
-    response = test_app.get(
-        f"/api/climsoft/v1/fault-resolutions/{get_fault_resolution.resolvedDatetime}/{get_fault_resolution.associatedWith}",
+    response = client.get(
+        f"/climsoft/v1/fault-resolutions/{get_fault_resolution.resolvedDatetime}/{get_fault_resolution.associatedWith}",
         headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -187,15 +184,15 @@ def test_should_return_single_fault_resolution(
 
 
 def test_should_create_a_fault_resolution(
-        test_app: TestClient,
+        client: TestClient,
         get_instrument_fault_report: climsoft_models.Instrumentfaultreport,
         get_access_token: str
 ):
     fault_resolution_data = climsoft_fault_resolution.get_valid_fault_resolution_input(
         instrument_fault_report_id=get_instrument_fault_report.reportId
     ).dict(by_alias=True)
-    response = test_app.post(
-        "/api/climsoft/v1/fault-resolutions",
+    response = client.post(
+        "/climsoft/v1/fault-resolutions",
         data=json.dumps(fault_resolution_data, default=str), headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -205,14 +202,14 @@ def test_should_create_a_fault_resolution(
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient,
+def test_should_raise_validation_error(client: TestClient,
                                        get_instrument_fault_report: climsoft_models.Instrumentfaultreport, 
                                        get_access_token: str):
     fault_resolution_data = climsoft_fault_resolution.get_valid_fault_resolution_input(
         instrument_fault_report_id=get_instrument_fault_report.reportId
     ).dict()
-    response = test_app.post(
-        "/api/climsoft/v1/fault-resolutions",
+    response = client.post(
+        "/climsoft/v1/fault-resolutions",
         data=json.dumps(fault_resolution_data, default=str), headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -221,7 +218,7 @@ def test_should_raise_validation_error(test_app: TestClient,
 
 
 def test_should_update_fault_resolution(
-    test_app: TestClient,
+    client: TestClient,
     get_fault_resolution: climsoft_models.Faultresolution,
     get_access_token: str
 ):
@@ -234,8 +231,8 @@ def test_should_update_fault_resolution(
 
     updates = {**fault_resolution_data, "remarks": uuid.uuid4().hex}
 
-    response = test_app.put(
-        f"/api/climsoft/v1/fault-resolutions/{resolved_datetime}/{associated_with}",
+    response = client.put(
+        f"/climsoft/v1/fault-resolutions/{resolved_datetime}/{associated_with}",
         data=json.dumps(updates, default=str), headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -247,7 +244,7 @@ def test_should_update_fault_resolution(
 
 
 def test_should_delete_fault_resolution(
-        test_app: TestClient,
+        client: TestClient,
         get_fault_resolution,
         get_access_token: str
 ):
@@ -257,15 +254,15 @@ def test_should_delete_fault_resolution(
     resolved_datetime = fault_resolution_data.pop("resolved_datetime")
     associated_with = fault_resolution_data.pop("associated_with")
 
-    response = test_app.delete(
-        f"/api/climsoft/v1/fault-resolutions/{resolved_datetime}/{associated_with}",
+    response = client.delete(
+        f"/climsoft/v1/fault-resolutions/{resolved_datetime}/{associated_with}",
         headers={
             "Authorization": f"Bearer {get_access_token}"
         }
     )
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/fault-resolutions/{resolved_datetime}/{associated_with}", headers={
+    response = client.get(f"/climsoft/v1/fault-resolutions/{resolved_datetime}/{associated_with}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

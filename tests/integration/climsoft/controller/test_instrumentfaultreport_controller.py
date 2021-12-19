@@ -91,11 +91,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -136,8 +133,8 @@ def get_instrument_fault_report(get_station: climsoft_models.Station, get_instru
     session.close()
 
 
-def test_should_return_first_five_station_location_histories(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/instrument-fault-reports", params={"limit": 5}, headers={
+def test_should_return_first_five_station_location_histories(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/instrument-fault-reports", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -145,8 +142,8 @@ def test_should_return_first_five_station_location_histories(test_app: TestClien
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_instrument_fault_report(test_app: TestClient, get_instrument_fault_report: climsoft_models.Instrumentfaultreport, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/instrument-fault-reports/{get_instrument_fault_report.reportId}", headers={
+def test_should_return_single_instrument_fault_report(client: TestClient, get_instrument_fault_report: climsoft_models.Instrumentfaultreport, get_access_token: str):
+    response = client.get(f"/climsoft/v1/instrument-fault-reports/{get_instrument_fault_report.reportId}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -154,9 +151,9 @@ def test_should_return_single_instrument_fault_report(test_app: TestClient, get_
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_instrument_fault_report(test_app: TestClient, get_station: climsoft_models.Station, get_instrument: climsoft_models.Instrument, get_access_token: str):
+def test_should_create_a_instrument_fault_report(client: TestClient, get_station: climsoft_models.Station, get_instrument: climsoft_models.Instrument, get_access_token: str):
     instrument_fault_report_data = climsoft_instrument_fault_report.get_valid_instrument_fault_report_input(station_id=get_station.stationId, instrument_id=get_instrument.instrumentId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/instrument-fault-reports", data=json.dumps(instrument_fault_report_data, default=str), headers={
+    response = client.post("/climsoft/v1/instrument-fault-reports", data=json.dumps(instrument_fault_report_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -164,21 +161,21 @@ def test_should_create_a_instrument_fault_report(test_app: TestClient, get_stati
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_instrument: climsoft_models.Instrument, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station, get_instrument: climsoft_models.Instrument, get_access_token: str):
     instrument_fault_report_data = climsoft_instrument_fault_report.get_valid_instrument_fault_report_input(station_id=get_station.stationId, instrument_id=get_instrument.instrumentId).dict()
-    response = test_app.post("/api/climsoft/v1/instrument-fault-reports", data=json.dumps(instrument_fault_report_data, default=str), headers={
+    response = client.post("/climsoft/v1/instrument-fault-reports", data=json.dumps(instrument_fault_report_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_instrument_fault_report(test_app: TestClient, get_instrument_fault_report: climsoft_models.Instrumentfaultreport, get_access_token: str):
+def test_should_update_instrument_fault_report(client: TestClient, get_instrument_fault_report: climsoft_models.Instrumentfaultreport, get_access_token: str):
     instrument_fault_report_data = instrumentfaultreport_schema.InstrumentFaultReport.from_orm(get_instrument_fault_report).dict(by_alias=True)
     report_id = instrument_fault_report_data.pop("report_id")
     
     updates = {**instrument_fault_report_data, "reported_by": uuid.uuid4().hex}
 
-    response = test_app.put(f"/api/climsoft/v1/instrument-fault-reports/{report_id}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/instrument-fault-reports/{report_id}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -187,16 +184,16 @@ def test_should_update_instrument_fault_report(test_app: TestClient, get_instrum
     assert response_data["result"][0]["reported_by"] == updates["reported_by"]
 
 
-def test_should_delete_instrument_fault_report(test_app: TestClient, get_instrument_fault_report, get_access_token: str):
+def test_should_delete_instrument_fault_report(client: TestClient, get_instrument_fault_report, get_access_token: str):
     instrument_fault_report_data = instrumentfaultreport_schema.InstrumentFaultReport.from_orm(get_instrument_fault_report).dict(by_alias=True)
     report_id = instrument_fault_report_data.pop("report_id")
 
-    response = test_app.delete(f"/api/climsoft/v1/instrument-fault-reports/{report_id}", headers={
+    response = client.delete(f"/climsoft/v1/instrument-fault-reports/{report_id}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/instrument-fault-reports/{report_id}", headers={
+    response = client.get(f"/climsoft/v1/instrument-fault-reports/{report_id}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

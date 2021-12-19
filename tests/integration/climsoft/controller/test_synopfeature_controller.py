@@ -69,11 +69,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -87,8 +84,8 @@ def get_synop_feature():
     session.close()
 
 
-def test_should_return_first_five_synop_features(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/synop-features", params={"limit": 5}, headers={
+def test_should_return_first_five_synop_features(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/synop-features", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -96,8 +93,8 @@ def test_should_return_first_five_synop_features(test_app: TestClient, get_acces
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_synop_feature(test_app: TestClient, get_synop_feature: climsoft_models.Synopfeature, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/synop-features/{get_synop_feature.abbreviation}", headers={
+def test_should_return_single_synop_feature(client: TestClient, get_synop_feature: climsoft_models.Synopfeature, get_access_token: str):
+    response = client.get(f"/climsoft/v1/synop-features/{get_synop_feature.abbreviation}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -105,9 +102,9 @@ def test_should_return_single_synop_feature(test_app: TestClient, get_synop_feat
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_synop_feature(test_app: TestClient, get_access_token: str):
+def test_should_create_a_synop_feature(client: TestClient, get_access_token: str):
     synop_feature_data = climsoft_synopfeature.get_valid_synop_feature_input().dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/synop-features", data=json.dumps(synop_feature_data, default=str), headers={
+    response = client.post("/climsoft/v1/synop-features", data=json.dumps(synop_feature_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -115,20 +112,20 @@ def test_should_create_a_synop_feature(test_app: TestClient, get_access_token: s
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_access_token: str):
     synop_feature_data = {"aaa": "bbbbbbb"}
-    response = test_app.post("/api/climsoft/v1/synop-features", data=json.dumps(synop_feature_data, default=str), headers={
+    response = client.post("/climsoft/v1/synop-features", data=json.dumps(synop_feature_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_synop_feature(test_app: TestClient, get_synop_feature, get_access_token: str):
+def test_should_update_synop_feature(client: TestClient, get_synop_feature, get_access_token: str):
     synop_feature_data = synopfeature_schema.SynopFeature.from_orm(get_synop_feature).dict(by_alias=True)
     abbreviation = synop_feature_data.pop("abbreviation")
     updates = {**synop_feature_data, "description": "updated name"}
 
-    response = test_app.put(f"/api/climsoft/v1/synop-features/{abbreviation}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/synop-features/{abbreviation}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -137,16 +134,16 @@ def test_should_update_synop_feature(test_app: TestClient, get_synop_feature, ge
     assert response_data["result"][0]["description"] == updates["description"]
 
 
-def test_should_delete_synop_feature(test_app: TestClient, get_synop_feature, get_access_token: str):
+def test_should_delete_synop_feature(client: TestClient, get_synop_feature, get_access_token: str):
     synop_feature_data = synopfeature_schema.SynopFeature.from_orm(get_synop_feature).dict(by_alias=True)
     abbreviation = synop_feature_data.pop("abbreviation")
 
-    response = test_app.delete(f"/api/climsoft/v1/synop-features/{abbreviation}", headers={
+    response = client.delete(f"/climsoft/v1/synop-features/{abbreviation}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/synop-features/{abbreviation}", headers={
+    response = client.get(f"/climsoft/v1/synop-features/{abbreviation}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 404
