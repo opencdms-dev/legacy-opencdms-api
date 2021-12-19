@@ -102,3 +102,8 @@ resources:
         type: process
         processor:
             name: HelloWorld
+    windrose-generator:
+        type: process
+        processor:
+            name: WindroseGenerator
+            data: src/WindroseGenerator.py
