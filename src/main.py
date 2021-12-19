@@ -9,17 +9,19 @@ from src.apps.surface.settings import setup as setup_surface
 from mch_api.api_mch import app as mch_api_application
 from starlette.middleware.wsgi import WSGIMiddleware
 from src.middlewares.auth import WSGIAuthMiddleWare
-from surface.api.tempestas_api.wsgi import application as surface_application
+from pygeoapi.starlette_app import app as pygeoapi_app
+# from surface.api.tempestas_api.wsgi import application as surface_application
 
 
 app = FastAPI()
 
 app.mount("/mch", WSGIAuthMiddleWare(WSGIMiddleware(mch_api_application)))
-app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(surface_application)))
+# app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(surface_application)))
+app.mount("/pygeoapi", pygeoapi_app)
 
 
 # setup surface
-setup_surface()
+# setup_surface()
 # migrate
 migrate_climsoft_db()
 migrate_auth_db()
@@ -27,10 +29,10 @@ migrate_auth_db()
 controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft", "auth", "surface"])
 controller_loader.detect(app)
 
-
-@app.on_event("startup")
-async def run_migrations():
-    await migrate_surface_db()
+#
+# @app.on_event("startup")
+# async def run_migrations():
+#     await migrate_surface_db()
 
 
 if __name__ == "__main__":
