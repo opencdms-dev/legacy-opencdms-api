@@ -72,12 +72,13 @@ services:
       - MCH_DB_NAME=test_mch_db
       - MCH_DB_PORT=3306
       - SECRET_KEY=test_opencdms_api_secret_key
+      - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
       - test_opencdms_climsoft_db
       - test_opencdms_auth_db
-    command: ["pytest", "tests/integration/auth/controller/test_auth_controller.py"]
+    command: ["pytest", "tests/integration"]
 
     networks:
       - test_opencdms_api_test_network
