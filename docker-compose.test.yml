@@ -13,7 +13,7 @@ services:
       - PYTHONPATH=/code/surface/api:/code/tests
       - TIMESCALEDB_TELEMETRY=off
       - PGDATA=/var/lib/postgresql/data/pgdata
-      - SURFACE_SECRET_KEY=test_surface_secret_key
+      - SURFACE_SECRET_KEY=)=z4gw5d)pyd4a!r7teec26+(2+3zvcslkb1el%e^gq-qo(r1w
       - SURFACE_DATA_DIR=/home/surface/surface_data/shared
       - SURFACE_DB_ENGINE=django.contrib.gis.db.backends.postgis
       - SURFACE_DB_HOST=test_opencdms_surface_db
