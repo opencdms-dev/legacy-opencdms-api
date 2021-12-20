@@ -1,5 +1,5 @@
-from src.apps.auth.db import engine
-from src.apps.auth.db.models.user_model import Base
+from apps.auth.db import engine
+from apps.auth.db.models.user_model import Base
 
 
 def migrate():

@@ -2,7 +2,7 @@ import logging
 from typing import List
 from sqlalchemy.orm.session import Session
 from opencdms.models.climsoft import v4_1_1_core as models
-from src.apps.climsoft.schemas import flag_schema
+from apps.climsoft.schemas import flag_schema
 from fastapi.exceptions import HTTPException
 
 logger = logging.getLogger("ClimsoftFlagService")

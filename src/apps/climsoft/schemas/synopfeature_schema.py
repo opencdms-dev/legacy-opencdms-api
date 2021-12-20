@@ -1,6 +1,6 @@
 from pydantic import BaseModel, constr
 from typing import List
-from src.common_schemas import Response
+from common_schemas import Response
 
 
 class CreateSynopFeature(BaseModel):

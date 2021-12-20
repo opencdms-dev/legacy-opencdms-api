@@ -9,11 +9,11 @@ class AppConfig:
     )
     CLIMSOFT_DB_URI: str = os.getenv(
         "CLIMSOFT_DB_URI",
-        "mysql+mysqldb://root:password@127.0.0.1:13306/climsoft"
+        "mysql+mysqldb://root:password@test_opencdms_climsoft_db:3306/climsoft"
     )
     AUTH_DB_URI: str = os.getenv(
         "AUTH_DB_URI",
-        "postgresql+psycopg2://postgres:password@localhost:15432/auth"
+        "postgresql+psycopg2://postgres:password@test_opencdms_auth_db:5432/auth"
     )
     SURFACE_DB_NAME: str = os.getenv(
         "SURFACE_DB_NAME",
@@ -35,6 +35,8 @@ class AppConfig:
         "SURFACE_DB_PORT",
         "25432"
     )
+
+    SURFACE_SECRET_KEY: str = os.getenv("SURFACE_SECRET_KEY")
 
 
 app_config = AppConfig()

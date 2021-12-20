@@ -6,14 +6,14 @@ import pytest
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
-from src.apps.climsoft.db.engine import db_engine
-from src.apps.climsoft.schemas import instrumentinspection_schema
-from tests.datagen.climsoft import instrumentinspection as climsoft_instrument_inspection, \
+from apps.climsoft.db.engine import db_engine
+from apps.climsoft.schemas import instrumentinspection_schema
+from datagen.climsoft import instrumentinspection as climsoft_instrument_inspection, \
     station as climsoft_station, instrument as climsoft_instrument
 from faker import Faker
 from fastapi.testclient import TestClient
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 fake = Faker()
@@ -94,11 +94,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -140,8 +137,8 @@ def get_instrument_inspection(get_station: climsoft_models.Station, get_instrume
     session.close()
 
 
-def test_should_return_first_five_station_location_histories(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/instrument-inspections", params={"limit": 5}, headers={
+def test_should_return_first_five_station_location_histories(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/instrument-inspections", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -150,12 +147,12 @@ def test_should_return_first_five_station_location_histories(test_app: TestClien
 
 
 def test_should_return_single_instrument_inspection(
-    test_app: TestClient,
+    client: TestClient,
     get_instrument_inspection: climsoft_models.Instrumentinspection,
     get_access_token: str
 ):
-    response = test_app.get(
-        f"/api/climsoft/v1/instrument-inspections/{get_instrument_inspection.performedOn}/{get_instrument_inspection.inspectionDatetime}",
+    response = client.get(
+        f"/climsoft/v1/instrument-inspections/{get_instrument_inspection.performedOn}/{get_instrument_inspection.inspectionDatetime}",
         headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -166,14 +163,14 @@ def test_should_return_single_instrument_inspection(
 
 
 def test_should_create_a_instrument_inspection(
-        test_app: TestClient, get_station: climsoft_models.Station,
+        client: TestClient, get_station: climsoft_models.Station,
         get_instrument: climsoft_models.Instrument,
         get_access_token: str
 ):
     instrument_inspection_data = climsoft_instrument_inspection.get_valid_instrument_inspection_input(
         station_id=get_station.stationId, instrument_id=get_instrument.instrumentId).dict(by_alias=True)
-    response = test_app.post(
-        "/api/climsoft/v1/instrument-inspections",
+    response = client.post(
+        "/climsoft/v1/instrument-inspections",
         data=json.dumps(instrument_inspection_data, default=str), headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -183,13 +180,13 @@ def test_should_create_a_instrument_inspection(
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station,
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station,
                                        get_instrument: climsoft_models.Instrument, get_access_token: str):
     instrument_inspection_data = climsoft_instrument_inspection.get_valid_instrument_inspection_input(
         station_id=get_station.stationId, instrument_id=get_instrument.instrumentId
     ).dict()
-    response = test_app.post(
-        "/api/climsoft/v1/instrument-inspections",
+    response = client.post(
+        "/climsoft/v1/instrument-inspections",
         data=json.dumps(instrument_inspection_data, default=str), headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -198,7 +195,7 @@ def test_should_raise_validation_error(test_app: TestClient, get_station: climso
 
 
 def test_should_update_instrument_inspection(
-    test_app: TestClient,
+    client: TestClient,
     get_instrument_inspection: climsoft_models.Instrumentinspection,
     get_access_token: str
 ):
@@ -210,8 +207,8 @@ def test_should_update_instrument_inspection(
 
     updates = {**instrument_inspection_data, "status": uuid.uuid4().hex}
 
-    response = test_app.put(
-        f"/api/climsoft/v1/instrument-inspections/{performed_on}/{inspection_datetime}",
+    response = client.put(
+        f"/climsoft/v1/instrument-inspections/{performed_on}/{inspection_datetime}",
         data=json.dumps(updates, default=str), headers={
             "Authorization": f"Bearer {get_access_token}"
         }
@@ -223,7 +220,7 @@ def test_should_update_instrument_inspection(
 
 
 def test_should_delete_instrument_inspection(
-        test_app: TestClient,
+        client: TestClient,
         get_instrument_inspection,
         get_access_token: str
 ):
@@ -233,15 +230,15 @@ def test_should_delete_instrument_inspection(
     performed_on = instrument_inspection_data.pop("performed_on")
     inspection_datetime = instrument_inspection_data.pop("inspection_datetime")
 
-    response = test_app.delete(
-        f"/api/climsoft/v1/instrument-inspections/{performed_on}/{inspection_datetime}",
+    response = client.delete(
+        f"/climsoft/v1/instrument-inspections/{performed_on}/{inspection_datetime}",
         headers={
             "Authorization": f"Bearer {get_access_token}"
         }
     )
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/instrument-inspections/{performed_on}/{inspection_datetime}", headers={
+    response = client.get(f"/climsoft/v1/instrument-inspections/{performed_on}/{inspection_datetime}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

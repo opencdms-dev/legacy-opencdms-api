@@ -20,8 +20,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
             cd /home/ubuntu/opencdms-api
             git pull origin main
-            docker-compose up -d --build
-            docker-compose stop opencdms-api
+            docker-compose -f docker-compose.prod.yml build
+            docker-compose -f docker-compose.prod.yml stop opencdms-api
             sleep 30
-            docker-compose up -d --build
+            docker-compose -f docker-compose.prod.yml up -d --build
           '

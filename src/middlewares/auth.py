@@ -6,10 +6,10 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose.exceptions import JWTError
 from starlette.types import Scope, Receive, Send, ASGIApp
 from jose import jwt
-from src.apps.auth.services import user_service
-from src.config import app_config
-from src.apps.auth.db.engine import SessionLocal
-from src.apps.auth.db.models import user_model
+from apps.auth.services import user_service
+from config import app_config
+from apps.auth.db.engine import SessionLocal
+from apps.auth.db.models import user_model
 
 
 class AuthMiddleWare:

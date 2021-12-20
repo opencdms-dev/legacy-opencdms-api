@@ -1,9 +1,9 @@
 import logging
 
 from sqlalchemy.orm import Session
-from src.apps.auth.schemas import auth_schema
+from apps.auth.schemas import auth_schema
 from fastapi.exceptions import HTTPException
-from src.apps.auth.db.models import user_model
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 logger = logging.getLogger("AuthServiceLogger")

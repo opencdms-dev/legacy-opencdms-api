@@ -3,13 +3,13 @@ import pytest
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
-from src.apps.climsoft.db.engine import db_engine
-from src.apps.climsoft.schemas import regkey_schema
-from tests.datagen.climsoft import regkey as climsoft_regkey
+from apps.climsoft.db.engine import db_engine
+from apps.climsoft.schemas import regkey_schema
+from datagen.climsoft import regkey as climsoft_regkey
 from faker import Faker
 from fastapi.testclient import TestClient
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 fake = Faker()
@@ -69,11 +69,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -87,8 +84,8 @@ def get_reg_key():
     session.close()
 
 
-def test_should_return_first_five_reg_keys(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/reg-keys", params={"limit": 5}, headers={
+def test_should_return_first_five_reg_keys(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/reg-keys", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -96,8 +93,8 @@ def test_should_return_first_five_reg_keys(test_app: TestClient, get_access_toke
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_reg_key(test_app: TestClient, get_reg_key: climsoft_models.Regkey, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/reg-keys/{get_reg_key.keyName}", headers={
+def test_should_return_single_reg_key(client: TestClient, get_reg_key: climsoft_models.Regkey, get_access_token: str):
+    response = client.get(f"/climsoft/v1/reg-keys/{get_reg_key.keyName}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -105,9 +102,9 @@ def test_should_return_single_reg_key(test_app: TestClient, get_reg_key: climsof
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_reg_key(test_app: TestClient, get_access_token: str):
+def test_should_create_a_reg_key(client: TestClient, get_access_token: str):
     reg_key_data = climsoft_regkey.get_valid_reg_key_input().dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/reg-keys", data=json.dumps(reg_key_data, default=str), headers={
+    response = client.post("/climsoft/v1/reg-keys", data=json.dumps(reg_key_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -115,20 +112,20 @@ def test_should_create_a_reg_key(test_app: TestClient, get_access_token: str):
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_access_token: str):
     reg_key_data = {"aaa": "bbbbbbb"}
-    response = test_app.post("/api/climsoft/v1/reg-keys", data=json.dumps(reg_key_data, default=str), headers={
+    response = client.post("/climsoft/v1/reg-keys", data=json.dumps(reg_key_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_reg_key(test_app: TestClient, get_reg_key, get_access_token: str):
+def test_should_update_reg_key(client: TestClient, get_reg_key, get_access_token: str):
     reg_key_data = regkey_schema.RegKey.from_orm(get_reg_key).dict(by_alias=True)
     key_name = reg_key_data.pop("key_name")
     updates = {**reg_key_data, "key_description": "updated name"}
 
-    response = test_app.put(f"/api/climsoft/v1/reg-keys/{key_name}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/reg-keys/{key_name}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -137,16 +134,16 @@ def test_should_update_reg_key(test_app: TestClient, get_reg_key, get_access_tok
     assert response_data["result"][0]["key_description"] == updates["key_description"]
 
 
-def test_should_delete_reg_key(test_app: TestClient, get_reg_key, get_access_token: str):
+def test_should_delete_reg_key(client: TestClient, get_reg_key, get_access_token: str):
     reg_key_data = regkey_schema.RegKey.from_orm(get_reg_key).dict(by_alias=True)
     key_name = reg_key_data.pop("key_name")
 
-    response = test_app.delete(f"/api/climsoft/v1/reg-keys/{key_name}", headers={
+    response = client.delete(f"/climsoft/v1/reg-keys/{key_name}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/reg-keys/{key_name}", headers={
+    response = client.get(f"/climsoft/v1/reg-keys/{key_name}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 404

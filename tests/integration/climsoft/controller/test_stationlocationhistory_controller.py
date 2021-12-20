@@ -6,13 +6,13 @@ import pytest
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
-from src.apps.climsoft.db.engine import db_engine
-from src.apps.climsoft.schemas import stationlocationhistory_schema
-from tests.datagen.climsoft import stationlocationhistory as climsoft_station_location_history, station as climsoft_station
+from apps.climsoft.db.engine import db_engine
+from apps.climsoft.schemas import stationlocationhistory_schema
+from datagen.climsoft import stationlocationhistory as climsoft_station_location_history, station as climsoft_station
 from faker import Faker
 from fastapi.testclient import TestClient
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 
@@ -83,11 +83,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -112,8 +109,8 @@ def get_station_location_history(get_station: climsoft_models.Station):
     session.close()
 
 
-def test_should_return_first_five_station_location_histories(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/station-location-histories", params={"limit": 5}, headers={
+def test_should_return_first_five_station_location_histories(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/station-location-histories", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -121,8 +118,8 @@ def test_should_return_first_five_station_location_histories(test_app: TestClien
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_station_location_history(test_app: TestClient, get_station_location_history: climsoft_models.Stationlocationhistory, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/station-location-histories/{get_station_location_history.belongsTo}/{get_station_location_history.openingDatetime}", headers={
+def test_should_return_single_station_location_history(client: TestClient, get_station_location_history: climsoft_models.Stationlocationhistory, get_access_token: str):
+    response = client.get(f"/climsoft/v1/station-location-histories/{get_station_location_history.belongsTo}/{get_station_location_history.openingDatetime}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -130,9 +127,9 @@ def test_should_return_single_station_location_history(test_app: TestClient, get
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_station_location_history(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_create_a_station_location_history(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     station_location_history_data = climsoft_station_location_history.get_valid_station_location_history_input(station_id=get_station.stationId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/station-location-histories", data=json.dumps(station_location_history_data, default=str), headers={
+    response = client.post("/climsoft/v1/station-location-histories", data=json.dumps(station_location_history_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -140,21 +137,21 @@ def test_should_create_a_station_location_history(test_app: TestClient, get_stat
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     station_location_history_data = climsoft_station_location_history.get_valid_station_location_history_input(station_id=get_station.stationId).dict()
-    response = test_app.post("/api/climsoft/v1/station-location-histories", data=json.dumps(station_location_history_data, default=str), headers={
+    response = client.post("/climsoft/v1/station-location-histories", data=json.dumps(station_location_history_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_station_location_history(test_app: TestClient, get_station_location_history: climsoft_models.Stationlocationhistory, get_access_token: str):
+def test_should_update_station_location_history(client: TestClient, get_station_location_history: climsoft_models.Stationlocationhistory, get_access_token: str):
     station_location_history_data = stationlocationhistory_schema.StationLocationHistory.from_orm(get_station_location_history).dict(by_alias=True)
     belongs_to = station_location_history_data.pop("belongs_to")
     opening_datetime = station_location_history_data.pop("opening_datetime")
     updates = {**station_location_history_data, "authority": uuid.uuid4().hex}
 
-    response = test_app.put(f"/api/climsoft/v1/station-location-histories/{belongs_to}/{opening_datetime}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/station-location-histories/{belongs_to}/{opening_datetime}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -163,17 +160,17 @@ def test_should_update_station_location_history(test_app: TestClient, get_statio
     assert response_data["result"][0]["authority"] == updates["authority"]
 
 
-def test_should_delete_station_location_history(test_app: TestClient, get_station_location_history, get_access_token: str):
+def test_should_delete_station_location_history(client: TestClient, get_station_location_history, get_access_token: str):
     station_location_history_data = stationlocationhistory_schema.StationLocationHistory.from_orm(get_station_location_history).dict(by_alias=True)
     belongs_to = station_location_history_data.pop("belongs_to")
     opening_datetime = station_location_history_data.pop("opening_datetime")
 
-    response = test_app.delete(f"/api/climsoft/v1/station-location-histories/{belongs_to}/{opening_datetime}", headers={
+    response = client.delete(f"/climsoft/v1/station-location-histories/{belongs_to}/{opening_datetime}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/station-location-histories/{belongs_to}/{opening_datetime}", headers={
+    response = client.get(f"/climsoft/v1/station-location-histories/{belongs_to}/{opening_datetime}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

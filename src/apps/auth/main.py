@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from src.config import app_config
-from src.apps.auth.db.migration import migrate
-from src.utils.controllers import ControllerLoader
+from config import app_config
+from apps.auth.db.migration import migrate
+from utils.controllers import ControllerLoader
 
 
 app = FastAPI()

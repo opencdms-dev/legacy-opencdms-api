@@ -5,12 +5,12 @@ import uuid
 from passlib.hash import django_pbkdf2_sha256 as handler
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm.session import Session
-from src.apps.auth.schemas import auth_schema
-from src.apps.auth.services import user_service
-from src.apps.auth.db.engine import SessionLocal
-from src.utils import response
+from apps.auth.schemas import auth_schema
+from apps.auth.services import user_service
+from apps.auth.db.engine import SessionLocal
+from utils import response
 from jose import jwt
-from src.config import app_config
+from config import app_config
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 
