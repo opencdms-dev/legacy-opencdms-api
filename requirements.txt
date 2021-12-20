@@ -42,7 +42,7 @@ mch-api @ git+https://github.com/opencdms/mch-api@b6c625f649ec75c61353d7e3298080
 mysqlclient==2.0.3
 numpy==1.21.4
 opencdms @ git+https://github.com/opencdms/pyopencdms@3aae43499a4d1000f1f56e092955a6e8b095d443
-opencdms-process @ git+https://github.com/opencdms/opencdms-process.git@ee30389d088efe858a3bf000fb810f3feca0233d
+opencdms-process @ git+https://github.com/faysal-ishtiaq/opencdms-process.git@windrose-process
 packaging==21.3
 pandas==1.3.4
 passlib==1.7.4
@@ -88,3 +88,4 @@ urllib3==1.26.7
 uvicorn==0.15.0
 Werkzeug==2.0.2
 zipp==3.6.0
+nest-asyncio~=1.5.4

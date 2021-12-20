@@ -11,6 +11,7 @@ from opencdms_api.middelware import AuthMiddleWare
 from opencdms_api.schema import StationSchema
 from opencdms_api.deps import get_session
 from opencdms_api.router import router
+from pygeoapi.starlette_app import app as pygeoapi_app
 
 
 # load controllers
@@ -21,6 +22,7 @@ def get_app():
     app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
     app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
     app.mount("/climsoft", climsoft_app)
+    app.mount("/pygeoapi", pygeoapi_app)
     app.include_router(router)
     return app
 

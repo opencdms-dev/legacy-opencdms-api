@@ -14,7 +14,7 @@ ENV PYTHONFAULTHANDLER=1 \
     POETRY_VIRTUALENVS_CREATE=0
 
 RUN apt-get update --fix-missing
-RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it
+RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it r-base-core
 RUN apt-get install -y curl git && pip install --upgrade pip "poetry==${POETRY_VERSION}"
 
 WORKDIR /code
@@ -24,6 +24,8 @@ RUN git clone --branch refactor-for-opencdms-server https://github.com/Shaibujnr
 
 RUN pip install numpy==1.21.2 --no-warn-script-location
 RUN pip install -r surface/api/requirements.txt
+
+RUN git clone https://github.com/opencdms/opencdms-test-data
 
 # Install Python dependencies.
 COPY pyproject.toml poetry.lock ./
@@ -36,6 +38,10 @@ COPY . .
 
 
 RUN poetry install
+
+COPY pygeoapi-config.yml /code/pygeoapi-config.yml
+
+RUN pygeoapi openapi generate /code/pygeoapi-config.yml > /code/pygeoapi-openapi.yml
 
 RUN useradd -m opencdms_api_user && chown -R opencdms_api_user /code
 

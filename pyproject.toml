@@ -17,6 +17,10 @@ pydantic = {extras = ["email"], version = "^1.8.2"}
 mch-api = {git = "https://github.com/Shaibujnr/mch-api.git", rev = "make_mch_api_installable"}
 Faker = "^10.0.0"
 python-multipart = "^0.0.5"
+pygeoapi = "^0.11.0"
+nest-asyncio = "^1.5.4"
+opencdms-process = {git = "https://github.com/faysal-ishtiaq/opencdms-process", rev = "windrose-process"}
+rpy2 = "^3.4.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

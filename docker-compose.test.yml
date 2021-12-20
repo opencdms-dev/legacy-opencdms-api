@@ -7,9 +7,14 @@ services:
       context: .
       dockerfile: dockerfile
     container_name: test_opencdms_api
+    volumes:
+      - ./pygeoapi-config.yml:/code/pygeoapi-config.yml
+      - ./pygeoapi-openapi.yml:/code/pygeoapi-openapi.yml
     expose:
       - "5000"
     environment:
+      - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
+      - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api:/code/tests
       - TIMESCALEDB_TELEMETRY=off
       - PGDATA=/var/lib/postgresql/data/pgdata
@@ -73,7 +78,7 @@ services:
       - MCH_DB_PORT=3306
       - SECRET_KEY=test_opencdms_api_secret_key
       - AUTH_DB_URI=postgresql+psycopg2://dba:dba@test_opencdms_surface_db:5432/test_surface_db
-      # - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4 # uncomment this for snapshot test
+#      - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4 # uncomment this for snapshot test
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db

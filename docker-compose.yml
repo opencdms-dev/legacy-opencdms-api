@@ -36,7 +36,7 @@ services:
 
   opencdms_surfacedb:
     image: timescale/timescaledb-postgis:2.3.0-pg13
-    container_name: opencdms_surface_db
+    container_name: opencdms_surfacedb
     volumes:
       - opencdms_surface_data:/var/lib/postgresql/data
     ports:

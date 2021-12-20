@@ -9,7 +9,6 @@ from config import app_config
 from mch_api.api_mch import app as mch_api_application
 from starlette.middleware.wsgi import WSGIMiddleware
 from middlewares.auth import WSGIAuthMiddleWare
-from pygeoapi.starlette_app import app as pygeoapi_app
 
 
 app = FastAPI()
@@ -17,7 +16,6 @@ app = FastAPI()
 app.mount("/mch", WSGIAuthMiddleWare(WSGIMiddleware(mch_api_application)))
 # app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(
 # surface_application)))
-app.mount("/pygeoapi", pygeoapi_app)
 
 
 # setup surface
@@ -26,7 +24,10 @@ app.mount("/pygeoapi", pygeoapi_app)
 migrate_climsoft_db()
 migrate_auth_db()
 # load controllers
-controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft", "auth"])
+controller_loader = ControllerLoader(
+    base_dir=app_config.BASE_DIR,
+    apps=["climsoft", "auth"]
+)
 controller_loader.detect(app)
 
 # @app.on_event("startup")

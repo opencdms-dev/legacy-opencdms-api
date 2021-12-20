@@ -45,6 +45,8 @@ services:
       dockerfile: dockerfile
     container_name: opencdms-api
     hostname: opencdms-api
+    volumes:
+      - ./pygeoapi-config.yml:/code/pygeoapi-config.yml
     expose:
       - "5000"
     depends_on:
@@ -52,6 +54,8 @@ services:
       - surfacedb
       - mchdb
     environment:
+      - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
+      - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
       - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
       - AUTH_DB_URI=postgresql+psycopg2://dba:dba@surfacedb/surface
@@ -133,15 +137,17 @@ services:
         "--reload",
         "--use-colors",
       ]
-  
-  traefik:
-    image: traefik:latest
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
+      - "5000:5000"
+#
+#  traefik:
+#    image: traefik:latest
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
 
 volumes:
   climsoftdb-data:
