@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, constr
-from src.apps.climsoft.schemas import Response, station_schema
+from apps.climsoft.schemas import Response, station_schema
 
 field_names = {
     "refersTo": "refers_to"

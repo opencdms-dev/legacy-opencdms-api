@@ -1,6 +1,6 @@
 import uuid
 from faker import Faker
-from src.apps.climsoft.schemas import obsscheduleclass_schema
+from apps.climsoft.schemas import obsscheduleclass_schema
 
 
 fake = Faker()

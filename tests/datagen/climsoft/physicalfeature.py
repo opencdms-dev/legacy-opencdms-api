@@ -1,7 +1,7 @@
 import uuid
 import datetime
 from faker import Faker
-from src.apps.climsoft.schemas import physicalfeature_schema
+from apps.climsoft.schemas import physicalfeature_schema
 
 
 fake = Faker()

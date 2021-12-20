@@ -1,0 +1,151 @@
+version: "3"
+
+services:
+  climsoftdb:
+    image: mariadb:10.1
+    container_name: climsoftdb
+    hostname: climsoftdb
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=climsoft
+    volumes:
+      - climsoftdb-data:/var/lib/mysql
+
+  surfacedb:
+    image: timescale/timescaledb-postgis:2.3.0-pg13
+    container_name: surfacedb
+    hostname: surfacedb
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_PASSWORD=dba
+      - POSTGRES_DB=surface
+      - POSTGRES_USER=dba
+    volumes:
+      - surfacedb-data:/var/lib/postgresql/data
+
+  mchdb:
+    build:
+      context: ./mch_db
+      dockerfile: Dockerfile
+    container_name: mchdb
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mch
+    volumes:
+      - mchdb-data:/var/lib/mysql
+
+  opencdms-api:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: opencdms-api
+    hostname: opencdms-api
+    expose:
+      - "5000"
+    depends_on:
+      - climsoftdb
+      - surfacedb
+      - mchdb
+    environment:
+      - PYTHONPATH=/code/surface/api
+      - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
+      - AUTH_DB_URI=postgresql+psycopg2://dba:dba@surfacedb/surface
+      - SURFACE_DB_NAME=surface
+      - SURFACE_DB_USER=dba
+      - SURFACE_DB_PASSWORD=dba
+      - SURFACE_DB_HOST=surfacedb
+      - SURFACE_DB_PORT=5432
+      - MCH_DB_PORT=3306
+      - MCH_DB_HOST=mchdb
+      - MCH_DB_NAME=mch
+      - MCH_DB_PASSWORD=password
+      - MCH_DB_USER=root
+      - APP_SECRET=MGExYmQ4ZDRiNjQ5NGE1YzkxMDFmM2IxMTcxMTYyNjMxOTA5MGQxZGVmYzI0Njk3OWRlNWYyYjZmY2YxNDQ0Y2NiNGYzYzY0ZTg0NjQ0NjU4NzQ4YmJkYTVkZjQzMWI3
+      - SURFACE_SECRET_KEY=fr-t)9juxwru#^iz9xwm_n3#hr(rfoi7)j#()-q*^ry^cj_n$y
+      - SECRET_KEY=4mzs_1e@+5fkn=d(l$bqfeo9*47b8lgt0!+wpu5vajx+%ac!qe
+      - TIMESCALEDB_TELEMETRY=off
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - SURFACE_DATA_DIR=/home/surface/surface_data/shared
+      - SURFACE_DB_ENGINE=django.contrib.gis.db.backends.postgis
+      - SURFACE_BROKER_URL=redis://redis:6379/0
+      - SURFACE_DJANGO_DEBUG=False
+      - LOGIN_REDIRECT_URL=/wx/stations/map/
+      - LOGOUT_REDIRECT_URL=/accounts/login/
+      - LRGS_EXECUTABLE_PATH=/surface/LrgsClient/bin/getDcpMessages
+      - LRGS_SERVER_HOST=lrgseddn1.cr.usgs.gov
+      - LRGS_SERVER_PORT=16003
+      - LRGS_USER=belnms
+      - LRGS_PASSWORD=BWSNlrgs2016!
+      - LRGS_CS_FILE_PATH=/data/search_parameters.cs
+      - LRGS_MAX_INTERVAL=719
+      - ENTL_PRIMARY_SERVER_HOST=107.23.152.248
+      - ENTL_PRIMARY_SERVER_PORT=2324
+      - ENTL_SECONDARY_SERVER_HOST=107.23.135.182
+      - ENTL_SECONDARY_SERVER_PORT=2324
+      - ENTL_PARTNER_ID=2B6FDADE-CA7F-443A-AD79-2FF21CEF4857
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_HOST_USER=test_email_host
+      - EMAIL_HOST_PASSWORD=test_email_password
+      - EMAIL_PORT=587
+      - TIMEZONE_NAME=America/Belize
+      - TIMEZONE_OFFSET=-360
+      - INMET_HOURLY_DATA_URL=
+      - INMET_DAILY_DATA_BASE_PATH=
+      - MAP_LATITUDE=17.302212
+      - MAP_LONGITUDE=-88.429595
+      - MAP_ZOOM=8
+      - SPATIAL_ANALYSIS_INITIAL_LATITUDE=15.8469375676
+      - SPATIAL_ANALYSIS_INITIAL_LONGITUDE=-89.227
+      - SPATIAL_ANALYSIS_FINAL_LATITUDE=18.5299822047
+      - SPATIAL_ANALYSIS_FINAL_LONGITUDE=-87.485
+      - SPATIAL_ANALYSIS_SHAPE_FILE_PATH=/surface/static/images/blz_shape.png
+      - STATION_MAP_WIND_SPEED_ID=51
+      - STATION_MAP_WIND_GUST_ID=53
+      - STATION_MAP_WIND_DIRECTION_ID=56
+      - STATION_MAP_TEMP_MAX_ID=16
+      - STATION_MAP_TEMP_MIN_ID=14
+      - STATION_MAP_TEMP_AVG_ID=10
+      - STATION_MAP_ATM_PRESSURE_ID=60
+      - STATION_MAP_PRECIPITATION_ID=0
+      - STATION_MAP_RELATIVE_HUMIDITY_ID=30
+      - STATION_MAP_SOLAR_RADIATION_ID=72
+      - STATION_MAP_FILTER_WATERSHED=1
+      - STATION_MAP_FILTER_REGION=1
+      - STATION_MAP_FILTER_COMMUNICATION=1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+    command:
+      [
+        "uvicorn",
+        "opencdms_api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5000",
+        "--reload",
+        "--use-colors",
+      ]
+  
+  traefik:
+    image: traefik:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
+
+volumes:
+  climsoftdb-data:
+  surfacedb-data:
+  mchdb-data:
+
+

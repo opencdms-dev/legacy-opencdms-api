@@ -1,128 +1,91 @@
 version: "3"
 
 services:
-  authdb:
-    image: postgres
-    container_name: authdb
-    hostname: authdb
+  opencdms_api:
+    image: opencdms_api:0.1.0
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: opencdms_api
+    ports:
+      - "5070:5000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/code/surface/api
+    depends_on:
+      - opencdms_surfacedb
+      - opencdms_mchdb
+      - opencdms_climsoftdb
+    volumes:
+      - ./src:/code/src
+      - ./surface:/code/surface
+    networks:
+      - opencdms_api_dev_network
+    command:
+      [
+        "uvicorn",
+        "opencdms_api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5000",
+        "--reload",
+        "--use-colors",
+      ]
+
+  opencdms_surfacedb:
+    image: timescale/timescaledb-postgis:2.3.0-pg13
+    container_name: opencdms_surface_db
+    volumes:
+      - opencdms_surface_data:/var/lib/postgresql/data
     ports:
       - "15432:5432"
     environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=auth
-    volumes:
-      - authdb-data:/var/lib/postgresql/data
-
-  climsoftdb:
-    image: mariadb:10.1
-    container_name: climsoftdb
-    hostname: climsoftdb
-    ports:
-      - "13306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=climsoft
-    volumes:
-      - climsoftdb-data:/var/lib/mysql
-
-
-  surfacedb:
-    image: timescale/timescaledb-postgis:latest-pg12
-    container_name: surfacedb
-    hostname: surfacedb
-    ports:
-      - "25432:5432"
-    environment:
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=dba
       - POSTGRES_DB=surface
-    volumes:
-      - surfacedb-data:/var/lib/postgresql/data
+      - POSTGRES_USER=dba
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+        max-file: "10"
+    networks:
+      - opencdms_api_dev_network
 
-  mchdb:
+  opencdms_mchdb:
     build:
       context: ./mch_db
       dockerfile: Dockerfile
-    container_name: mchdb
+    container_name: opencdms_mchdb
+    volumes:
+      - opencdms_mch_data:/var/lib/mysql
+    ports:
+      - "13306:3306"
+    environment:
+      - MYSQL_DATABASE=mch
+      - MYSQL_ROOT_PASSWORD=root_password
+    networks:
+      - opencdms_api_dev_network
+
+  opencdms_climsoftdb:
+    image: mariadb:10.1
+    container_name: opencdms_climsoftdb
     ports:
       - "23306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=mch
+      - MYSQL_DATABASE=climsoft
+    networks:
+      - opencdms_api_dev_network
     volumes:
-      - mchdb-data:/var/lib/mysql
+      - opencdms_climsoftdb_data:/var/lib/mysql
 
-  opencdms-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: opencdms-api
-    hostname: opencdms-api
-    ports:
-      - "5000:5000"
-    depends_on:
-      - authdb
-      - climsoftdb
-      - surfacedb
-      - mchdb
-    environment:
-      - PYGEOAPI_CONFIG=/app/src/pygeoapi-config.yml
-      - PYGEOAPI_OPENAPI=/app/src/pygeoapi-openapi.yml
-      - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
-      - AUTH_DB_URI=postgresql+psycopg2://postgres:password@authdb/auth
-      - OPENCDMS_API=True
-      - ENTL_PRIMARY_SERVER_PORT=0
-      - TIMEZONE_OFFSET=0
-      - MAP_LATITUDE=0
-      - MAP_LONGITUDE=0
-      - MAP_ZOOM=6
-      - SPATIAL_ANALYSIS_INITIAL_LATITUDE=-180
-      - SPATIAL_ANALYSIS_INITIAL_LONGITUDE=-180
-      - SPATIAL_ANALYSIS_FINAL_LATITUDE=180
-      - SPATIAL_ANALYSIS_FINAL_LONGITUDE=180
-      - STATION_MAP_WIND_SPEED_ID=0
-      - STATION_MAP_WIND_GUST_ID=0
-      - STATION_MAP_WIND_DIRECTION_ID=0
-      - STATION_MAP_TEMP_MAX_ID=0
-      - STATION_MAP_TEMP_MIN_ID=0
-      - STATION_MAP_TEMP_AVG_ID=0
-      - STATION_MAP_ATM_PRESSURE_ID=0
-      - STATION_MAP_PRECIPITATION_ID=0
-      - STATION_MAP_RELATIVE_HUMIDITY_ID=0
-      - STATION_MAP_SOLAR_RADIATION_ID=0
-      - SURFACE_DB_NAME=surface
-      - SURFACE_DB_USER=postgres
-      - SURFACE_DB_PASSWORD=password
-      - SURFACE_DB_HOST=surfacedb
-      - SURFACE_DB_PORT=5432
-      - MCH_DB_PORT=3306
-      - MCH_DB_HOST=mchdb
-      - MCH_DB_NAME=mch
-      - MCH_DB_PASSWORD=password
-      - MCH_DB_USER=root
-      - APP_SECRET=MGExYmQ4ZDRiNjQ5NGE1YzkxMDFmM2IxMTcxMTYyNjMxOTA5MGQxZGVmYzI0Njk3OWRlNWYyYjZmY2YxNDQ0Y2NiNGYzYzY0ZTg0NjQ0NjU4NzQ4YmJkYTVkZjQzMWI3
-      - SURFACE_SECRET_KEY=MGExYmQ4ZDRiNjQ5NGE1YzkxMDFmM2IxMTcxMTYyNjMxOTA5MGQxZGVmYzI0Njk3OWRlNWYyYjZmY2YxNDQ0Y2NiNGYzYzY0ZTg0NjQ0NjU4NzQ4YmJkYTVkZjQzMWI3
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
-      - "traefik.http.routers.fastapi.tls=true"
-      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
-    volumes:
-      - ./pygeoapi-config.yml:/app/src/pygeoapi-config.yml
-      - ./pygeoapi-openapi.yml:/app/src/pygeoapi-openapi.yml
-#
-#  traefik:
-#    image: traefik:latest
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    volumes:
-#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-#      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
 
 volumes:
-  authdb-data:
-  climsoftdb-data:
-  surfacedb-data:
-  mchdb-data:
+  opencdms_surface_data:
+  opencdms_mch_data:
+  opencdms_climsoftdb_data:
 
-
+networks:
+  opencdms_api_dev_network:

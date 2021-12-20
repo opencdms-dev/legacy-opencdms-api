@@ -6,8 +6,8 @@ from passlib.hash import django_pbkdf2_sha256 as handler
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.sql import text as sa_text
 
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 
 fake = Faker()
 
@@ -42,15 +42,12 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
-def test_should_return_first_five_obselements(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/data-forms", params={"limit": 5}, headers={
+def test_should_return_first_five_obselements(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/data-forms", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -58,9 +55,9 @@ def test_should_return_first_five_obselements(test_app: TestClient, get_access_t
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_station(test_app: TestClient,
+def test_should_return_single_station(client: TestClient,
                                       get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/data-forms/form_agro1", headers={
+    response = client.get(f"/climsoft/v1/data-forms/form_agro1", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

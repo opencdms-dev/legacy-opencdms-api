@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from src.apps.climsoft.schemas import acquisitiontype_schema
+from apps.climsoft.schemas import acquisitiontype_schema
 
 fake = Faker()
 

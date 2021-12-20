@@ -5,8 +5,8 @@ from passlib.hash import django_pbkdf2_sha256 as handler
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.sql import text as sa_text
 
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 
 fake = Faker()
 
@@ -40,8 +40,8 @@ def teardown_module(module):
             ''').execution_options(autocommit=True))
 
 
-# def test_should_return_first_five_observation_initials(test_app: TestClient, get_access_token: str):
-#     response = test_app.get("/api/climsoft/v1/observation-initials", params={"limit": 5}, headers={
+# def test_should_return_first_five_observation_initials(client: TestClient, get_access_token: str):
+#     response = client.get("/climsoft/v1/observation-initials", params={"limit": 5}, headers={
 #         "Authorization": f"Bearer {get_access_token}"
 #     })
 #     assert response.status_code == 200
@@ -49,11 +49,11 @@ def teardown_module(module):
 #     assert len(response_data["result"]) == 5
 #
 #
-# def test_should_return_single_observation_initial(test_app: TestClient,
+# def test_should_return_single_observation_initial(client: TestClient,
 #                                                   get_observation_initial: climsoft_models.Observationinitial,
 #                                                   get_access_token: str):
-#     response = test_app.get(
-#         f"/api/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}",
+#     response = client.get(
+#         f"/climsoft/v1/observation-initials/{get_observation_initial.recordedFrom}/{get_observation_initial.describedBy}/{get_observation_initial.obsDatetime}/{get_observation_initial.qcStatus}/{get_observation_initial.acquisitionType}",
 #         headers={
 #             "Authorization": f"Bearer {get_access_token}"
 #         })

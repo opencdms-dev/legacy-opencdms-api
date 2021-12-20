@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.config import app_config
+from config import app_config
 
 
 db_engine = create_engine(

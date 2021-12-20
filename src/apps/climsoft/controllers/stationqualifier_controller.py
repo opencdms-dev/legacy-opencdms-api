@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends
-from src.apps.climsoft.services import stationqualifier_service
-from src.apps.climsoft.schemas import stationqualifier_schema
-from src.utils.response import get_success_response, get_error_response
-from src.apps.climsoft.db.engine import SessionLocal
+from apps.climsoft.services import stationqualifier_service
+from apps.climsoft.schemas import stationqualifier_schema
+from utils.response import get_success_response, get_error_response
+from apps.climsoft.db.engine import SessionLocal
 from sqlalchemy.orm.session import Session
-from src.dependencies import auth
+from dependencies import auth
 
 
 router = APIRouter(
-    prefix="/api/climsoft/v1",
+    prefix="/v1",
     tags=["climsoft"],
     dependencies=[Depends(auth.get_current_user)]
 )

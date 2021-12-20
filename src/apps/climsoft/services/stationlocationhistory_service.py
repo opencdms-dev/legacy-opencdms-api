@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy.orm.session import Session
 from sqlalchemy.orm import joinedload
 from opencdms.models.climsoft import v4_1_1_core as models
-from src.apps.climsoft.schemas import stationlocationhistory_schema
+from apps.climsoft.schemas import stationlocationhistory_schema
 from fastapi.exceptions import HTTPException
 
 logger = logging.getLogger("ClimsoftStationLocationHistoryService")

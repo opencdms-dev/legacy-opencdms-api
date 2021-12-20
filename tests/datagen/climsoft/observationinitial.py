@@ -3,7 +3,7 @@ import random
 import datetime
 from typing import Tuple
 from faker import Faker
-from src.apps.climsoft.schemas import observationinitial_schema
+from apps.climsoft.schemas import observationinitial_schema
 
 
 fake = Faker()

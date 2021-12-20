@@ -1,6 +1,6 @@
 from sqlalchemy.sql.sqltypes import Boolean
 from sqlalchemy import Sequence, Column, Integer, String, DateTime, func
-from src.apps.auth.db.base import Base, metadata
+from apps.auth.db.base import Base, metadata
 
 
 class AuthUser(Base):

@@ -3,13 +3,13 @@ import pytest
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
-from src.apps.climsoft.db.engine import db_engine
-from src.apps.climsoft.schemas import instrument_schema
-from tests.datagen.climsoft import instrument as climsoft_instrument, station as climsoft_station
+from apps.climsoft.db.engine import db_engine
+from apps.climsoft.schemas import instrument_schema
+from datagen.climsoft import instrument as climsoft_instrument, station as climsoft_station
 from faker import Faker
 from fastapi.testclient import TestClient
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 
@@ -80,11 +80,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -109,8 +106,8 @@ def get_instrument(get_station: climsoft_models.Station):
     session.close()
 
 
-def test_should_return_first_five_instruments(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/instruments", params={"limit": 5}, headers={
+def test_should_return_first_five_instruments(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/instruments", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -118,8 +115,8 @@ def test_should_return_first_five_instruments(test_app: TestClient, get_access_t
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_instrument(test_app: TestClient, get_instrument: climsoft_models.Instrument, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/instruments/{get_instrument.instrumentId}", headers={
+def test_should_return_single_instrument(client: TestClient, get_instrument: climsoft_models.Instrument, get_access_token: str):
+    response = client.get(f"/climsoft/v1/instruments/{get_instrument.instrumentId}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -127,9 +124,9 @@ def test_should_return_single_instrument(test_app: TestClient, get_instrument: c
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_instrument(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_create_a_instrument(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     instrument_data = climsoft_instrument.get_valid_instrument_input(station_id=get_station.stationId).dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/instruments", data=json.dumps(instrument_data, default=str), headers={
+    response = client.post("/climsoft/v1/instruments", data=json.dumps(instrument_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -137,20 +134,20 @@ def test_should_create_a_instrument(test_app: TestClient, get_station: climsoft_
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_station: climsoft_models.Station, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_station: climsoft_models.Station, get_access_token: str):
     instrument_data = climsoft_instrument.get_valid_instrument_input(station_id=get_station.stationId).dict()
-    response = test_app.post("/api/climsoft/v1/instruments", data=json.dumps(instrument_data, default=str), headers={
+    response = client.post("/climsoft/v1/instruments", data=json.dumps(instrument_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_instrument(test_app: TestClient, get_instrument: climsoft_models.Instrument, get_access_token: str):
+def test_should_update_instrument(client: TestClient, get_instrument: climsoft_models.Instrument, get_access_token: str):
     instrument_data = instrument_schema.Instrument.from_orm(get_instrument).dict(by_alias=True)
     instrument_id = instrument_data.pop("instrument_id")
     updates = {**instrument_data, "instrument_name": "updated name"}
 
-    response = test_app.put(f"/api/climsoft/v1/instruments/{instrument_id}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/instruments/{instrument_id}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -159,16 +156,16 @@ def test_should_update_instrument(test_app: TestClient, get_instrument: climsoft
     assert response_data["result"][0]["instrument_name"] == updates["instrument_name"]
 
 
-def test_should_delete_instrument(test_app: TestClient, get_instrument, get_access_token: str):
+def test_should_delete_instrument(client: TestClient, get_instrument, get_access_token: str):
     instrument_data = instrument_schema.Instrument.from_orm(get_instrument).dict(by_alias=True)
     instrument_id = instrument_data.pop("instrument_id")
 
-    response = test_app.delete(f"/api/climsoft/v1/instruments/{instrument_id}", headers={
+    response = client.delete(f"/climsoft/v1/instruments/{instrument_id}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/instruments/{instrument_id}", headers={
+    response = client.get(f"/climsoft/v1/instruments/{instrument_id}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
 

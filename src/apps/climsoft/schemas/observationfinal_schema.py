@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional
 from pydantic import BaseModel, constr, StrictStr
-from src.apps.climsoft.schemas import Response, obselement_schema, station_schema
+from apps.climsoft.schemas import Response, obselement_schema, station_schema
 
 
 field_names_no_pk = {

@@ -1,22 +1,22 @@
 import uvicorn
 from fastapi import FastAPI
-from src.apps.climsoft.db.migration import migrate as migrate_climsoft_db
-from src.apps.auth.db.migration import migrate as migrate_auth_db
-from src.apps.surface.db.migration import migrate as migrate_surface_db
-from src.utils.controllers import ControllerLoader
-from src.config import app_config
-from src.apps.surface.settings import setup as setup_surface
+from apps.climsoft.db.migration import migrate as migrate_climsoft_db
+from apps.auth.db.migration import migrate as migrate_auth_db
+# from apps.surface.db.migration import migrate as migrate_surface_db
+from utils.controllers import ControllerLoader
+from config import app_config
+# from apps.surface.settings import setup as setup_surface
 from mch_api.api_mch import app as mch_api_application
 from starlette.middleware.wsgi import WSGIMiddleware
-from src.middlewares.auth import WSGIAuthMiddleWare
+from middlewares.auth import WSGIAuthMiddleWare
 from pygeoapi.starlette_app import app as pygeoapi_app
-# from surface.api.tempestas_api.wsgi import application as surface_application
 
 
 app = FastAPI()
 
 app.mount("/mch", WSGIAuthMiddleWare(WSGIMiddleware(mch_api_application)))
-# app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(surface_application)))
+# app.mount("/surface", WSGIAuthMiddleWare(WSGIMiddleware(
+# surface_application)))
 app.mount("/pygeoapi", pygeoapi_app)
 
 
@@ -26,10 +26,9 @@ app.mount("/pygeoapi", pygeoapi_app)
 migrate_climsoft_db()
 migrate_auth_db()
 # load controllers
-controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft", "auth", "surface"])
+controller_loader = ControllerLoader(base_dir=app_config.BASE_DIR, apps=["climsoft", "auth"])
 controller_loader.detect(app)
 
-#
 # @app.on_event("startup")
 # async def run_migrations():
 #     await migrate_surface_db()

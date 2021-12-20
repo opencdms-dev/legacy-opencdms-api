@@ -3,13 +3,13 @@ import pytest
 from sqlalchemy.sql import text as sa_text
 from sqlalchemy.orm.session import sessionmaker
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
-from src.apps.climsoft.db.engine import db_engine
-from src.apps.climsoft.schemas import flag_schema
-from tests.datagen.climsoft import flag as climsoft_flag
+from apps.climsoft.db.engine import db_engine
+from apps.climsoft.schemas import flag_schema
+from datagen.climsoft import flag as climsoft_flag
 from faker import Faker
 from fastapi.testclient import TestClient
-from src.apps.auth.db.engine import db_engine as auth_db_engine
-from src.apps.auth.db.models import user_model
+from apps.auth.db.engine import db_engine as auth_db_engine
+from apps.auth.db.models import user_model
 from passlib.hash import django_pbkdf2_sha256 as handler
 
 fake = Faker()
@@ -69,11 +69,8 @@ def teardown_module(module):
 
 
 @pytest.fixture
-def get_access_token(test_app: TestClient):
-    sign_in_data = {"username": "testuser", "password": "password", "scope": ""}
-    response = test_app.post("/api/auth/v1/sign-in", data=sign_in_data)
-    response_data = response.json()
-    return response_data['access_token']
+def get_access_token(user_access_token: str) -> str:
+    return user_access_token
 
 
 @pytest.fixture
@@ -87,8 +84,8 @@ def get_flag():
     session.close()
 
 
-def test_should_return_first_five_flags(test_app: TestClient, get_access_token: str):
-    response = test_app.get("/api/climsoft/v1/flags", params={"limit": 5}, headers={
+def test_should_return_first_five_flags(client: TestClient, get_access_token: str):
+    response = client.get("/climsoft/v1/flags", params={"limit": 5}, headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -96,8 +93,8 @@ def test_should_return_first_five_flags(test_app: TestClient, get_access_token: 
     assert len(response_data["result"]) == 5
 
 
-def test_should_return_single_flag(test_app: TestClient, get_flag: climsoft_models.Flag, get_access_token: str):
-    response = test_app.get(f"/api/climsoft/v1/flags/{get_flag.characterSymbol}", headers={
+def test_should_return_single_flag(client: TestClient, get_flag: climsoft_models.Flag, get_access_token: str):
+    response = client.get(f"/climsoft/v1/flags/{get_flag.characterSymbol}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -105,9 +102,9 @@ def test_should_return_single_flag(test_app: TestClient, get_flag: climsoft_mode
     assert len(response_data["result"]) == 1
 
 
-def test_should_create_a_flag(test_app: TestClient, get_access_token: str):
+def test_should_create_a_flag(client: TestClient, get_access_token: str):
     flag_data = climsoft_flag.get_valid_flag_input().dict(by_alias=True)
-    response = test_app.post("/api/climsoft/v1/flags", data=json.dumps(flag_data, default=str), headers={
+    response = client.post("/climsoft/v1/flags", data=json.dumps(flag_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
@@ -115,20 +112,20 @@ def test_should_create_a_flag(test_app: TestClient, get_access_token: str):
     assert len(response_data["result"]) == 1
 
 
-def test_should_raise_validation_error(test_app: TestClient, get_access_token: str):
+def test_should_raise_validation_error(client: TestClient, get_access_token: str):
     flag_data = climsoft_flag.get_valid_flag_input().dict()
-    response = test_app.post("/api/climsoft/v1/flags", data=json.dumps(flag_data, default=str), headers={
+    response = client.post("/climsoft/v1/flags", data=json.dumps(flag_data, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 422
 
 
-def test_should_update_flag(test_app: TestClient, get_flag, get_access_token: str):
+def test_should_update_flag(client: TestClient, get_flag, get_access_token: str):
     flag_data = flag_schema.Flag.from_orm(get_flag).dict(by_alias=True)
     character_symbol = flag_data.pop("character_symbol")
     updates = {**flag_data, "description": "updated name"}
 
-    response = test_app.put(f"/api/climsoft/v1/flags/{character_symbol}", data=json.dumps(updates, default=str), headers={
+    response = client.put(f"/climsoft/v1/flags/{character_symbol}", data=json.dumps(updates, default=str), headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     response_data = response.json()
@@ -137,16 +134,16 @@ def test_should_update_flag(test_app: TestClient, get_flag, get_access_token: st
     assert response_data["result"][0]["description"] == updates["description"]
 
 
-def test_should_delete_flag(test_app: TestClient, get_flag, get_access_token: str):
+def test_should_delete_flag(client: TestClient, get_flag, get_access_token: str):
     flag_data = flag_schema.Flag.from_orm(get_flag).dict(by_alias=True)
     character_symbol = flag_data.pop("character_symbol")
 
-    response = test_app.delete(f"/api/climsoft/v1/flags/{character_symbol}", headers={
+    response = client.delete(f"/climsoft/v1/flags/{character_symbol}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 200
 
-    response = test_app.get(f"/api/climsoft/v1/flags/{character_symbol}", headers={
+    response = client.get(f"/climsoft/v1/flags/{character_symbol}", headers={
         "Authorization": f"Bearer {get_access_token}"
     })
     assert response.status_code == 404

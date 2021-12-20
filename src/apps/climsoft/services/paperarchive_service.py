@@ -2,7 +2,7 @@ import logging
 from fastapi import HTTPException
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import Session
-from src.apps.climsoft.schemas import paperarchive_schema
+from apps.climsoft.schemas import paperarchive_schema
 from opencdms.models.climsoft import v4_1_1_core as models
 
 
