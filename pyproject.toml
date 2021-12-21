@@ -21,6 +21,7 @@ pygeoapi = "^0.11.0"
 nest-asyncio = "^1.5.4"
 opencdms-process = {git = "https://github.com/faysal-ishtiaq/opencdms-process", rev = "windrose-process"}
 rpy2 = "^3.4.5"
+Flask-Cors = "^3.0.10"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
