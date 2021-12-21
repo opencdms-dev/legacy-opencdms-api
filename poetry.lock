@@ -514,7 +514,7 @@ Click = ">=7.0"
 type = "git"
 url = "https://github.com/faysal-ishtiaq/opencdms-process"
 reference = "windrose-process"
-resolved_reference = "4ffa4a5623835632813a7ed249b424f01370d597"
+resolved_reference = "cb71ad8a16399342c4b892e20d59c6c3b5b12799"
 
 [[package]]
 name = "packaging"
