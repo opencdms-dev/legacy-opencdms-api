@@ -14,8 +14,9 @@ ENV PYTHONFAULTHANDLER=1 \
     POETRY_VIRTUALENVS_CREATE=0
 
 RUN apt-get update --fix-missing
-RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it r-base-core
+RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it r-base-core libmagick++-dev
 RUN apt-get install -y curl git && pip install --upgrade pip "poetry==${POETRY_VERSION}"
+RUN R -e "install.packages('magick')"
 
 WORKDIR /code
 
