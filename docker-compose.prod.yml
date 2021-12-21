@@ -45,8 +45,6 @@ services:
       dockerfile: dockerfile
     container_name: opencdms-api
     hostname: opencdms-api
-    volumes:
-      - ./pygeoapi-config.yml:/code/pygeoapi-config.yml
     expose:
       - "5000"
     depends_on:
@@ -126,17 +124,6 @@ services:
       - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
-    command:
-      [
-        "uvicorn",
-        "opencdms_api.main:app",
-        "--host",
-        "0.0.0.0",
-        "--port",
-        "5000",
-        "--reload",
-        "--use-colors",
-      ]
     ports:
       - "5000:5000"
 #

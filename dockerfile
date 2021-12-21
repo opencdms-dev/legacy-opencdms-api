@@ -39,9 +39,7 @@ COPY . .
 
 RUN poetry install
 
-COPY pygeoapi-config.yml /code/pygeoapi-config.yml
-
-RUN pygeoapi openapi generate /code/pygeoapi-config.yml > /code/pygeoapi-openapi.yml
+COPY ["pygeoapi-config.yml", "/code"]
 
 RUN useradd -m opencdms_api_user && chown -R opencdms_api_user /code
 
