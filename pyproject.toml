@@ -9,7 +9,7 @@ python = "^3.9"
 fastapi = "^0.70.0"
 uvicorn = "^0.15.0"
 SQLAlchemy = "^1.4.26"
-opencdms = {git = "https://github.com/Shaibujnr/pyopencdms.git", rev = "remove-other-setups"}
+opencdms = {git = "https://github.com/faysal-ishtiaq/opencdms-process", rev = "main"}
 passlib = "^1.7.4"
 inflection = "^0.5.1"
 python-jose = "^3.3.0"
