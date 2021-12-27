@@ -10,7 +10,7 @@ services:
     expose:
       - "5000"
     environment:
-      - PYTHONPATH=/code/surface/api:/code/tests
+      - PYTHONPATH=/code/surface/api
       - TIMESCALEDB_TELEMETRY=off
       - PGDATA=/var/lib/postgresql/data/pgdata
       - SURFACE_SECRET_KEY=)=z4gw5d)pyd4a!r7teec26+(2+3zvcslkb1el%e^gq-qo(r1w
@@ -73,12 +73,14 @@ services:
       - MCH_DB_PORT=3306
       - SECRET_KEY=test_opencdms_api_secret_key
       - AUTH_DB_URI=postgresql+psycopg2://dba:dba@test_opencdms_surface_db:5432/test_surface_db
-      # - CLIMSOFT_DB_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4 # uncomment this for snapshot test
+      - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@test_opencdms_climsoft_db:3306/climsoft
+      - CLIMSOFT_SECRET_KEY=climsoft_test_secret
+      # - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4 # uncomment this for snapshot test
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
       - test_opencdms_climsoft_db
-    command: ["pytest", "tests/integration", "-s"]
+    command: ["pytest", "-s"]
 
     networks:
       - test_opencdms_api_test_network
