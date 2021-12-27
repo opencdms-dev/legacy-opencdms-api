@@ -7,7 +7,7 @@ authors = ["Your Name <you@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = "^0.70.0"
-uvicorn = "^0.15.0"
+uvicorn = "^0.16.0"
 SQLAlchemy = "^1.4.26"
 opencdms = {git = "https://github.com/Shaibujnr/pyopencdms.git", rev = "remove-other-setups"}
 passlib = "^1.7.4"
@@ -17,6 +17,7 @@ pydantic = {extras = ["email"], version = "^1.8.2"}
 mch-api = {git = "https://github.com/Shaibujnr/mch-api.git", rev = "make_mch_api_installable"}
 Faker = "^10.0.0"
 python-multipart = "^0.0.5"
+climsoft-api = {git = "https://github.com/Shaibujnr/climsoft-api.git", rev = "setup-climsoft"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

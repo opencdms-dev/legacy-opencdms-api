@@ -11,11 +11,12 @@ from passlib.hash import django_pbkdf2_sha256 as handler
 from opencdms_api.config import settings
 from opencdms_api.main import get_app
 from fastapi.testclient import TestClient
-from main import app as oapp
+
 
 @pytest.fixture
 def app() -> FastAPI:
     return get_app()
+
 
 @pytest.fixture
 def client(app: FastAPI) -> TestClient:
@@ -55,6 +56,7 @@ def user_access_token(user: AuthUser) -> str:
         key=settings.SURFACE_SECRET_KEY,
     )
     return access_token
+
 
 @pytest.fixture
 def user_auth_header(user_access_token: str) -> Dict[str, str]:

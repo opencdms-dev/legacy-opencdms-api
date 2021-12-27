@@ -1,7 +1,7 @@
 from starlette.middleware.wsgi import WSGIMiddleware
 from typing import List
 from opencdms.models.climsoft.v4_1_1_core import Station
-from apps.climsoft.main import app as climsoft_app
+from climsoft_api.main import get_app as get_climsoft_app
 from tempestas_api.wsgi import application as surface_application
 from mch_api.api_mch import app as mch_api_application
 from fastapi import FastAPI, Depends
@@ -18,9 +18,10 @@ from opencdms_api.router import router
 def get_app():
     app = FastAPI()
     # climsoft_app.add_middleware(AuthMiddleWare)
+    climsoft_app = get_climsoft_app()
     app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
     app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
-    app.mount("/climsoft", climsoft_app)
+    app.mount("/climsoft", AuthMiddleWare(climsoft_app))
     app.include_router(router)
     return app
 

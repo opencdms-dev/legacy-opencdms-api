@@ -54,11 +54,10 @@ services:
       - opencdms_api_dev_network
 
   opencdms_mchdb:
-    build:
-      context: ./mch_db
-      dockerfile: Dockerfile
+    image: opencdms/mysql:5.1.73
     container_name: opencdms_mchdb
     volumes:
+      - ./mch_scripts:/docker-entrypoint-initdb.d
       - opencdms_mch_data:/var/lib/mysql
     ports:
       - "13306:3306"

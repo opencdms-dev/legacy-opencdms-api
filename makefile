@@ -8,7 +8,7 @@ down:
 	docker-compose down
 
 serve:
-	docker-compose up
+	docker-compose up --force-recreate
 
 served:
 	docker-compose up -d
