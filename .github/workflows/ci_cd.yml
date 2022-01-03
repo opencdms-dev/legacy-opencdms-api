@@ -2,7 +2,7 @@ name: Deploy on EC2
 
 on:
   push:
-    branches: [ '**' ]
+    branches: [ main ]
 
 jobs:
   Deploy:
@@ -25,5 +25,5 @@ jobs:
             sleep 30
             docker-compose -f docker-compose.prod.yml up -d --build
             sleep 15
-            docker exec -it mchdb bash -c \'mysql -u root -p mch < /scripts/create_mch_english_basic_tables.sql\'
+            docker exec -it mchdb bash -c "mysql -u root -p mch < /scripts/create_mch_english_basic_tables.sql"
           '
