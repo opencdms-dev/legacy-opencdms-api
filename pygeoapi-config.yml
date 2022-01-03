@@ -69,11 +69,6 @@ metadata:
         role: pointOfContact
 
 resources:
-    hello-world:
-        type: process
-        processor:
-            name: HelloWorld
-
     windrose-generator:
         type: process
         processor:

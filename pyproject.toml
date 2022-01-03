@@ -9,7 +9,6 @@ python = "^3.9"
 fastapi = "^0.70.0"
 uvicorn = "^0.15.0"
 SQLAlchemy = "^1.4.26"
-opencdms = {git = "https://github.com/faysal-ishtiaq/opencdms-process", rev = "main"}
 passlib = "^1.7.4"
 inflection = "^0.5.1"
 python-jose = "^3.3.0"
@@ -22,6 +21,7 @@ nest-asyncio = "^1.5.4"
 rpy2 = "^3.4.5"
 Flask-Cors = "^3.0.10"
 opencdms-process = {git = "https://github.com/faysal-ishtiaq/opencdms-process", rev = "windrose-process"}
+opencdms = {git = "https://github.com/opencdms/pyopencdms", rev = "main"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
