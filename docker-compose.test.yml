@@ -2,7 +2,6 @@ version: "3"
 
 services:
   test_opencdms_api:
-    image: opencdms_api:0.1.0
     build:
       context: .
       dockerfile: dockerfile
@@ -98,7 +97,9 @@ services:
       - test_opencdms_api_test_network
 
   test_opencdms_mch_db:
-    image: mysql:8.0.27
+    build:
+      context: .
+      dockerfile: mch.dockerfile
     container_name: test_opencdms_mch_db
     expose:
       - "3306"
