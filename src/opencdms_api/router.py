@@ -34,6 +34,7 @@ def register_new_user(
         email=payload.email,
         username=payload.username,
         password=handler.hash(payload.password),
+        is_active=True,
     )
     session.add(user)
     session.commit()

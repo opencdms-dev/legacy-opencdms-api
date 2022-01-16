@@ -23,6 +23,7 @@ def test_register_new_user(client: TestClient, session: Session):
     assert new_user.email == "test_register_new_user@gmail.com"
     assert new_user.first_name == "Shaibu"
     assert new_user.last_name == "Shaibu"
+    assert new_user.is_active
     assert handler.verify("my_password", new_user.password)
 
 

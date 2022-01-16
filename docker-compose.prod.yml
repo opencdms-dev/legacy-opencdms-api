@@ -28,8 +28,8 @@ services:
 
   mchdb:
     build:
-      context: ./mch_db
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: mch.dockerfile
     container_name: mchdb
     expose:
       - "3306"
