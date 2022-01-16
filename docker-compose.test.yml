@@ -78,6 +78,8 @@ services:
       - SURFACE_API_ENABLED=true
       - CLIMSOFT_API_ENABLED=true
       - MCH_API_ENABLED=true
+      - DEFAULT_USERNAME=admin
+      - DEFAULT_PASSWORD=password123
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
