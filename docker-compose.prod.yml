@@ -118,6 +118,11 @@ services:
       - STATION_MAP_FILTER_WATERSHED=1
       - STATION_MAP_FILTER_REGION=1
       - STATION_MAP_FILTER_COMMUNICATION=1
+      - SURFACE_API_ENABLED=true
+      - CLIMSOFT_API_ENABLED=true
+      - MCH_API_ENABLED=true
+      - DEFAULT_USERNAME=admin
+      - DEFAULT_PASSWORD=password123
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
