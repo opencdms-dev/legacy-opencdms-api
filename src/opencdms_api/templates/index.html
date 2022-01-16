@@ -1,0 +1,10 @@
+<html>
+    <body>
+        <h2>Available APIs</h2>
+        <ul>
+            {% for item in supported_apis -%}
+                <li><a href="{{item['url']}}">{{item['title']}}</a></li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

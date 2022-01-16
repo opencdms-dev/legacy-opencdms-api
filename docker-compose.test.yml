@@ -75,6 +75,11 @@ services:
       - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@test_opencdms_climsoft_db:3306/climsoft
       - CLIMSOFT_SECRET_KEY=climsoft_test_secret
       # - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@host.docker.internal:33308/mariadb_climsoft_test_db_v4 # uncomment this for snapshot test
+      - SURFACE_API_ENABLED=true
+      - CLIMSOFT_API_ENABLED=true
+      - MCH_API_ENABLED=true
+      - DEFAULT_USERNAME=admin
+      - DEFAULT_PASSWORD=password123
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
