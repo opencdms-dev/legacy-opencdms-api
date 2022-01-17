@@ -54,7 +54,7 @@ services:
     environment:
       - PYTHONPATH=/code/surface/api
       - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@climsoftdb/climsoft
-      - CLIMSOFT_SECRET=6v(n93zuas7&k^-zcvkp5kq*3hw49t%ra0nt6!_3(0&4!
+      - CLIMSOFT_SECRET_KEY=6v(n93zuas7&k^-zcvkp5kq*3hw49t%ra0nt6!_3(0&4!
       - AUTH_DB_URI=postgresql+psycopg2://dba:dba@surfacedb/surface
       - SURFACE_DB_NAME=surface
       - SURFACE_DB_USER=dba
