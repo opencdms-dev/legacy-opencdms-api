@@ -1,4 +1,4 @@
-# opencdms-server
+# opencdms-api
 
 OpenCDMS server uses Python FastAPI to expose a web interface for `opencdms-app` and other supported CDMSs.
 
@@ -13,67 +13,62 @@ The root directory has two main directories:
 - `src` : Contains all the applications/CDMS wrappers
 - `tests` : Contains all the tests
 
-Apart from these two directories we also have a docker-compose file contianing:
+Apart from these two directories we also have three docker-compose files:
 
-- `auth-db` service which is used for authentication
-- `climsoft-db` service which should be used for storing Climsoft CDMS data
-- `surface-db` service which should be used for storing Surface CDMS data
-- `opencdms-server` is the application we are developing
+- `docker-compose.yml` For development
+- `docker-compose.prod.yml` For production deployment (contains traefik config for https)
+- `docker-compose.test.yml` For testing
 
-There is also a `Dockerfile` where we have defined the docker image for `opencdms-server` service
+These docker-compose files have all the necessary services to run `opencdms-api`
+
+There is also a `dockerfile` where we have defined the docker image for `opencdms-api` service
 
 *Project root*
 ```
 .
+├── create_mch_english_basic_tables.sql
+├── docker-compose.prod.yml
+├── docker-compose.test.yml
 ├── docker-compose.yml
-├── Dockerfile
-├── LICENSE
+├── dockerfile
+├── entrypoint.sh
+├── init_climsoft_db.py
+├── makefile
+├── mch.dbn
+├── mch.dockerfile
+├── MCHtablasycampos.def
+├── poetry.lock
+├── pyproject.toml
 ├── README.md
+├── requirements-old.txt
 ├── requirements.txt
+├── scripts
+│   └── load_initial_surface_data.sh
 ├── src
-│   ├── apps
-│   ├── db
-│   ├── main.py
-│   └── utils
-└── tests
-    ├── app-name
-    ├── ...other apps...
-    ├── conftest.py
-    └── datagen
+│   └── opencdms_api
+│       ├── config.py
+│       ├── db.py
+│       ├── deps.py
+│       ├── __init__.py
+│       ├── main.py
+│       ├── middelware.py
+│       ├── models.py
+│       ├── router.py
+│       ├── schema.py
+│       └── templates
+├── tests
+│   ├── conftest.py
+│   ├── __init__.py
+│   └── test_router.py
+└── traefik
+    └── traefik.toml
+
 
 ```
-
-In the app specific directory, the file structure is like below
-
-*App root*
-
-```
-.
-├── controllers
-├── db
-├── schemas
-└── services
-
-```
-
-Controllers directory holds all the routes that we define. Routes are meant to handle application logic, i.e. authorization, data validation etc.
-
-DB directory contains the DB configuration for respective app
-
-Schemas directory contains all the DTOs defined as Pydantic Model
-
-Services directory contains the business logic
 
 ### Running Development Server
 
 The easiest way to go is running `docker-compose up -d --build`
-
-The MCH database cannot be populated automatically. To populate the MCH database, do the following:
-
-```bash
-$ docker exec -it mchdb bash
-$ mysql -u root -p mch < /scripts/create_mch_english_basic_tables.sql
-```
 
 Also, you can do the following:
 
@@ -92,26 +87,6 @@ Note: You have to run database instance separately. Go to this repository for de
 
 Each master release should pass all the  To check if the tests are as expected or to add new feature or to fix some issue, you can run the tests on your own.
 
-Follow these steps:
+To run the tests, you just need to run `docker-compose -f docker-compose.test.yml up --build`
 
-```bash
-$ pip3 install virtualenv 
-$ virtualenv venv 
-$ source venv/bin/activate
-$ pip install -r requirements.txt
-$ docker-compose down -v
-$ docker-compose up -d --build
-$ pytest tests/integration
-```
-
-Additionally, you can run snapshot  We have collected a subset of data from production climsoft instance and we will run query on them to check if we are getting expected result.
-
-  - From outside your project, run `git clone https://github.com/opencdms/opencdms-test-data`
-  - `cd opencdms-test-data`
-  - `docker-compose down -v`
-  - `docker-compose up climsoft-4.1.1 --build`
-  - Go to the project root `opencdms-server`
-  - `source venv/bin/activate`
-  - `export CLIMSOFT_DB_URI=mysql+mysqldb://root:password@127.0.0.1:33308/mariadb_climsoft_test_db_v4`
-  - `pytest tests/snapshot`
-
+Check the logs for error.

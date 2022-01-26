@@ -18,12 +18,12 @@ services:
       - SURFACE_DB_NAME=surface
       - SURFACE_DB_USER=dba
       - SURFACE_DB_PASSWORD=dba
-      - SURFACE_DB_HOST=surfacedb
+      - SURFACE_DB_HOST=opencdms_surfacedb
       - SURFACE_DB_PORT=5432
       - MCH_DB_PORT=3306
-      - MCH_DB_HOST=mchdb
+      - MCH_DB_HOST=opencdms_mchdb
       - MCH_DB_NAME=mch
-      - MCH_DB_PASSWORD=password
+      - MCH_DB_PASSWORD=root_password
       - MCH_DB_USER=root
       - APP_SECRET=app-secret
       - SURFACE_SECRET_KEY=surface-secret-key
