@@ -90,3 +90,5 @@ Each master release should pass all the  To check if the tests are as expected o
 To run the tests, you just need to run `docker-compose -f docker-compose.test.yml up --build`
 
 Check the logs for error.
+
+### How to access surface, climsoft or mch API
