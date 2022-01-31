@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from opencdms_api.config import settings
+from src.opencdms_api.config import settings
 from sqlalchemy.orm import sessionmaker, scoped_session, Session
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine

@@ -1,5 +1,5 @@
 from sqlalchemy.orm.session import Session
-from opencdms_api.db import SessionLocal
+from src.opencdms_api.db import SessionLocal
 
 
 def get_session():

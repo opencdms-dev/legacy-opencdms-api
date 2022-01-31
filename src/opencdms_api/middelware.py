@@ -6,9 +6,9 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose.exceptions import JWTError
 from starlette.types import Scope, Receive, Send, ASGIApp
 from jose import jwt
-from opencdms_api import models
-from opencdms_api.config import settings
-from opencdms_api.db import db_session_scope
+from src.opencdms_api import models
+from src.opencdms_api.config import settings
+from src.opencdms_api.db import db_session_scope
 
 
 class AuthMiddleWare:
