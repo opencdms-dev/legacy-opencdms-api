@@ -1,5 +1,5 @@
 from sqlalchemy.sql.sqltypes import Boolean
-from opencdms_api.db import Base
+from src.opencdms_api.db import Base
 from sqlalchemy import Sequence, Column, Integer, String, DateTime, func
 
 

@@ -7,13 +7,13 @@ from mch_api.api_mch import app as mch_api_application
 from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm.session import Session
 from passlib.hash import django_pbkdf2_sha256 as handler
-from opencdms_api.middelware import AuthMiddleWare
-from opencdms_api.schema import StationSchema
-from opencdms_api.deps import get_session
-from opencdms_api.db import SessionLocal
-from opencdms_api import models
-from opencdms_api.router import router
-from opencdms_api.config import settings
+from src.opencdms_api.middelware import AuthMiddleWare
+from src.opencdms_api.schema import StationSchema
+from src.opencdms_api.deps import get_session
+from src.opencdms_api.db import SessionLocal
+from src.opencdms_api import models
+from src.opencdms_api.router import router
+from src.opencdms_api.config import settings
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pathlib import Path

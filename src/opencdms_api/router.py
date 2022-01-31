@@ -4,13 +4,13 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm.session import Session
 from passlib.hash import django_pbkdf2_sha256 as handler
-from opencdms_api import deps, models
-from opencdms_api.schema import (
+from src.opencdms_api import deps, models
+from src.opencdms_api.schema import (
     UserCreateSchema,
     AuthenticationSchema,
     TokenSchema,
 )
-from opencdms_api.config import settings
+from src.opencdms_api.config import settings
 from jose import jwt
 
 router = APIRouter()
