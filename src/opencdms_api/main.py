@@ -81,7 +81,7 @@ def fetch_stations(session: Session = Depends(get_session)):
 
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
-    supported_apis = []
+    supported_apis = [{"title": "Pygeoapi", "url": "/pygeoapi"}]
     if settings.SURFACE_API_ENABLED:
         supported_apis.append({"title": "Surface API", "url": "/surface"})
     if settings.CLIMSOFT_API_ENABLED:
