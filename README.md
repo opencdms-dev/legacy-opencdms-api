@@ -136,3 +136,4 @@ which will return something like this:
 {"message":"Successfully fetched acquisition types.","status":"success","result":[]}
 ```
 
+You can use Postman to make this requests easily.
