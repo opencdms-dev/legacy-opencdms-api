@@ -17,6 +17,7 @@ from src.opencdms_api.config import settings
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pathlib import Path
+from pygeoapi.flask_app import APP as pygeoapi_app
 
 
 # load controllers
@@ -31,6 +32,8 @@ def get_app():
         app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
     if settings.CLIMSOFT_API_ENABLED is True:
         app.mount("/climsoft", AuthMiddleWare(climsoft_app))
+    app.mount("/pygeoapi", AuthMiddleWare(WSGIMiddleware(pygeoapi_app)))
+
     app.include_router(router)
 
     @app.on_event("startup")
