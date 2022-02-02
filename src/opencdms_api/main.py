@@ -26,22 +26,13 @@ from pygeoapi.flask_app import APP as pygeoapi_app
 def get_app():
     app = FastAPI()
     climsoft_app = get_climsoft_app()
-    # if settings.SURFACE_API_ENABLED is True:
-    #     app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
-    # if settings.MCH_API_ENABLED is True:
-    #     app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
-    # if settings.CLIMSOFT_API_ENABLED is True:
-    #     app.mount("/climsoft", AuthMiddleWare(climsoft_app))
-    # app.mount("/pygeoapi", AuthMiddleWare(WSGIMiddleware(pygeoapi_app)))
-
     if settings.SURFACE_API_ENABLED is True:
-        app.mount("/surface", WSGIMiddleware(surface_application))
+        app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
     if settings.MCH_API_ENABLED is True:
-        app.mount("/mch", WSGIMiddleware(mch_api_application))
+        app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
     if settings.CLIMSOFT_API_ENABLED is True:
-        app.mount("/climsoft", climsoft_app)
-    app.mount("/pygeoapi", WSGIMiddleware(pygeoapi_app))
-
+        app.mount("/climsoft", AuthMiddleWare(climsoft_app))
+    app.mount("/pygeoapi", AuthMiddleWare(WSGIMiddleware(pygeoapi_app)))
 
     app.include_router(router)
 
