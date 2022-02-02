@@ -33,7 +33,7 @@ mch-api @ git+https://github.com/opencdms/mch-api.git@main
 mysqlclient
 numpy
 opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
-climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@package-installer
+climsoft_api @ git+https://github.com/opencdms/climsoft-api.git@main
 packaging
 pandas
 passlib
@@ -63,3 +63,5 @@ typing-extensions
 urllib3
 uvicorn
 Werkzeug
+Flask-Cors
+opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main

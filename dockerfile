@@ -9,8 +9,9 @@ ENV PYTHONFAULTHANDLER=1 \
     PIP_NO_CACHE_DIR=1
 
 RUN apt-get update --fix-missing
-RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it
+RUN apt-get install -y g++ libgdal-dev libpq-dev libgeos-dev libproj-dev openjdk-17-jre vim wait-for-it r-base-core libmagick++-dev
 RUN apt-get install -y curl git && pip install --upgrade pip
+RUN R -e "install.packages('magick')"
 
 WORKDIR /code
 
@@ -32,6 +33,8 @@ COPY MCHtablasycampos.def ./MCHtablasycampos.def
 RUN useradd -m opencdms_api_user && chown -R opencdms_api_user /code
 
 RUN ["chmod", "+x", "/code/scripts/load_initial_surface_data.sh"]
+
+COPY ["pygeoapi-config.yml", "/code"]
 
 USER opencdms_api_user
 

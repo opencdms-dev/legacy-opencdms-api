@@ -52,6 +52,8 @@ services:
       - surfacedb
       - mchdb
     environment:
+      - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
+      - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
       - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@climsoftdb:3306/climsoft
       - CLIMSOFT_SECRET_KEY=6v(n93zuas7&k^-zcvkp5kq*3hw49t%ra0nt6!_3(0&4!
@@ -123,9 +125,10 @@ services:
       - MCH_API_ENABLED=true
       - DEFAULT_USERNAME=admin
       - DEFAULT_PASSWORD=password123
+
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
+      - "traefik.http.routers.fastapi.rule=Host(`$HOST_FQDN`)"
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
     command:

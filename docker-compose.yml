@@ -11,6 +11,8 @@ services:
     env_file:
       - .env
     environment:
+      - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
+      - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
       - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@opencdms_climsoftdb:3306/climsoft
       - CLIMSOFT_SECRET_KEY=climsoft-secret-key

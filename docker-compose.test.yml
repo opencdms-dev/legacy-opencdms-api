@@ -9,6 +9,8 @@ services:
     expose:
       - "5000"
     environment:
+      - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
+      - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
       - TIMESCALEDB_TELEMETRY=off
       - PGDATA=/var/lib/postgresql/data/pgdata
@@ -80,6 +82,7 @@ services:
       - MCH_API_ENABLED=true
       - DEFAULT_USERNAME=admin
       - DEFAULT_PASSWORD=password123
+
     depends_on:
       - test_opencdms_surface_db
       - test_opencdms_mch_db
