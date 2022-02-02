@@ -19,6 +19,7 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           export HOST_FQDN=${HOST_FQDN}
+          echo $HOST_FQDN
           ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
             cd /home/ubuntu/opencdms-api
             git pull origin main
