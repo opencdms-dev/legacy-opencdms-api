@@ -1,4 +1,4 @@
-name: Deploy on EC2
+name: Deploy on EC2 - Latest
 
 on:
   push:
@@ -11,9 +11,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: Deploy in EC2
         env:
-            PRIVATE_KEY: ${{secrets.AWS_PRIVATE_KEY}}
-            HOSTNAME : ${{secrets.HOSTNAME}}
+            PRIVATE_KEY: ${{secrets.AWS_PRIVATE_KEY_LATEST}}
+            HOSTNAME : ${{secrets.HOSTNAME_LATEST}}
             USERNAME : ${{secrets.USERNAME}}
+            HOST_FQDN: ${{secrets.LATEST_HOST_FQDN}}
 
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key

@@ -128,7 +128,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fastapi.rule=Host(`api.opencdms.org`)"
+      - "traefik.http.routers.fastapi.rule=Host(`$HOST_FQDN`)"
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
     command:

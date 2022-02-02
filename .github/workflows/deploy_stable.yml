@@ -1,0 +1,29 @@
+name: Deploy on EC2 - Stable
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy in EC2
+        env:
+            PRIVATE_KEY: ${{secrets.AWS_PRIVATE_KEY_STABLE}}
+            HOSTNAME : ${{secrets.HOSTNAME_STABLE}}
+            USERNAME : ${{secrets.USERNAME}}
+            HOST_FQDN: ${{secrets.STABLE_HOST_FQDN}}
+
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} '
+            cd /home/ubuntu/opencdms-api
+            git pull origin main
+            docker-compose -f docker-compose.prod.yml build
+            docker-compose -f docker-compose.prod.yml stop opencdms-api
+            sleep 30
+            docker-compose -f docker-compose.prod.yml up -d --build
+          '

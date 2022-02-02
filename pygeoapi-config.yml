@@ -1,19 +1,18 @@
 server:
     bind:
         host: 0.0.0.0
-        port: 5070
-    url: http://localhost:5070/pygeoapi/
+        port: 443
+    url: https://${HOST_FQDN}/pygeoapi/
     mimetype: application/json; charset=UTF-8
     encoding: utf-8
     gzip: false
     languages:
-        # First language is the default language
         - en-US
         - fr-CA
     cors: true
     pretty_print: true
     limit: 10
-    # templates: /path/to/templates
+
     map:
         url: https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png
         attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia maps</a> | Map data &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -24,7 +23,6 @@ server:
 
 logging:
     level: ERROR
-    #logfile: /tmp/pygeoapi.log
 
 metadata:
     identification:
