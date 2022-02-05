@@ -84,6 +84,7 @@ services:
       - MCH_API_ENABLED=true
       - DEFAULT_USERNAME=admin
       - DEFAULT_PASSWORD=password123
+      - HOST_FQDN=$HOST_FQDN
     depends_on:
       - opencdms_surfacedb
       - opencdms_mchdb
