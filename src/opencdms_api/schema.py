@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic.networks import EmailStr
 import inflection
 from pydantic import BaseModel
@@ -52,3 +54,6 @@ class AuthenticationSchema(BaseSchema):
 
 class TokenSchema(BaseModel):
     access_token: str
+    first_name: str
+    last_name: str
+

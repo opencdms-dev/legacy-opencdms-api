@@ -8,7 +8,7 @@ from src.opencdms_api import deps, models
 from src.opencdms_api.schema import (
     UserCreateSchema,
     AuthenticationSchema,
-    TokenSchema,
+    TokenSchema
 )
 from src.opencdms_api.config import settings
 from jose import jwt
@@ -59,8 +59,9 @@ def authenticate(
             "exp": datetime.utcnow() + timedelta(hours=24),
             "token_type": "access",
             "jti": str(uuid4()),
-            "user_id": int(user.id),
+            "user_id": int(user.id)
         },
         key=settings.SURFACE_SECRET_KEY,
     )
-    return TokenSchema(access_token=access_token)
+    return TokenSchema(access_token=access_token, first_name=user.first_name, last_name=user.last_name)
+
