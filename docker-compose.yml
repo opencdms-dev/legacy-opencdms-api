@@ -85,12 +85,15 @@ services:
       - DEFAULT_USERNAME=admin
       - DEFAULT_PASSWORD=password123
       - HOST_FQDN=$HOST_FQDN
+      - CLIMSOFT_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      - CLIMSOFT_AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
     depends_on:
       - opencdms_surfacedb
       - opencdms_mchdb
       - opencdms_climsoftdb
     volumes:
       - ./src:/code/src
+      - ./climsoft_uploads:/climsoft_uploads
     networks:
       - opencdms_api_dev_network
     command:
@@ -151,7 +154,6 @@ services:
       - opencdms_api_dev_network
     volumes:
       - opencdms_climsoftdb_data:/var/lib/mysql
-
 
 volumes:
   opencdms_surface_data:
