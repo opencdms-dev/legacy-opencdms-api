@@ -15,10 +15,12 @@ jobs:
             HOSTNAME : ${{secrets.HOSTNAME_LATEST}}
             USERNAME : ${{secrets.USERNAME}}
             HOST_FQDN: ${{secrets.LATEST_HOST_FQDN}}
+            AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+            AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -o SendEnv=HOST_FQDN -i private_key ${USERNAME}@${HOSTNAME} '
+          ssh -o StrictHostKeyChecking=no -o SendEnv=HOST_FQDN SendEnv=AWS_ACCESS_KEY_ID SendEnv=AWS_SECRET_ACCESS_KEY -i private_key ${USERNAME}@${HOSTNAME} '
             cd /home/ubuntu/opencdms-api
             git pull origin main
             docker-compose -f docker-compose.prod.yml build

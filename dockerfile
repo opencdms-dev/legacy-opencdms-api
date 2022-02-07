@@ -30,12 +30,8 @@ COPY init_climsoft_db.py ./init_climsoft_db.py
 COPY mch.dbn ./mch.dbn
 COPY MCHtablasycampos.def ./MCHtablasycampos.def
 
-RUN useradd -m opencdms_api_user && chown -R opencdms_api_user /code
-
 RUN ["chmod", "+x", "/code/scripts/load_initial_surface_data.sh"]
 
 COPY ["pygeoapi-config.yml", "/code"]
-
-USER opencdms_api_user
 
 ENTRYPOINT [ "/bin/sh", "entrypoint.sh" ]
