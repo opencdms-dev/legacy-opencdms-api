@@ -137,3 +137,44 @@ which will return something like this:
 ```
 
 You can use Postman to make this requests easily.
+
+
+### Repository Settings
+
+To deploy on a server using the deployment scripts (in `.github/workflows`) we need 
+to setup following action secrets on github:
+
+```bash
+AWS_PRIVATE_KEY_LATEST [used to login to server]
+AWS_PRIVATE_KEY_STABLE [used to login to server]
+HOSTNAME_LATEST [ip address/fqdn to ssh into] 
+HOSTNAME_STABLE [ip address/fqdn to ssh into]
+AWS_ACCESS_KEY_ID [to use with aws boto3]
+AWS_SECRET_ACCESS_KEY [to use with aws boto3]
+LATEST_HOST_FQDN [ fqdn where you want the api available ]
+STABLE_HOST_FQDN [ fqdn where you want the api available ]
+USERNAME [username on deployment server]
+```
+
+Note: The deployment scripts deploy to `api-latest.opencdms.org` whenever a push
+is made to `main` branch.
+The deployment scripts deploy to `api.opencdms.org` whenever a release is made.
+
+`LATEST` and `STABLE` suffix/prefix in the action secrets depicts whether the variable will be
+used in deployment to latest or stable server.
+
+
+### Setting up host for deployment
+
+To deploy on a server using the deployment scripts (in `.github/workflows`) 
+we need `docker`, `docker-compose` and `openssh` installed on the server. Also, 
+we are sending some variables to deployment server via `ssh`. So, you need to edit
+`/etc/ssh/sshd_config` file on the deployment server. Find and change this line
+
+```yaml
+AcceptEnv  LANG LC_*
+```
+to
+```yaml
+AcceptEnv HOST_FQDN AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY LANG LC_*
+```
