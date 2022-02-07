@@ -18,13 +18,19 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 from pygeoapi.flask_app import APP as pygeoapi_app
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # load controllers
-
-
 def get_app():
     app = FastAPI()
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    )
     climsoft_app = get_climsoft_app()
     if settings.SURFACE_API_ENABLED is True:
         app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
