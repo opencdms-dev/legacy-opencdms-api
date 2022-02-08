@@ -48,7 +48,7 @@ class AuthMiddleWare:
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         request = Request(scope, receive, send)
         if request.url.path not in {
-            "/climsoft/docs",
+            "/climsoft",
             "/climsoft/openapi.json"
         }:
             self.authenticate_request(request)

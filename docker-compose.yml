@@ -4,7 +4,7 @@ services:
   opencdms_api:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     container_name: opencdms_api
     ports:
       - "5070:5000"
@@ -14,7 +14,7 @@ services:
       - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
       - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
-      - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@opencdms_climsoftdb:3306/climsoft
+      - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@opencdms_climsoftdb:3306/mariadb_climsoft_test_db_v4
       - CLIMSOFT_SECRET_KEY=climsoft-secret-key
       - AUTH_DB_URI=postgresql+psycopg2://dba:dba@surfacedb:5432/surface
       - SURFACE_DB_NAME=surface
@@ -143,7 +143,9 @@ services:
       - opencdms_api_dev_network
 
   opencdms_climsoftdb:
-    image: mariadb:10.1
+    build:
+      context: .
+      dockerfile: Dockerfile.climsoft
     container_name: opencdms_climsoftdb
     ports:
       - "23306:3306"

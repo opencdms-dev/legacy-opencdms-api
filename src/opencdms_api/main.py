@@ -91,7 +91,7 @@ def root(request: Request):
     if settings.SURFACE_API_ENABLED:
         supported_apis.append({"title": "Surface API", "url": "/surface"})
     if settings.CLIMSOFT_API_ENABLED:
-        supported_apis.append({"title": "Climsoft API", "url": "/climsoft/docs"})
+        supported_apis.append({"title": "Climsoft API", "url": "/climsoft"})
     if settings.MCH_API_ENABLED:
         supported_apis.append({"title": "MCH API", "url": "/mch"})
     return templates.TemplateResponse(
