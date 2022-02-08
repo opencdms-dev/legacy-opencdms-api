@@ -4,7 +4,7 @@ services:
   test_opencdms_api:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     container_name: test_opencdms_api
     expose:
       - "5000"
