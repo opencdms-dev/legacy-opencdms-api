@@ -138,8 +138,6 @@ services:
       - "traefik.http.routers.fastapi.rule=Host(`$HOST_FQDN`)"
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
-      - "traefik.http.middlewares.fastapi.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE"
-      - "traefik.http.middlewares.fastapi.headers.accesscontrolalloworigin=*"
     command:
       [
         "uvicorn",
