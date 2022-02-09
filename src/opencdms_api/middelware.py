@@ -49,7 +49,8 @@ class AuthMiddleWare:
         request = Request(scope, receive, send)
         if request.url.path not in {
             "/climsoft",
-            "/climsoft/openapi.json"
+            "/climsoft/openapi.json",
+            "/climsoft/"
         }:
             self.authenticate_request(request)
         await self.app(scope, receive, send)
