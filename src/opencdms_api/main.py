@@ -19,17 +19,21 @@ from fastapi.responses import HTMLResponse
 from pathlib import Path
 from pygeoapi.flask_app import APP as pygeoapi_app
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware import Middleware
 
 
 # load controllers
 def get_app():
-    app = FastAPI()
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"]
+    app = FastAPI(
+        middleware=[
+            Middleware(
+                CORSMiddleware,
+                allow_origins=["*"],
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"]
+            )
+        ]
     )
     climsoft_app = get_climsoft_app()
     if settings.SURFACE_API_ENABLED is True:
