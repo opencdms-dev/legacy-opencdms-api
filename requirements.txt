@@ -53,7 +53,6 @@ pytz
 requests
 rsa
 six
-sqlacodegen
 SQLAlchemy
 sqlparse
 starlette
