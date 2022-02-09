@@ -147,6 +147,9 @@ services:
         "5000",
         "--reload",
         "--use-colors",
+        "--proxy-headers",
+        "--forwarded-allow-ips",
+        "*"
       ]
   
   traefik:
