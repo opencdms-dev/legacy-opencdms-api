@@ -54,6 +54,7 @@ services:
       - surfacedb
       - mchdb
     environment:
+      - FORWARDED_ALLOW_IPS=*
       - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
       - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
@@ -137,6 +138,8 @@ services:
       - "traefik.http.routers.fastapi.rule=Host(`$HOST_FQDN`)"
       - "traefik.http.routers.fastapi.tls=true"
       - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+      - "traefik.http.middlewares.fastapi.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE"
+      - "traefik.http.middlewares.fastapi.headers.accesscontrolalloworigin=*"
     command:
       [
         "uvicorn",
@@ -148,8 +151,6 @@ services:
         "--reload",
         "--use-colors",
         "--proxy-headers",
-        "--forwarded-allow-ips",
-        "*"
       ]
   
   traefik:
