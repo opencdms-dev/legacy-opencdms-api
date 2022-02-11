@@ -57,3 +57,12 @@ class TokenSchema(BaseModel):
     first_name: str
     last_name: str
 
+
+class CurrentUserSchema(BaseSchema):
+    email: EmailStr
+    username: str
+    first_name: str
+    last_name: str
+
+    class Config:
+        orm_mode = True

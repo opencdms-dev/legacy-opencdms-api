@@ -6,12 +6,13 @@ from fastapi.security.utils import get_authorization_scheme_param
 from jose.exceptions import JWTError
 from starlette.types import Scope, Receive, Send, ASGIApp
 from jose import jwt
-from sqlalchemy.orm import sessionmaker, scoped_session, Session
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from src.opencdms_api import models
 from src.opencdms_api.config import settings
 from src.opencdms_api.db import db_session_scope
 from src.opencdms_api import climsoft_rbac_config
+from src.opencdms_api.schema import CurrentUserSchema
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 
 
@@ -23,14 +24,14 @@ class AuthMiddleWare:
     def __init__(self, app: ASGIApp):
         self.app = app
 
-    def get_user(self, username: str) -> Optional[models.AuthUser]:
+    def get_user(self, username: str) -> Optional[CurrentUserSchema]:
         with db_session_scope() as session:
             user: models.AuthUser = (
                 session.query(models.AuthUser)
                 .filter(models.AuthUser.username == username)
                 .one_or_none()
             )
-            return user
+            return CurrentUserSchema.from_orm(user) if user is not None else None
 
     def authenticate_request(self, request: Request):
         authorization_header = request.headers.get("authorization")
@@ -47,23 +48,17 @@ class AuthMiddleWare:
         user = self.get_user(username)
         if user is None:
             raise HTTPException(401, "Unauthorized request")
-        request.state.user = user
+        return user
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         request = Request(scope, receive, send)
-        print(request.url.path)
-        if request.url.path not in {
-            "/climsoft",
-            "/climsoft/openapi.json",
-            "/climsoft/"
-        }:
-            self.authenticate_request(request)
+        self.authenticate_request(request)
         await self.app(scope, receive, send)
 
 
-class ClimsoftRBACMiddleware:
+class ClimsoftRBACMiddleware(AuthMiddleWare):
     def __init__(self, app: ASGIApp):
-        self.app = app
+        super().__init__(app)
 
     def get_climsoft_role_for_username(self, username: str):
         climsoft_engine = create_engine(os.getenv("CLIMSOFT_DATABASE_URI"))
@@ -88,6 +83,14 @@ class ClimsoftRBACMiddleware:
             return sep.join(string[:pos]), sep.join(string[pos:])
 
         request = Request(scope, receive, send)
+        user = None
+        if request.url.path not in {
+            "/climsoft",
+            "/climsoft/openapi.json",
+            "/climsoft/"
+        }:
+            user = self.authenticate_request(request)
+
         resource_url = split(request.url.path, "/", 4)[0]
         required_role = climsoft_rbac_config.required_role_lookup.get(
             resource_url, {}
@@ -95,7 +98,7 @@ class ClimsoftRBACMiddleware:
             request.method.lower()
         )
 
-        if (not required_role) or (self.get_climsoft_role_for_username(request.state.user.username) in required_role):
+        if (not required_role) or (self.get_climsoft_role_for_username(user.username) in required_role):
             await self.app(scope, receive, send)
         else:
             raise HTTPException(status_code=403)
