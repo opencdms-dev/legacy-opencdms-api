@@ -1,152 +1,183 @@
 required_role_lookup = {
+    "/climsoft/v1/climsoft-users": {
+        "post": {"ClimsoftAdmin"},
+        "get": {"ClimsoftAdmin"},
+        "put": {"ClimsoftAdmin"},
+        "delete": {"ClimsoftAdmin"}
+    },
     "/climsoft/v1/file-upload/image": {
-        "post": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/s3/image": {
-        "get": ""
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"}
     },
     "/climsoft/v1/acquisition-types": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/data-forms": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/fault-resolutions": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/feature-geographical-positions": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/flags": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/instruments": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftOperator"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"}
     },
     "/climsoft/v1/instrument-fault-reports": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"}
     },
     "/climsoft/v1/instrument-inspections": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"}
     },
     "/climsoft/v1/obselements": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/observation-finals": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftOperator"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftOperator"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftOperator"}
     },
     "/climsoft/v1/observation-initials": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC", "ClimsoftOperator", "ClimsoftOperatorSupervisor"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC", "ClimsoftOperator", "ClimsoftOperatorSupervisor"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC", "ClimsoftOperator", "ClimsoftOperatorSupervisor"}
     },
     "/climsoft/v1/obs-schedule-class": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/paper-archives": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/paper-archive-definitions": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/physical-features": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/physical-feature-class": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/qc-status-definitions": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC"}
     },
     "/climsoft/v1/qc-types": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftQC"}
     },
     "/climsoft/v1/reg-keys": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     },
     "/climsoft/v1/stations": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"}
     },
     "/climsoft/v1/station-elements": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"}
     },
     "/climsoft/v1/station-location-histories": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"}
     },
     "/climsoft/v1/station-qualifiers": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata"}
     },
     "/climsoft/v1/synop-features": {
-        "post": "",
-        "get": "",
-        "put": "",
-        "delete": ""
+        "post": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "get": {"ClimsoftAdmin", "ClimsoftDeveloper", "ClimsoftMetadata", "ClimsoftOperator",
+                "ClimsoftOperatorSupervisor", "ClimsoftProducts", "ClimsoftQC", "ClimsoftRainfall", "ClimsoftRainfall"},
+        "put": {"ClimsoftAdmin", "ClimsoftDeveloper"},
+        "delete": {"ClimsoftAdmin", "ClimsoftDeveloper"}
     }
 }

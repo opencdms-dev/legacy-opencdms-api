@@ -1,3 +1,7 @@
+import logging
+import os
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 from starlette.middleware.wsgi import WSGIMiddleware
 from typing import List
 from opencdms.models.climsoft.v4_1_1_core import Station
@@ -7,7 +11,7 @@ from mch_api.api_mch import app as mch_api_application
 from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm.session import Session
 from passlib.hash import django_pbkdf2_sha256 as handler
-from src.opencdms_api.middelware import AuthMiddleWare
+from src.opencdms_api.middelware import AuthMiddleWare, ClimsoftRBACMiddleware
 from src.opencdms_api.schema import StationSchema
 from src.opencdms_api.deps import get_session
 from src.opencdms_api.db import SessionLocal
@@ -20,6 +24,7 @@ from pathlib import Path
 from pygeoapi.flask_app import APP as pygeoapi_app
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
+from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 
 
 # load controllers
@@ -41,7 +46,7 @@ def get_app():
     if settings.MCH_API_ENABLED is True:
         app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
     if settings.CLIMSOFT_API_ENABLED is True:
-        app.mount("/climsoft", AuthMiddleWare(climsoft_app))
+        app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
     app.mount("/pygeoapi", AuthMiddleWare(WSGIMiddleware(pygeoapi_app)))
 
     app.include_router(router)
@@ -59,7 +64,7 @@ def get_app():
                 default_user = models.AuthUser(
                     first_name="Default",
                     last_name="User",
-                    email="admin@opencdms_api.com",
+                    email="admin@opencdms.org",
                     username=settings.DEFAULT_USERNAME,
                     password=handler.hash(settings.DEFAULT_PASSWORD),
                     is_active=True,
@@ -71,8 +76,32 @@ def get_app():
                 session.commit()
         except Exception as e:
             session.rollback()
-            raise e
+            logging.getLogger("OpenCDMSLogger").exception(e)
         finally:
+            session.close()
+
+        if settings.CLIMSOFT_API_ENABLED:
+            climsoft_engine = create_engine(os.getenv("CLIMSOFT_DATABASE_URI"))
+            ClimsoftSessionLocal = sessionmaker(climsoft_engine)
+            session = ClimsoftSessionLocal()
+            try:
+                clim_user_role = session.query(climsoft_models.ClimsoftUser).filter_by(
+                    userName=settings.DEFAULT_USERNAME
+                ).one_or_none()
+
+                if clim_user_role is None:
+                    clim_user_role = climsoft_models.ClimsoftUser(
+                        userName=settings.DEFAULT_USERNAME,
+                        userRole="ClimsoftAdmin"
+                    )
+                    session.add(clim_user_role)
+                    session.commit()
+            except Exception as e:
+                session.rollback()
+                logging.getLogger("OpenCDMSLogger").exception(e)
+            finally:
+                session.close()
+
             session.close()
 
     return app
@@ -82,11 +111,6 @@ app = get_app()
 
 path_to_templates = Path(__file__).parents[0] / "templates"
 templates = Jinja2Templates(directory=str(path_to_templates.absolute()))
-
-
-@app.get("/stations", response_model=List[StationSchema])
-def fetch_stations(session: Session = Depends(get_session)):
-    return session.query(Station).all()
 
 
 @app.get("/", response_class=HTMLResponse)
