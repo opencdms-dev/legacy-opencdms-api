@@ -1,3 +1,4 @@
+import os
 from contextlib import contextmanager
 from src.opencdms_api.config import settings
 from sqlalchemy.orm import sessionmaker, scoped_session, Session
@@ -8,7 +9,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 engine = create_engine(settings.DATABASE_URI)
-
 
 SessionLocal = sessionmaker(engine)
 
