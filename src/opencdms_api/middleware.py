@@ -78,9 +78,9 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
         return role
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
-        def split(string, sep, pos):
+        def extract_resource_from_path(string, sep, start, end):
             string = string.split(sep)
-            return sep.join(string[:pos]), sep.join(string[pos:])
+            return sep.join(string[start:end])
 
         request = Request(scope, receive, send)
         user = None
@@ -91,7 +91,7 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
         }:
             user = self.authenticate_request(request)
 
-        resource_url = split(request.url.path, "/", 4)[0]
+        resource_url = extract_resource_from_path(request.url.path, "/", 3, 4)
         required_role = climsoft_rbac_config.required_role_lookup.get(
             resource_url, {}
         ).get(
