@@ -11,7 +11,7 @@ from mch_api.api_mch import app as mch_api_application
 from fastapi import FastAPI, Depends, Request
 from sqlalchemy.orm.session import Session
 from passlib.hash import django_pbkdf2_sha256 as handler
-from src.opencdms_api.middelware import AuthMiddleWare, ClimsoftRBACMiddleware
+from src.opencdms_api.middleware import AuthMiddleWare, ClimsoftRBACMiddleware
 from src.opencdms_api.schema import StationSchema
 from src.opencdms_api.deps import get_session
 from src.opencdms_api.db import SessionLocal
