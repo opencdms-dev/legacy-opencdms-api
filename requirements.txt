@@ -32,7 +32,7 @@ mch-api @ git+https://github.com/opencdms/mch-api.git@main
 mysqlclient
 numpy
 opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
-climsoft_api @ git+https://github.com/opencdms/climsoft-api.git@main
+climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@refactor-pagination
 packaging
 pandas
 passlib
