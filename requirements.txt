@@ -1,5 +1,4 @@
 alembic
-aniso8601
 asgiref
 attrs
 certifi
