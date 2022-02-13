@@ -20,10 +20,11 @@ RUN git clone https://github.com/opencdms/surface.git
 RUN pip install numpy==1.21.2 --no-warn-script-location
 RUN pip install -r surface/api/requirements.txt
 
+COPY ./src ./src
+
 COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
-COPY ./src ./src
 COPY ./scripts ./scripts
 COPY entrypoint.sh ./entrypoint.sh
 COPY init_climsoft_db.py ./init_climsoft_db.py
