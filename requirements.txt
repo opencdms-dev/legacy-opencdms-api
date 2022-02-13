@@ -38,7 +38,6 @@ pandas
 passlib
 pluggy
 psycopg2
-py
 pyasn1
 pycparser
 pydantic
