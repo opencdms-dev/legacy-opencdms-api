@@ -1,15 +1,8 @@
-asgiref
-attrs
-certifi
-cffi
-charset-normalizer
 click
 cryptography
 Django
 django-colorfield
 djantic
-dnspython
-ecdsa
 email-validator
 Faker
 fastapi
@@ -17,28 +10,13 @@ FastAPI-SQLAlchemy
 Flask
 Flask-MySQLdb
 Flask-RESTful
-greenlet
-h11
-idna
-inflect
-iniconfig
-itsdangerous
-Jinja2
-Mako
-Markdown
-MarkupSafe
 mch-api @ git+https://github.com/opencdms/mch-api.git@main
 mysqlclient
 numpy
 opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
-climsoft_api @ git+https://github.com/opencdms/climsoft-api.git@main
-packaging
+climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@opencdms-api-42
 pandas
-passlib
-pluggy
 psycopg2
-pyasn1
-pycparser
 pydantic
 pyparsing
 pytest
@@ -53,11 +31,9 @@ six
 SQLAlchemy
 sqlparse
 starlette
-text-unidecode
-toml
-typing-extensions
 urllib3
 uvicorn
+MarkupSafe==2.0.1
 Werkzeug
 Flask-Cors
 opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
