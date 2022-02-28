@@ -27,8 +27,8 @@ python-multipart
 pytz
 requests
 rsa
-six
 SQLAlchemy
+six
 sqlparse
 starlette
 urllib3
