@@ -28,10 +28,11 @@ class AuthMiddleWare:
         with db_session_scope() as session:
             user: models.AuthUser = (
                 session.query(models.AuthUser)
-                .filter(models.AuthUser.username == username)
-                .one_or_none()
+                    .filter(models.AuthUser.username == username)
+                    .one_or_none()
             )
-            return CurrentUserSchema.from_orm(user) if user is not None else None
+            return CurrentUserSchema.from_orm(
+                user) if user is not None else None
 
     def authenticate_request(self, request: Request):
         authorization_header = request.headers.get("authorization")
@@ -68,7 +69,8 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
         role = None
 
         try:
-            user_role = session.query(climsoft_models.ClimsoftUser).filter_by(userName=username).one_or_none()
+            user_role = session.query(climsoft_models.ClimsoftUser).filter_by(
+                userName=username).one_or_none()
             role = user_role.userRole
         except Exception as e:
             pass
@@ -76,6 +78,11 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
         session.close()
 
         return role
+
+    def has_required_role(self, username, required_role):
+        return self.get_climsoft_role_for_username(
+            username
+        ) in required_role
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         def extract_resource_from_path(string, sep, start, end):
@@ -98,14 +105,9 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
             request.method.lower()
         )
 
-        has_required_role = (
-            self.get_climsoft_role_for_username(user.username) in required_role
-        )
-        if (not required_role) or has_required_role:
+        if (not required_role) or self.has_required_role(
+            user.username, required_role
+        ):
             await self.app(scope, receive, send)
         else:
             raise HTTPException(status_code=403)
-
-
-
-
