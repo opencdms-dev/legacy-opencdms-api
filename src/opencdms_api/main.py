@@ -3,17 +3,13 @@ import os
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from starlette.middleware.wsgi import WSGIMiddleware
-from typing import List
-from opencdms.models.climsoft.v4_1_1_core import Station
 from climsoft_api.main import get_app as get_climsoft_app
 from tempestas_api.wsgi import application as surface_application
 from mch_api.api_mch import app as mch_api_application
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Request
 from sqlalchemy.orm.session import Session
 from passlib.hash import django_pbkdf2_sha256 as handler
 from src.opencdms_api.middleware import AuthMiddleWare, ClimsoftRBACMiddleware
-from src.opencdms_api.schema import StationSchema
-from src.opencdms_api.deps import get_session
 from src.opencdms_api.db import SessionLocal
 from src.opencdms_api import models
 from src.opencdms_api.router import router
@@ -41,13 +37,21 @@ def get_app():
         ]
     )
     climsoft_app = get_climsoft_app()
+    # if settings.SURFACE_API_ENABLED is True:
+    #     app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
+    # if settings.MCH_API_ENABLED is True:
+    #     app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
+    # if settings.CLIMSOFT_API_ENABLED is True:
+    #     app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
+    # app.mount("/pygeoapi", AuthMiddleWare(WSGIMiddleware(pygeoapi_app)))
+    #
     if settings.SURFACE_API_ENABLED is True:
-        app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
+        app.mount("/surface", WSGIMiddleware(surface_application))
     if settings.MCH_API_ENABLED is True:
-        app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
+        app.mount("/mch", WSGIMiddleware(mch_api_application))
     if settings.CLIMSOFT_API_ENABLED is True:
-        app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
-    app.mount("/pygeoapi", AuthMiddleWare(WSGIMiddleware(pygeoapi_app)))
+        app.mount("/climsoft", climsoft_app)
+    app.mount("/pygeoapi", WSGIMiddleware(pygeoapi_app))
 
     app.include_router(router)
 
