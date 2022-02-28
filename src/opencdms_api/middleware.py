@@ -98,7 +98,10 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
             request.method.lower()
         )
 
-        if (not required_role) or (self.get_climsoft_role_for_username(user.username) in required_role):
+        has_required_role = (
+            self.get_climsoft_role_for_username(user.username) in required_role
+        )
+        if (not required_role) or has_required_role:
             await self.app(scope, receive, send)
         else:
             raise HTTPException(status_code=403)
