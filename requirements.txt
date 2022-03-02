@@ -35,6 +35,6 @@ urllib3
 uvicorn
 MarkupSafe==2.0.1
 Werkzeug
-opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
 Flask-Cors
 Babel
+opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
