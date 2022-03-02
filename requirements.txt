@@ -15,8 +15,8 @@ mysqlclient
 numpy
 opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
 climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@opencdms-api-42
-pandas
 psycopg2
+pandas
 pydantic
 pyparsing
 pytest
@@ -25,10 +25,10 @@ python-editor
 python-jose
 python-multipart
 pytz
-requests
-six
 rsa
+six
 SQLAlchemy
+requests
 sqlparse
 starlette
 urllib3
