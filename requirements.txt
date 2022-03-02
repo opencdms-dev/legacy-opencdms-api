@@ -32,8 +32,8 @@ requests
 sqlparse
 starlette
 urllib3
-uvicorn
 MarkupSafe==2.0.1
+uvicorn
 Werkzeug
 Flask-Cors
 Babel
