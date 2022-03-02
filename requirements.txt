@@ -37,3 +37,4 @@ MarkupSafe==2.0.1
 Werkzeug
 Flask-Cors
 opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
+Babel
