@@ -1,3 +1,4 @@
+Babel
 click
 cryptography
 Django
@@ -35,6 +36,5 @@ urllib3
 MarkupSafe==2.0.1
 uvicorn
 Flask-Cors
-Babel
 opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
 Werkzeug

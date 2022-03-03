@@ -39,12 +39,20 @@ def get_app():
     climsoft_app = get_climsoft_app()
 
     if settings.SURFACE_API_ENABLED is True:
-        app.mount("/surface", AuthMiddleWare(WSGIMiddleware(surface_application)))
+        surface_wsgi_app = WSGIMiddleware(surface_application)
+        app.mount("/surface", surface_wsgi_app)
+        # app.mount("/surface", AuthMiddleWare(surface_application))
     if settings.MCH_API_ENABLED is True:
-        app.mount("/mch", AuthMiddleWare(WSGIMiddleware(mch_api_application)))
+        mch_wsgi_app = WSGIMiddleware(mch_api_application)
+        app.mount("/mch", mch_wsgi_app)
+        # app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
     if settings.CLIMSOFT_API_ENABLED is True:
-        app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
-    app.mount("/pygeoapi", AuthMiddleWare(WSGIMiddleware(pygeoapi_app)))
+        app.mount("/climsoft", climsoft_app)
+        # app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
+
+    pygeoapi_wsgi_app = WSGIMiddleware(pygeoapi_app)
+    app.mount("/pygeoapi", pygeoapi_wsgi_app)
+    # app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
 
     app.include_router(router)
 
