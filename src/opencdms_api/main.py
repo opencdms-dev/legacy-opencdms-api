@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from starlette.middleware.wsgi import WSGIMiddleware
 from climsoft_api.main import get_app as get_climsoft_app
+from climsoft_api.config import settings as climsoft_settings
 from tempestas_api.wsgi import application as surface_application
 from mch_api.api_mch import app as mch_api_application
 from fastapi import FastAPI, Request
@@ -90,7 +91,9 @@ def get_app():
             ClimsoftSessionLocal = sessionmaker(climsoft_engine)
             session = ClimsoftSessionLocal()
             try:
-                clim_user_role = session.query(climsoft_models.ClimsoftUser).filter_by(
+                clim_user_role = session.query(
+                    climsoft_models.ClimsoftUser
+                ).filter_by(
                     userName=settings.DEFAULT_USERNAME
                 ).one_or_none()
 

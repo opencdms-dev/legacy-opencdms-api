@@ -6,9 +6,9 @@ django-colorfield
 djantic
 email-validator
 Faker
+Flask
 fastapi
 FastAPI-SQLAlchemy
-Flask
 Flask-MySQLdb
 Flask-RESTful
 mch-api @ git+https://github.com/opencdms/mch-api.git@main
