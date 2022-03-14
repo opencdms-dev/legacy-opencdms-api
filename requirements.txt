@@ -16,8 +16,8 @@ mysqlclient
 numpy
 opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
 climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@opencdms-api-42
-psycopg2
 pandas
+psycopg2
 pydantic
 pyparsing
 pytest
@@ -35,6 +35,6 @@ starlette
 urllib3
 MarkupSafe==2.0.1
 uvicorn
-Flask-Cors
-opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
 Werkzeug
+opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
+Flask-Cors
