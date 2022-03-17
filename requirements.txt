@@ -32,8 +32,8 @@ SQLAlchemy
 requests
 urllib3
 sqlparse
-starlette
 MarkupSafe==2.0.1
+starlette
 uvicorn
 Flask-Cors
 Werkzeug
