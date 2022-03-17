@@ -30,9 +30,9 @@ rsa
 six
 SQLAlchemy
 requests
+urllib3
 sqlparse
 starlette
-urllib3
 MarkupSafe==2.0.1
 uvicorn
 Flask-Cors
