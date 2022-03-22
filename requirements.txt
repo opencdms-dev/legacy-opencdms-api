@@ -28,8 +28,8 @@ python-multipart
 pytz
 rsa
 six
-requests
 SQLAlchemy
+requests
 urllib3
 sqlparse
 MarkupSafe==2.0.1
