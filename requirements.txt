@@ -4,6 +4,7 @@ cryptography
 Django
 django-colorfield
 email-validator
+Flask-Cors
 djantic
 Faker
 Flask
@@ -35,6 +36,5 @@ sqlparse
 MarkupSafe==2.0.1
 starlette
 uvicorn
-Flask-Cors
 Werkzeug
 opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
