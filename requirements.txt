@@ -3,9 +3,9 @@ click
 cryptography
 Django
 django-colorfield
+djantic
 email-validator
 Flask-Cors
-djantic
 Faker
 Flask
 fastapi
