@@ -7,8 +7,8 @@ djantic
 email-validator
 Flask-Cors
 Faker
-Flask
 fastapi
+Flask
 FastAPI-SQLAlchemy
 Flask-MySQLdb
 Flask-RESTful
