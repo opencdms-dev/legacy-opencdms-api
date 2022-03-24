@@ -1,0 +1,4 @@
+﻿"belongs_to","opening_datetime","station_type","geoLocationMethod","geoLocationAccuracy","closing_datetime","latitude","longitude","elevation","authority","admin_region","drainage_basin"
+"67774010","1897-04-01 06:00:00","landFixed","GPS","4","1897-05-01 06:00:00","-17.830000","31.030000","1471","MSD","Harare Province","Manyame River Basin"
+"67774010","1897-05-01 06:00:00","landFixed","GPS","4","1897-06-01 06:00:00","-17.830000","31.040000","1471","MSD","Harare Province","Manyame River Basin"
+"67774010","1897-06-01 06:00:00","landFixed","GPS","4","1897-07-01 06:00:00","-17.830000","31.050000","1471","MSD","Harare Province","Manyame River Basin"

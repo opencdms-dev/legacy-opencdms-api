@@ -1,3 +1,5 @@
 FROM mariadb:10.1
 
+COPY ./seed-data/climsoft4/stationlocationhistory.csv /seed-data/climsoft4/stationlocationhistory.csv
 COPY ./climsoft-db-snapshot.sql /docker-entrypoint-initdb.d/1.sql
+COPY ./climsoft-db-dummy-data.sql /docker-entrypoint-initdb.d/2.sql

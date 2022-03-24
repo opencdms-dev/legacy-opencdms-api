@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     DEFAULT_USERNAME: str
     DEFAULT_PASSWORD: str
 
+    AUTH_ENABLED: bool
+
     DATABASE_URI: Optional[PostgresDsn] = None
 
     @validator("DATABASE_URI", pre=True)

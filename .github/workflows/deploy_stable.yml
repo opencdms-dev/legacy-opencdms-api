@@ -1,5 +1,7 @@
 name: Deploy on EC2 - Stable
-
+### EDIT ssh -o to send AUTH_ENABLED, HOST_FQDN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+### YOU HAVE TO CONFIGURE ssh agent ON SERVER TO ACCEPT THESE
+### YOU HAVE TO SET GITHUB ENV VARS AS WELL
 on:
   release:
     types:
@@ -21,10 +23,11 @@ jobs:
 
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -o SendEnv=HOST_FQDN -o SendEnv=AWS_ACCESS_KEY_ID -o SendEnv=AWS_SECRET_ACCESS_KEY -i private_key ${USERNAME}@${HOSTNAME} '
+          ssh -o StrictHostKeyChecking=no -o SendEnv=AUTH_ENABLED -o SendEnv=HOST_FQDN -o SendEnv=AWS_ACCESS_KEY_ID -o SendEnv=AWS_SECRET_ACCESS_KEY -i private_key ${USERNAME}@${HOSTNAME} '
             cd /home/ubuntu/opencdms-api
             git pull origin main
-            docker-compose -f docker-compose.prod.yml build
+            docker-compose -f docker-compose.prod.yml down -v --remove-orphans
+            docker-compose -f docker-compose.prod.yml up -d --build
             docker-compose -f docker-compose.prod.yml stop opencdms-api
             sleep 30
             docker-compose -f docker-compose.prod.yml up -d --build
