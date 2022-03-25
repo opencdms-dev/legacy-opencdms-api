@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict, Optional
 
 from pydantic import BaseSettings, PostgresDsn, validator
@@ -45,4 +46,5 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
 
 
+print(os.getenv("AUTH_ENABLED"))
 settings = Settings()
