@@ -20,6 +20,7 @@ jobs:
             AUTH_ENABLED: "True"
 
         run: |
+          echo AUTH_ENABLED
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -o SendEnv=AUTH_ENABLED -o SendEnv=HOST_FQDN -o SendEnv=AWS_ACCESS_KEY_ID -o SendEnv=AWS_SECRET_ACCESS_KEY -i private_key ${USERNAME}@${HOSTNAME} '
             cd /home/ubuntu/opencdms-api
