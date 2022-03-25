@@ -17,7 +17,7 @@ jobs:
             HOST_FQDN: ${{secrets.LATEST_HOST_FQDN}}
             AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
             AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-            AUTH_ENABLED: True
+            AUTH_ENABLED: "True"
 
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
