@@ -131,6 +131,7 @@ services:
       - HOST_FQDN=$HOST_FQDN
       - CLIMSOFT_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - CLIMSOFT_AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - AUTH_ENABLED=$AUTH_ENABLED
     volumes:
       - ./climsoft_uploads:/climsoft_uploads
     labels:
