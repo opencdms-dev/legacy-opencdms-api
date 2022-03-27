@@ -41,10 +41,10 @@ def get_app():
 
     if settings.SURFACE_API_ENABLED is True:
         surface_wsgi_app = WSGIMiddleware(surface_application)
-        if not settings.AUTH_ENABLED:
-            app.mount("/surface", surface_wsgi_app)
-        else:
-            app.mount("/surface", AuthMiddleWare(surface_wsgi_app))
+        # if not settings.AUTH_ENABLED:
+        app.mount("/surface", surface_wsgi_app)
+        # else:
+        #     app.mount("/surface", AuthMiddleWare(surface_wsgi_app))
 
     if settings.MCH_API_ENABLED is True:
         mch_wsgi_app = WSGIMiddleware(mch_api_application)
