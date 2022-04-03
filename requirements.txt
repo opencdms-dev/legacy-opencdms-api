@@ -26,8 +26,8 @@ python-dateutil
 python-editor
 python-jose
 python-multipart
-pytz
 rsa
+pytz
 six
 SQLAlchemy
 requests
