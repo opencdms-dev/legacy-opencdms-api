@@ -22,9 +22,9 @@ psycopg2
 pydantic
 pyparsing
 pytest
+python-jose
 python-dateutil
 python-editor
-python-jose
 python-multipart
 rsa
 pytz
