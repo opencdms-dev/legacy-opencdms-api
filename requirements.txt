@@ -12,11 +12,8 @@ Flask
 FastAPI-SQLAlchemy
 Flask-MySQLdb
 Flask-RESTful
-mch-api @ git+https://github.com/opencdms/mch-api.git@main
 mysqlclient
 numpy
-opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
-climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@data-forms
 pandas
 psycopg2
 pydantic
@@ -37,4 +34,7 @@ MarkupSafe==2.0.1
 starlette
 uvicorn
 Werkzeug
+mch-api @ git+https://github.com/opencdms/mch-api.git@main
 opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
+opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
+climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@data-forms
