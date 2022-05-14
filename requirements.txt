@@ -6,8 +6,8 @@ django-colorfield
 djantic
 email-validator
 Flask-Cors
-Faker
 fastapi
+Faker
 Flask
 Flask-MySQLdb
 FastAPI-SQLAlchemy
