@@ -26,8 +26,8 @@ python-jose
 python-dateutil
 python-editor
 python-multipart
-pytz
 rsa
+pytz
 SQLAlchemy
 requests
 urllib3
