@@ -9,8 +9,8 @@ Flask-Cors
 Faker
 fastapi
 Flask
-FastAPI-SQLAlchemy
 Flask-MySQLdb
+FastAPI-SQLAlchemy
 Flask-RESTful
 mch-api @ git+https://github.com/opencdms/mch-api.git@main
 mysqlclient
