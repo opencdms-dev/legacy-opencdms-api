@@ -17,8 +17,8 @@ mysqlclient
 numpy
 opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
 climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@data-forms
-pandas
 psycopg2
+pandas
 pydantic
 pyparsing
 pytest
