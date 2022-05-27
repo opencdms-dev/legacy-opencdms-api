@@ -23,8 +23,8 @@ pydantic
 pyparsing
 pytest
 python-jose
-python-dateutil
 python-editor
+python-dateutil
 rsa
 python-multipart
 pytz
