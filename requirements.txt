@@ -16,7 +16,7 @@ mch-api @ git+https://github.com/opencdms/mch-api.git@main
 mysqlclient
 numpy
 opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
-climsoft_api @ git+https://github.com/faysal-ishtiaq/climsoft-api.git@data-forms
+climsoft_api @ git@https://github.com/openclimateinitiative/climsoft-api.git
 psycopg2
 pandas
 pydantic
