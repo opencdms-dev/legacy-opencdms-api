@@ -163,7 +163,6 @@ The deployment scripts deploy to `api.opencdms.org` whenever a release is made.
 `LATEST` and `STABLE` suffix/prefix in the action secrets depicts whether the variable will be
 used in deployment to latest or stable server.
 
-
 ### Setting up host for deployment
 
 To deploy on a server using the deployment scripts (in `.github/workflows`) 
@@ -178,3 +177,7 @@ to
 ```yaml
 AcceptEnv HOST_FQDN AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY LANG LC_*
 ```
+
+### Known issues
+
+Rapidly deploying the code multiple times in a short period of time can cause Let's Encrypt to hit a rate limit - this results in the security certificate not being issued (wait before deploying again).
