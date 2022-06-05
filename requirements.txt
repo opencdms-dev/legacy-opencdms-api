@@ -1,5 +1,5 @@
-Babel
 click
+Babel
 cryptography
 Django
 django-colorfield
