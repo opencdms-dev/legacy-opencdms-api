@@ -30,8 +30,8 @@ pytz
 python-multipart
 SQLAlchemy
 requests
-urllib3
 sqlparse
+urllib3
 MarkupSafe==2.0.1
 starlette
 uvicorn
