@@ -7,7 +7,7 @@ from climsoft_api.main import get_app as get_climsoft_app
 from climsoft_api.config import settings as climsoft_settings
 from tempestas_api.wsgi import application as surface_application
 from mch_api.api_mch import app as mch_api_application
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from sqlalchemy.orm.session import Session
 from passlib.hash import django_pbkdf2_sha256 as handler
 from src.opencdms_api.middleware import AuthMiddleWare, ClimsoftRBACMiddleware
@@ -22,10 +22,42 @@ from pygeoapi.flask_app import APP as pygeoapi_app
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
+from fastapi.openapi.utils import get_openapi
+
+
+def get_climsoft_app_with_login_form():
+    app = get_climsoft_app()
+    openapi_schema = app.openapi_schema
+    if openapi_schema is not None:
+        if openapi_schema["components"] is None:
+            openapi_schema["components"] = {
+                "securitySchemes": {
+                    "bearerAuth": {
+                        "type": "http",
+                        "scheme": "bearer",
+                        "bearerFormat": "JWT"
+                    }
+                }
+            }
+        else:
+            openapi_schema["components"]["securitySchemes"] = {
+                    "bearerAuth": {
+                        "type": "http",
+                        "scheme": "bearer",
+                        "bearerFormat": "JWT"
+                    }
+                }
+        openapi_schema["security"] = {"bearerAuth": []}
+        for idx, path in openapi_schema["paths"]:
+            print(idx, path)
+    app.openapi_schema = openapi_schema
+
+    return app
 
 
 # load controllers
 def get_app():
+
     app = FastAPI(
         middleware=[
             Middleware(
@@ -37,34 +69,22 @@ def get_app():
             )
         ]
     )
-    climsoft_app = get_climsoft_app()
-
+    climsoft_app = get_climsoft_app_with_login_form()
     if settings.SURFACE_API_ENABLED is True:
         surface_wsgi_app = WSGIMiddleware(surface_application)
-        # if not settings.AUTH_ENABLED:
         app.mount("/surface", surface_wsgi_app)
-        # else:
-        #     app.mount("/surface", AuthMiddleWare(surface_wsgi_app))
+        # app.mount("/surface", AuthMiddleWare(surface_wsgi_app))
 
     if settings.MCH_API_ENABLED is True:
         mch_wsgi_app = WSGIMiddleware(mch_api_application)
-        if not settings.AUTH_ENABLED:
-            app.mount("/mch", mch_wsgi_app)
-        else:
-            app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
+        app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
 
     if settings.CLIMSOFT_API_ENABLED is True:
-        if not settings.AUTH_ENABLED:
-            app.mount("/climsoft", climsoft_app)
-        else:
-            app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
+        app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
 
     pygeoapi_wsgi_app = WSGIMiddleware(pygeoapi_app)
-    if not settings.AUTH_ENABLED:
-        app.mount("/pygeoapi", pygeoapi_wsgi_app)
-    else:
-        app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
 
+    app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
     app.include_router(router)
 
     @app.on_event("startup")

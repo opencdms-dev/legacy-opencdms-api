@@ -16,13 +16,11 @@ class Settings(BaseSettings):
     SURFACE_DB_PASSWORD: str
 
     SURFACE_API_ENABLED: bool
-    CLIMSOFT_API_ENABLED: bool
+    CLIMSOFT_API_ENABLED: bool = True
     MCH_API_ENABLED: bool
 
     DEFAULT_USERNAME: str
     DEFAULT_PASSWORD: str
-
-    AUTH_ENABLED: bool
 
     DATABASE_URI: Optional[PostgresDsn] = None
 
@@ -46,5 +44,4 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
 
 
-print(os.getenv("AUTH_ENABLED"))
 settings = Settings()
