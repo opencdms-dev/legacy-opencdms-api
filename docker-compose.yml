@@ -14,18 +14,18 @@ services:
       - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
       - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
-      - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@opencdms_climsoftdb:3306/mariadb_climsoft_test_db_v4
+      - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@climsoft-4.1.1:3306/mariadb_climsoft_test_db_v4
       - CLIMSOFT_SECRET_KEY=climsoft-secret-key
-      - AUTH_DB_URI=postgresql+psycopg2://dba:dba@surfacedb:5432/surface
+      - AUTH_DB_URI=postgresql+psycopg2://dba:dba@opencdms_surface_db:5432/surface
       - SURFACE_DB_NAME=surface
       - SURFACE_DB_USER=dba
       - SURFACE_DB_PASSWORD=dba
       - SURFACE_DB_HOST=opencdms_surfacedb
       - SURFACE_DB_PORT=5432
       - MCH_DB_PORT=3306
-      - MCH_DB_HOST=opencdms_mchdb
+      - MCH_DB_HOST=mch-english
       - MCH_DB_NAME=mch
-      - MCH_DB_PASSWORD=root_password
+      - MCH_DB_PASSWORD=password
       - MCH_DB_USER=root
       - APP_SECRET=app-secret
       - SURFACE_SECRET_KEY=surface-secret-key
@@ -87,15 +87,14 @@ services:
       - HOST_FQDN=$HOST_FQDN
       - CLIMSOFT_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - CLIMSOFT_AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - AUTH_ENABLED=true
     depends_on:
       - opencdms_surfacedb
-      - opencdms_mchdb
-      - opencdms_climsoftdb
     volumes:
       - ./src:/code/src
       - ./climsoft_uploads:/climsoft_uploads
     networks:
-      - opencdms_api_dev_network
+      - opencdms-test-data_opencdms
     command:
       [
         "uvicorn",
@@ -114,7 +113,7 @@ services:
     volumes:
       - opencdms_surface_data:/var/lib/postgresql/data
     ports:
-      - "15432:5432"
+      - "65432:5432"
     environment:
       - POSTGRES_PASSWORD=dba
       - POSTGRES_DB=surface
@@ -125,42 +124,12 @@ services:
         max-size: "1M"
         max-file: "10"
     networks:
-      - opencdms_api_dev_network
-
-  opencdms_mchdb:
-    build:
-      context: .
-      dockerfile: mch.dockerfile
-    container_name: opencdms_mchdb
-    volumes:
-      - opencdms_mch_data:/var/lib/mysql
-    ports:
-      - "13306:3306"
-    environment:
-      - MYSQL_DATABASE=mch
-      - MYSQL_ROOT_PASSWORD=root_password
-    networks:
-      - opencdms_api_dev_network
-
-  opencdms_climsoftdb:
-    build:
-      context: .
-      dockerfile: Dockerfile.climsoft
-    container_name: opencdms_climsoftdb
-    ports:
-      - "23306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=climsoft
-    networks:
-      - opencdms_api_dev_network
-    volumes:
-      - opencdms_climsoftdb_data:/var/lib/mysql
+      - opencdms-test-data_opencdms
 
 volumes:
   opencdms_surface_data:
-  opencdms_mch_data:
-  opencdms_climsoftdb_data:
 
 networks:
-  opencdms_api_dev_network:
+  opencdms-test-data_opencdms:
+    external: true
+    driver: bridge

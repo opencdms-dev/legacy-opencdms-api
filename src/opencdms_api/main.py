@@ -1,3 +1,4 @@
+import copy
 import logging
 import os
 from sqlalchemy.orm import sessionmaker
@@ -7,10 +8,10 @@ from climsoft_api.main import get_app as get_climsoft_app
 from climsoft_api.config import settings as climsoft_settings
 from tempestas_api.wsgi import application as surface_application
 from mch_api.api_mch import app as mch_api_application
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from sqlalchemy.orm.session import Session
 from passlib.hash import django_pbkdf2_sha256 as handler
-from src.opencdms_api.middleware import AuthMiddleWare, ClimsoftRBACMiddleware
+from src.opencdms_api.middleware import AuthMiddleWare
 from src.opencdms_api.db import SessionLocal
 from src.opencdms_api import models
 from src.opencdms_api.router import router
@@ -22,6 +23,8 @@ from pygeoapi.flask_app import APP as pygeoapi_app
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
+from src.opencdms_api.middleware import get_authorized_climsoft_user
+from climsoft_api.api import api_routers
 
 
 # load controllers
@@ -41,29 +44,24 @@ def get_app():
 
     if settings.SURFACE_API_ENABLED is True:
         surface_wsgi_app = WSGIMiddleware(surface_application)
-        # if not settings.AUTH_ENABLED:
         app.mount("/surface", surface_wsgi_app)
-        # else:
-        #     app.mount("/surface", AuthMiddleWare(surface_wsgi_app))
 
     if settings.MCH_API_ENABLED is True:
         mch_wsgi_app = WSGIMiddleware(mch_api_application)
-        if not settings.AUTH_ENABLED:
-            app.mount("/mch", mch_wsgi_app)
-        else:
-            app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
+        app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
 
     if settings.CLIMSOFT_API_ENABLED is True:
-        if not settings.AUTH_ENABLED:
-            app.mount("/climsoft", climsoft_app)
-        else:
-            app.mount("/climsoft", ClimsoftRBACMiddleware(climsoft_app))
+        for r in api_routers:
+            climsoft_app.include_router(
+                **r.dict(),
+                dependencies=[
+                    Depends(get_authorized_climsoft_user)
+                ]
+            )
+        app.mount("/climsoft", climsoft_app)
 
     pygeoapi_wsgi_app = WSGIMiddleware(pygeoapi_app)
-    if not settings.AUTH_ENABLED:
-        app.mount("/pygeoapi", pygeoapi_wsgi_app)
-    else:
-        app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
+    app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
 
     app.include_router(router)
 
