@@ -14,6 +14,49 @@ from src.opencdms_api.db import db_session_scope
 from src.opencdms_api import climsoft_rbac_config
 from src.opencdms_api.schema import CurrentUserSchema
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
+from fastapi import Header, Depends
+
+
+def get_user(username: str) -> Optional[CurrentUserSchema]:
+    with db_session_scope() as session:
+        user: models.AuthUser = (
+            session.query(models.AuthUser)
+            .filter(models.AuthUser.username == username)
+            .one_or_none()
+        )
+        return CurrentUserSchema.from_orm(user) \
+            if user is not None else None
+
+
+def get_climsoft_role_for_username(username: str):
+    climsoft_engine = create_engine(os.getenv("CLIMSOFT_DATABASE_URI"))
+    ClimsoftSessionLocal = sessionmaker(climsoft_engine)
+    session = ClimsoftSessionLocal()
+
+    role = None
+
+    try:
+        user_role = session.query(climsoft_models.ClimsoftUser).filter_by(
+            userName=username
+        ).one_or_none()
+        role = user_role.userRole
+    except Exception as e:
+        pass
+
+    session.close()
+
+    return role
+
+
+def has_required_climsoft_role(username, required_role):
+    return get_climsoft_role_for_username(
+        username
+    ) in required_role
+
+
+def extract_resource_from_path(string, sep, start, end):
+    string = string.split(sep)
+    return sep.join(string[start:end])
 
 
 class AuthMiddleWare:
@@ -23,16 +66,6 @@ class AuthMiddleWare:
 
     def __init__(self, app: ASGIApp):
         self.app = app
-
-    def get_user(self, username: str) -> Optional[CurrentUserSchema]:
-        with db_session_scope() as session:
-            user: models.AuthUser = (
-                session.query(models.AuthUser)
-                    .filter(models.AuthUser.username == username)
-                    .one_or_none()
-            )
-            return CurrentUserSchema.from_orm(
-                user) if user is not None else None
 
     def authenticate_request(self, request: Request):
         authorization_header = request.headers.get("authorization")
@@ -61,34 +94,7 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
     def __init__(self, app: ASGIApp):
         super().__init__(app)
 
-    def get_climsoft_role_for_username(self, username: str):
-        climsoft_engine = create_engine(os.getenv("CLIMSOFT_DATABASE_URI"))
-        ClimsoftSessionLocal = sessionmaker(climsoft_engine)
-        session = ClimsoftSessionLocal()
-
-        role = None
-
-        try:
-            user_role = session.query(climsoft_models.ClimsoftUser).filter_by(
-                userName=username).one_or_none()
-            role = user_role.userRole
-        except Exception as e:
-            pass
-
-        session.close()
-
-        return role
-
-    def has_required_role(self, username, required_role):
-        return self.get_climsoft_role_for_username(
-            username
-        ) in required_role
-
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
-        def extract_resource_from_path(string, sep, start, end):
-            string = string.split(sep)
-            return sep.join(string[start:end])
-
         request = Request(scope, receive, send)
         user = None
         if request.url.path not in {
@@ -105,9 +111,43 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
             request.method.lower()
         )
 
-        if (not required_role) or self.has_required_role(
+        if (not required_role) or has_required_climsoft_role(
             user.username, required_role
         ):
             await self.app(scope, receive, send)
         else:
             raise HTTPException(status_code=403)
+
+
+def get_authorized_climsoft_user(
+    request: Request,
+    authorization: str = Header("authorization")
+):
+    scheme, token = get_authorization_scheme_param(authorization)
+    if scheme.lower() != "bearer":
+        raise HTTPException(401, "Invalid authorization header scheme")
+    try:
+        claims = jwt.decode(token, settings.SURFACE_SECRET_KEY)
+    except JWTError:
+        raise HTTPException(401, "Unauthorized request")
+
+    username = claims["sub"]
+
+    user = get_user(username)
+
+    if user is None:
+        raise HTTPException(401, "Unauthorized request")
+
+    resource_url = extract_resource_from_path(request.url.path, "/", 3, 4)
+    required_role = climsoft_rbac_config.required_role_lookup.get(
+        resource_url, {}
+    ).get(
+        request.method.lower()
+    )
+
+    if required_role and not has_required_climsoft_role(
+        user.username, required_role
+    ):
+        raise HTTPException(status_code=403)
+
+    return user
