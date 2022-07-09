@@ -121,7 +121,7 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
 
 def get_authorized_climsoft_user(
     request: Request,
-    authorization: str = Header("authorization")
+    authorization: str = Header(None)
 ):
     scheme, token = get_authorization_scheme_param(authorization)
     if scheme.lower() != "bearer":

@@ -25,6 +25,10 @@ from fastapi.middleware import Middleware
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from src.opencdms_api.middleware import get_authorized_climsoft_user
 from climsoft_api.api import api_routers
+from fastapi.security import OAuth2PasswordBearer
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 
 # load controllers
@@ -55,7 +59,7 @@ def get_app():
             climsoft_app.include_router(
                 **r.dict(),
                 dependencies=[
-                    Depends(get_authorized_climsoft_user)
+                    Depends(oauth2_scheme)
                 ]
             )
         app.mount("/climsoft", climsoft_app)

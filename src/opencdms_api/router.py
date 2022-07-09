@@ -12,6 +12,7 @@ from src.opencdms_api.schema import (
 )
 from src.opencdms_api.config import settings
 from jose import jwt
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 
@@ -42,7 +43,7 @@ def register_new_user(
 
 @router.post("/auth", response_model=TokenSchema)
 def authenticate(
-    payload: AuthenticationSchema, session: Session = Depends(deps.get_session)
+    payload: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(deps.get_session)
 ):
     user = (
         session.query(models.AuthUser)
