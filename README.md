@@ -139,6 +139,26 @@ which will return something like this:
 You can use Postman to make this requests easily.
 
 
+### Improved Swagger Experience for Climsoft
+
+When you go to climsoft swagger doc on your server, follow these steps:
+
+##### Access Denied
+![Access Denied](screenshots/access-denied.png)
+
+##### Auth Button
+![Auth Button](screenshots/auth-button.png)
+
+##### Login Form
+![Login Form](screenshots/login-form.png)
+
+##### Authorized
+![Authorized](screenshots/authorized.png)
+
+##### Success
+![Success](screenshots/success.png)
+
+
 ### Repository Settings
 
 To deploy on a server using the deployment scripts (in `.github/workflows`) we need 
