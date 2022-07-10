@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     SURFACE_API_ENABLED: bool
     CLIMSOFT_API_ENABLED: bool
     MCH_API_ENABLED: bool
+    PYGEOAPI_ENABLED: bool
 
     DEFAULT_USERNAME: str
     DEFAULT_PASSWORD: str
