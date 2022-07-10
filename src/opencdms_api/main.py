@@ -48,21 +48,33 @@ def get_app():
 
     if settings.MCH_API_ENABLED:
         mch_wsgi_app = WSGIMiddleware(mch_api_application)
-        app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
+        if settings.AUTH_ENABLED:
+            app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
+        else:
+            app.mount("/mch", mch_wsgi_app)
 
     if settings.CLIMSOFT_API_ENABLED:
-        for r in api_routers:
-            climsoft_app.include_router(
-                **r.dict(),
-                dependencies=[
-                    Depends(get_authorized_climsoft_user)
-                ]
-            )
+        if settings.AUTH_ENABLED:
+            for r in api_routers:
+                climsoft_app.include_router(
+                    **r.dict(),
+                    dependencies=[
+                        Depends(get_authorized_climsoft_user)
+                    ]
+                )
+        else:
+            for r in api_routers:
+                climsoft_app.include_router(
+                    **r.dict()
+                )
         app.mount("/climsoft", climsoft_app)
 
     if settings.PYGEOAPI_ENABLED:
         pygeoapi_wsgi_app = WSGIMiddleware(pygeoapi_app)
-        app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
+        if settings.AUTH_ENABLED:
+            app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
+        else:
+            app.mount("/pygeoapi", pygeoapi_wsgi_app)
 
     app.include_router(router)
 
