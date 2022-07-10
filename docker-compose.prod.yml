@@ -110,7 +110,7 @@ services:
         "--port",
         "5000",
         "--reload",
-        "--use-colors",
+        "--proxy-headers",
       ]
 
   opencdms_surfacedb:
