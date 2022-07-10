@@ -15,6 +15,10 @@ from src.opencdms_api import climsoft_rbac_config
 from src.opencdms_api.schema import CurrentUserSchema
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from fastapi import Header, Depends
+from fastapi.security import OAuth2PasswordBearer
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 
 def get_user(username: str) -> Optional[CurrentUserSchema]:
@@ -121,11 +125,8 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
 
 def get_authorized_climsoft_user(
     request: Request,
-    authorization: str = Header(None)
+    token: str = Depends(oauth2_scheme)
 ):
-    scheme, token = get_authorization_scheme_param(authorization)
-    if scheme.lower() != "bearer":
-        raise HTTPException(401, "Invalid authorization header scheme")
     try:
         claims = jwt.decode(token, settings.SURFACE_SECRET_KEY)
     except JWTError:

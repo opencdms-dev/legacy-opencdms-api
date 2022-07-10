@@ -79,10 +79,10 @@ services:
       - STATION_MAP_FILTER_WATERSHED=1
       - STATION_MAP_FILTER_REGION=1
       - STATION_MAP_FILTER_COMMUNICATION=1
-      - SURFACE_API_ENABLED=true
-      - CLIMSOFT_API_ENABLED=true
-      - MCH_API_ENABLED=true
-      - PYGEOAPI_ENABLED=true
+      - SURFACE_API_ENABLED=$SURFACE_API_ENABLED
+      - CLIMSOFT_API_ENABLED=$CLIMSOFT_API_ENABLED
+      - MCH_API_ENABLED=$MCH_API_ENABLED
+      - PYGEOAPI_ENABLED=$PYGEOAPI_ENABLED
       - DEFAULT_USERNAME=admin
       - DEFAULT_PASSWORD=password123
       - HOST_FQDN=$HOST_FQDN
@@ -94,6 +94,11 @@ services:
     volumes:
       - ./src:/code/src
       - ./climsoft_uploads:/climsoft_uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`$HOST_FQDN`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
     networks:
       - opencdms-test-data_opencdms
     command:
@@ -126,6 +131,15 @@ services:
         max-file: "10"
     networks:
       - opencdms-test-data_opencdms
+
+  traefik:
+    image: traefik:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "$PWD/traefik/traefik.toml:/etc/traefik/traefik.toml"
 
 volumes:
   opencdms_surface_data:

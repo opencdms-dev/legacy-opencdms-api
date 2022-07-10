@@ -27,7 +27,6 @@ RUN pip install -r requirements.txt
 
 COPY ./scripts ./scripts
 COPY entrypoint.sh ./entrypoint.sh
-COPY init_climsoft_db.py ./init_climsoft_db.py
 COPY mch.dbn ./mch.dbn
 COPY MCHtablasycampos.def ./MCHtablasycampos.def
 

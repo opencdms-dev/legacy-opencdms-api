@@ -25,10 +25,6 @@ from fastapi.middleware import Middleware
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from src.opencdms_api.middleware import get_authorized_climsoft_user
 from climsoft_api.api import api_routers
-from fastapi.security import OAuth2PasswordBearer
-
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
 
 
 # load controllers
@@ -46,26 +42,27 @@ def get_app():
     )
     climsoft_app = get_climsoft_app()
 
-    if settings.SURFACE_API_ENABLED is True:
+    if settings.SURFACE_API_ENABLED:
         surface_wsgi_app = WSGIMiddleware(surface_application)
         app.mount("/surface", surface_wsgi_app)
 
-    if settings.MCH_API_ENABLED is True:
+    if settings.MCH_API_ENABLED:
         mch_wsgi_app = WSGIMiddleware(mch_api_application)
         app.mount("/mch", AuthMiddleWare(mch_wsgi_app))
 
-    if settings.CLIMSOFT_API_ENABLED is True:
+    if settings.CLIMSOFT_API_ENABLED:
         for r in api_routers:
             climsoft_app.include_router(
                 **r.dict(),
                 dependencies=[
-                    Depends(oauth2_scheme)
+                    Depends(get_authorized_climsoft_user)
                 ]
             )
         app.mount("/climsoft", climsoft_app)
 
-    pygeoapi_wsgi_app = WSGIMiddleware(pygeoapi_app)
-    app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
+    if settings.PYGEOAPI_ENABLED:
+        pygeoapi_wsgi_app = WSGIMiddleware(pygeoapi_app)
+        app.mount("/pygeoapi", AuthMiddleWare(pygeoapi_wsgi_app))
 
     app.include_router(router)
 
