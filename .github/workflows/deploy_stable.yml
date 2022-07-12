@@ -41,5 +41,6 @@ jobs:
             docker-compose down -v --remove-orphans
             docker-compose up -d postgresql mysql oracle
             sleep 15
+            cd /home/ubuntu/opencdms-api
             docker-compose -f docker-compose.prod.yml up -d --build
           '
