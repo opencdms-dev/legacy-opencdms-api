@@ -32,13 +32,14 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -o SendEnv=AUTH_ENABLED -o SendEnv=HOST_FQDN -o SendEnv=AWS_ACCESS_KEY_ID -o SendEnv=AWS_SECRET_ACCESS_KEY -o SendEnv=CLIMSOFT_API_ENABLED -o SendEnv=SURFACE_API_ENABLED -o SendEnv=MCH_API_ENABLED -o SendEnv=PYGEOAPI_ENABLED -i private_key ${USERNAME}@${HOSTNAME} '
-            cd /home/ubuntu/opencdms-test-data
+            cd /home/${USERNAME}/opencdms-test-data
             git pull origin main
-            cd /home/ubuntu/opencdms-api
+            cd /home/${USERNAME}/opencdms-api
             git pull origin main
             docker-compose -f docker-compose.prod.yml down -v --remove-orphans
-            docker-compose -f ../opencdms-test-data/docker-compose.yml down -v --remove-orphans
-            docker-compose -f ../opencdms-test-data/docker-compose.yml up -d postgresql mysql oracle
+            cd /home/${USERNAME}/opencdms-test-data
+            docker-compose down -v --remove-orphans
+            docker-compose up -d postgresql mysql oracle
             sleep 15
             docker-compose -f docker-compose.prod.yml up -d --build
           '
