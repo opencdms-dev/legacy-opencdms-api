@@ -3,6 +3,9 @@ name: Deploy on EC2 - Stable
 ### YOU HAVE TO CONFIGURE ssh agent ON SERVER TO ACCEPT THESE
 ### YOU HAVE TO SET GITHUB ENV VARS AS WELL
 on:
+  push:
+    branches:
+      - "*"
   release:
     types:
       - published
@@ -34,8 +37,9 @@ jobs:
             cd /home/ubuntu/opencdms-api
             git pull origin main
             docker-compose -f docker-compose.prod.yml down -v --remove-orphans
-            docker-compose -f ../opencdms-test-data/docker-compose.yml down -v --remove-orphans
-            docker-compose -f ../opencdms-test-data/docker-compose.yml up -d postgresql mysql oracle
+            cd /home/ubuntu/opencdms-test-data
+            docker-compose down -v --remove-orphans
+            docker-compose up -d postgresql mysql oracle
             sleep 15
             docker-compose -f docker-compose.prod.yml up -d --build
           '

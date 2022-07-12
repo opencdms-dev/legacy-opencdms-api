@@ -8,8 +8,6 @@ services:
     container_name: opencdms_api
     ports:
       - "5070:5000"
-    env_file:
-      - .env
     environment:
       - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
       - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
