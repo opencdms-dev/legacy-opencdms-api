@@ -3,6 +3,9 @@ name: Deploy on EC2 - Stable
 ### YOU HAVE TO CONFIGURE ssh agent ON SERVER TO ACCEPT THESE
 ### YOU HAVE TO SET GITHUB ENV VARS AS WELL
 on:
+  push:
+    branches:
+      - "*"
   release:
     types:
       - published
