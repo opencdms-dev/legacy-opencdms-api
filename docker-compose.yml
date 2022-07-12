@@ -79,16 +79,16 @@ services:
       - STATION_MAP_FILTER_WATERSHED=1
       - STATION_MAP_FILTER_REGION=1
       - STATION_MAP_FILTER_COMMUNICATION=1
-      - SURFACE_API_ENABLED=true
+      - SURFACE_API_ENABLED=false
       - CLIMSOFT_API_ENABLED=true
-      - MCH_API_ENABLED=true
-      - PYGEOAPI_ENABLED=true
+      - MCH_API_ENABLED=false
+      - PYGEOAPI_ENABLED=false
       - DEFAULT_USERNAME=admin
       - DEFAULT_PASSWORD=password123
       - HOST_FQDN=$HOST_FQDN
       - CLIMSOFT_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - CLIMSOFT_AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-      - AUTH_ENABLED=true
+      - AUTH_ENABLED=false
     depends_on:
       - opencdms_surfacedb
     volumes:
