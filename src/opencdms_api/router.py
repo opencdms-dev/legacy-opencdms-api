@@ -69,10 +69,10 @@ def authenticate(
     return TokenSchema(access_token=access_token, first_name=user.first_name, last_name=user.last_name)
 
 
-@router.post("/climsoft-auth", response_model=TokenSchema)
+@router.post("/climsoft-auth", response_model=ClimsoftTokenSchema)
 def authenticate(
     payload: OAuth2PasswordRequestForm = Depends(),
-    session: Session = Depends(deps.get_climsoft_session())
+    session: Session = Depends(deps.get_climsoft_session)
 ):
     user = session.execute(sa_text(f'''
         SELECT User
@@ -87,13 +87,12 @@ def authenticate(
 
     access_token = jwt.encode(
         {
-            "sub": user[1],
+            "sub": user['User'],
             "exp": datetime.utcnow() + timedelta(hours=24),
             "token_type": "access",
-            "jti": str(uuid4()),
-            "user_id": int(user.id)
+            "jti": str(uuid4())
         },
         key=settings.SURFACE_SECRET_KEY,
     )
-    return ClimsoftTokenSchema(access_token=access_token, username=user[1])
+    return ClimsoftTokenSchema(access_token=access_token, username=user['User'])
 
