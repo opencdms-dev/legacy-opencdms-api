@@ -19,6 +19,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
+climsoft_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/climsoft-auth")
 
 
 def get_user(username: str) -> Optional[CurrentUserSchema]:
@@ -142,7 +143,7 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
 
 def get_authorized_climsoft_user(
     request: Request,
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(climsoft_oauth2_scheme)
 ):
     try:
         claims = jwt.decode(token, settings.SURFACE_SECRET_KEY)
