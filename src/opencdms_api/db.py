@@ -9,9 +9,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 engine = create_engine(settings.DATABASE_URI)
-
+climsoft_engine = create_engine(settings.CLIMSOFT_DATABASE_URI)
 SessionLocal = sessionmaker(engine)
-
+ClimsoftSessionLocal = sessionmaker(climsoft_engine)
 Base = declarative_base()
 
 ScopedSession = scoped_session(SessionLocal)
