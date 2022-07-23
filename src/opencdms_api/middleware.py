@@ -12,7 +12,7 @@ from src.opencdms_api import models
 from src.opencdms_api.config import settings
 from src.opencdms_api.db import db_session_scope
 from src.opencdms_api import climsoft_rbac_config
-from src.opencdms_api.schema import CurrentUserSchema
+from src.opencdms_api.schema import CurrentUserSchema, CurrentClimsoftUserSchema
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from fastapi import Header, Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -98,6 +98,23 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
     def __init__(self, app: ASGIApp):
         super().__init__(app)
 
+    def authenticate_request(self, request: Request):
+        authorization_header = request.headers.get("authorization")
+        if authorization_header is None:
+            raise HTTPException(401, "Unauthorized request")
+        scheme, token = get_authorization_scheme_param(authorization_header)
+        if scheme.lower() != "bearer":
+            raise HTTPException(401, "Invalid authorization header scheme")
+        try:
+            claims = jwt.decode(token, settings.SURFACE_SECRET_KEY)
+        except JWTError:
+            raise HTTPException(401, "Unauthorized request")
+        username = claims["sub"]
+        user = CurrentClimsoftUserSchema(username=username)
+        if user is None:
+            raise HTTPException(401, "Unauthorized request")
+        return user
+
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         request = Request(scope, receive, send)
         user = None
@@ -134,7 +151,7 @@ def get_authorized_climsoft_user(
 
     username = claims["sub"]
 
-    user = get_user(username)
+    user = CurrentClimsoftUserSchema(username=username)
 
     if user is None:
         raise HTTPException(401, "Unauthorized request")

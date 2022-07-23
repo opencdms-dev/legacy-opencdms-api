@@ -58,6 +58,11 @@ class TokenSchema(BaseModel):
     last_name: str
 
 
+class ClimsoftTokenSchema(BaseModel):
+    access_token: str
+    username: str
+
+
 class CurrentUserSchema(BaseSchema):
     email: EmailStr
     username: str
@@ -66,3 +71,7 @@ class CurrentUserSchema(BaseSchema):
 
     class Config:
         orm_mode = True
+
+
+class CurrentClimsoftUserSchema(BaseModel):
+    username: str
