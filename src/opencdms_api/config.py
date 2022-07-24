@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     AUTH_ENABLED: bool
 
     CLIMSOFT_DATABASE_URI: str
+    CLIMSOFT_DEFAULT_USER: str = "root"
     DATABASE_URI: Optional[PostgresDsn] = None
 
     @validator("DATABASE_URI", pre=True)

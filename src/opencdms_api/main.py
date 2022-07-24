@@ -118,6 +118,12 @@ def get_app():
                     userName=settings.DEFAULT_USERNAME
                 ).one_or_none()
 
+                clim_mysql_default_user_role = session.query(
+                    climsoft_models.ClimsoftUser
+                ).filter_by(
+                    userName=settings.CLIMSOFT_DEFAULT_USER
+                ).one_or_none()
+
                 if clim_user_role is None:
                     clim_user_role = climsoft_models.ClimsoftUser(
                         userName=settings.DEFAULT_USERNAME,
@@ -125,11 +131,18 @@ def get_app():
                     )
                     session.add(clim_user_role)
                     session.commit()
+
+                if clim_mysql_default_user_role is None:
+                    clim_mysql_default_user_role = climsoft_models.ClimsoftUser(
+                        userName=settings.CLIMSOFT_DEFAULT_USER,
+                        userRole="ClimsoftAdmin"
+                    )
+                    session.add(clim_mysql_default_user_role)
+                    session.commit()
             except Exception as e:
                 session.rollback()
                 logging.getLogger("OpenCDMSLogger").exception(e)
-            finally:
-                session.close()
+
 
             session.close()
 
