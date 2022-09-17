@@ -30,4 +30,3 @@ def get_climsoft_session():
         raise e
     finally:
         session.close()
-

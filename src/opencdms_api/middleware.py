@@ -29,8 +29,7 @@ def get_user(username: str) -> Optional[CurrentUserSchema]:
             .filter(models.AuthUser.username == username)
             .one_or_none()
         )
-        return CurrentUserSchema.from_orm(user) \
-            if user is not None else None
+        return CurrentUserSchema.from_orm(user) if user is not None else None
 
 
 def get_climsoft_role_for_username(username: str):
@@ -41,9 +40,11 @@ def get_climsoft_role_for_username(username: str):
     role = None
 
     try:
-        user_role = session.query(climsoft_models.ClimsoftUser).filter_by(
-            userName=username
-        ).one_or_none()
+        user_role = (
+            session.query(climsoft_models.ClimsoftUser)
+            .filter_by(userName=username)
+            .one_or_none()
+        )
         role = user_role.userRole
     except Exception as e:
         pass
@@ -54,9 +55,7 @@ def get_climsoft_role_for_username(username: str):
 
 
 def has_required_climsoft_role(username, required_role):
-    return get_climsoft_role_for_username(
-        username
-    ) in required_role
+    return get_climsoft_role_for_username(username) in required_role
 
 
 def extract_resource_from_path(string, sep, start, end):
@@ -122,16 +121,14 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
         if request.url.path not in {
             "/climsoft",
             "/climsoft/openapi.json",
-            "/climsoft/"
+            "/climsoft/",
         }:
             user = self.authenticate_request(request)
 
         resource_url = extract_resource_from_path(request.url.path, "/", 3, 4)
         required_role = climsoft_rbac_config.required_role_lookup.get(
             resource_url, {}
-        ).get(
-            request.method.lower()
-        )
+        ).get(request.method.lower())
 
         if (not required_role) or has_required_climsoft_role(
             user.username, required_role
@@ -142,8 +139,7 @@ class ClimsoftRBACMiddleware(AuthMiddleWare):
 
 
 def get_authorized_climsoft_user(
-    request: Request,
-    token: str = Depends(climsoft_oauth2_scheme)
+    request: Request, token: str = Depends(climsoft_oauth2_scheme)
 ):
     try:
         claims = jwt.decode(token, settings.SURFACE_SECRET_KEY)
@@ -158,15 +154,11 @@ def get_authorized_climsoft_user(
         raise HTTPException(401, "Unauthorized request")
 
     resource_url = extract_resource_from_path(request.url.path, "/", 3, 4)
-    required_role = climsoft_rbac_config.required_role_lookup.get(
-        resource_url, {}
-    ).get(
+    required_role = climsoft_rbac_config.required_role_lookup.get(resource_url, {}).get(
         request.method.lower()
     )
 
-    if required_role and not has_required_climsoft_role(
-        user.username, required_role
-    ):
+    if required_role and not has_required_climsoft_role(user.username, required_role):
         raise HTTPException(status_code=403)
 
     return user

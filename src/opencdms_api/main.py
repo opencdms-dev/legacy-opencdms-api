@@ -25,6 +25,9 @@ from fastapi.middleware import Middleware
 from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from src.opencdms_api.middleware import get_authorized_climsoft_user
 from climsoft_api.api import api_routers
+from src.opencdms_api.utils.multi_deployment import load_deployment_configs
+
+deployment_configs = load_deployment_configs()
 
 
 # load controllers
@@ -36,12 +39,10 @@ def get_app():
                 allow_origins=["*"],
                 allow_credentials=True,
                 allow_methods=["*"],
-                allow_headers=["*"]
+                allow_headers=["*"],
             )
         ]
     )
-    climsoft_app = get_climsoft_app()
-
     if settings.SURFACE_API_ENABLED:
         surface_wsgi_app = WSGIMiddleware(surface_application)
         app.mount("/surface", surface_wsgi_app)
@@ -54,20 +55,27 @@ def get_app():
             app.mount("/mch", mch_wsgi_app)
 
     if settings.CLIMSOFT_API_ENABLED:
+        climsoft_dependencies = None
         if settings.AUTH_ENABLED:
-            for r in api_routers:
-                climsoft_app.include_router(
-                    **r.dict(),
-                    dependencies=[
-                        Depends(get_authorized_climsoft_user)
-                    ]
-                )
+            climsoft_dependencies = [Depends(get_authorized_climsoft_user)]
+        if deployment_configs:
+            for key, config in deployment_configs.items():
+                climsoft_app = get_climsoft_app(config)
+
+                for r in api_routers:
+                    climsoft_app.include_router(
+                        **r.dict(), dependencies=climsoft_dependencies
+                    )
+
+                app.mount(f"/{key}/climsoft", climsoft_app)
         else:
+            climsoft_app = get_climsoft_app()
             for r in api_routers:
                 climsoft_app.include_router(
-                    **r.dict()
+                    **r.dict(), dependencies=climsoft_dependencies
                 )
-        app.mount("/climsoft", climsoft_app)
+
+            app.mount("/climsoft", climsoft_app)
 
     if settings.PYGEOAPI_ENABLED:
         pygeoapi_wsgi_app = WSGIMiddleware(pygeoapi_app)
@@ -112,16 +120,15 @@ def get_app():
             ClimsoftSessionLocal = sessionmaker(climsoft_engine)
             session = ClimsoftSessionLocal()
             try:
-                clim_user_role = session.query(
-                    climsoft_models.ClimsoftUser
-                ).filter_by(
-                    userName=settings.DEFAULT_USERNAME
-                ).one_or_none()
+                clim_user_role = (
+                    session.query(climsoft_models.ClimsoftUser)
+                    .filter_by(userName=settings.DEFAULT_USERNAME)
+                    .one_or_none()
+                )
 
                 if clim_user_role is None:
                     clim_user_role = climsoft_models.ClimsoftUser(
-                        userName=settings.DEFAULT_USERNAME,
-                        userRole="ClimsoftAdmin"
+                        userName=settings.DEFAULT_USERNAME, userRole="ClimsoftAdmin"
                     )
                     session.add(clim_user_role)
                     session.commit()
@@ -150,7 +157,11 @@ def root(request: Request):
     if settings.SURFACE_API_ENABLED:
         supported_apis.append({"title": "Surface API", "url": "/surface"})
     if settings.CLIMSOFT_API_ENABLED:
-        supported_apis.append({"title": "Climsoft API", "url": "/climsoft"})
+        if deployment_configs:
+            for k, v in deployment_configs.items():
+                supported_apis.append({"title": v.get("NAME"), "url": f"/{k}/climsoft"})
+        else:
+            supported_apis.append({"title": "Climsoft API", "url": "/climsoft"})
     if settings.MCH_API_ENABLED:
         supported_apis.append({"title": "MCH API", "url": "/mch"})
     return templates.TemplateResponse(
