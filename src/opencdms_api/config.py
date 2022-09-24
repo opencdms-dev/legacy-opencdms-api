@@ -49,5 +49,4 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
 
 
-print(os.getenv("AUTH_ENABLED"))
 settings = Settings()

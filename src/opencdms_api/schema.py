@@ -1,5 +1,5 @@
-import datetime
-
+from fastapi import Form
+from typing import Optional
 from pydantic.networks import EmailStr
 import inflection
 from pydantic import BaseModel
@@ -75,3 +75,22 @@ class CurrentUserSchema(BaseSchema):
 
 class CurrentClimsoftUserSchema(BaseModel):
     username: str
+    deployment_key: str = None
+
+
+class ClimsoftPasswordRequestForm:
+    def __init__(
+        self,
+        grant_type: str = Form(None, regex="password"),
+        username: str = Form(...),
+        password: str = Form(...),
+        scope: str = Form(""),
+        client_id: Optional[str] = Form(None),
+        client_secret: Optional[str] = Form(None),
+    ):
+        self.grant_type = grant_type
+        self.username = username
+        self.password = password
+        self.scope = scope.split()
+        self.client_id = client_id
+        self.client_secret = client_secret

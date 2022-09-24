@@ -5,12 +5,11 @@ from sqlalchemy import Sequence, Column, Integer, String, DateTime, func
 
 class AuthUser(Base):
     """Auth user model defined to match that of surface db"""
+
     __tablename__ = "auth_user"
     # __table_args__ = (UniqueConstraint("org_id", "datasource_id"),)
     auth_user_id_seq = Sequence("auth_user_id_seq", metadata=Base.metadata)
-    id = Column(
-        Integer, primary_key=True, server_default=auth_user_id_seq.next_value()
-    )
+    id = Column(Integer, primary_key=True, server_default=auth_user_id_seq.next_value())
     password = Column(String(128), nullable=False)
     last_login = Column(DateTime, nullable=True)
     is_superuser = Column(Boolean, nullable=False, default=True)

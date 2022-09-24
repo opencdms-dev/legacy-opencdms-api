@@ -15,7 +15,7 @@ Flask-RESTful
 mch-api @ git+https://github.com/opencdms/mch-api.git@main
 mysqlclient
 numpy
-opencdms @ git+https://github.com/opencdms/pyopencdms.git@main
+opencdms@git+https://github.com/opencdms/pyopencdms.git@main
 climsoft_api @ git+https://github.com/openclimateinitiative/climsoft-api.git@main
 psycopg2
 pandas
@@ -37,3 +37,4 @@ starlette
 uvicorn
 Werkzeug
 opencdms_process @ git+https://github.com/opencdms/opencdms-process.git@main
+pyyaml

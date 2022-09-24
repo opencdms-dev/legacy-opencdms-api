@@ -1,0 +1,3 @@
+test:
+  NAME: Climsoft Test
+  DATABASE_URI: "mysql+mysqldb://root:password@mysql:3306/mariadb_climsoft_test_db_v4"

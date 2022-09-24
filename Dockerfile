@@ -29,6 +29,7 @@ COPY ./scripts ./scripts
 COPY entrypoint.sh ./entrypoint.sh
 COPY mch.dbn ./mch.dbn
 COPY MCHtablasycampos.def ./MCHtablasycampos.def
+COPY climsoft-multi-deployment.yml ./climsoft-multi-deployment.yml
 
 RUN ["chmod", "+x", "/code/scripts/load_initial_surface_data.sh"]
 
