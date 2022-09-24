@@ -11,6 +11,7 @@ services:
     env_file:
       - .env
     environment:
+      - CLIMSOFT_DEFAULT_USER=root
       - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
       - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
