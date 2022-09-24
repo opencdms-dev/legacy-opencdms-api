@@ -14,7 +14,7 @@ services:
       - PYGEOAPI_CONFIG=/code/pygeoapi-config.yml
       - PYGEOAPI_OPENAPI=/code/pygeoapi-openapi.yml
       - PYTHONPATH=/code/surface/api
-      - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@mysql:3306/mariadb_climsoft_test_db_v4
+      - CLIMSOFT_DATABASE_URI=mysql+mysqldb://root:password@mysql:63306/mariadb_climsoft_test_db_v4
       - CLIMSOFT_SECRET_KEY=climsoft-secret-key
       - AUTH_DB_URI=postgresql+psycopg2://dba:dba@opencdms_surface_db:5432/surface
       - SURFACE_DB_NAME=surface

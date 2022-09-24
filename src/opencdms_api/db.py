@@ -6,15 +6,25 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from typing import Generator
 from sqlalchemy.ext.declarative import declarative_base
-
+from src.opencdms_api.utils.multi_deployment import load_deployment_configs
 
 engine = create_engine(settings.DATABASE_URI)
-climsoft_engine = create_engine(settings.CLIMSOFT_DATABASE_URI)
 SessionLocal = sessionmaker(engine)
-ClimsoftSessionLocal = sessionmaker(climsoft_engine)
 Base = declarative_base()
 
 ScopedSession = scoped_session(SessionLocal)
+
+
+def get_climsoft_engine(deployment_key):
+    deployment_configs = load_deployment_configs()
+    if deployment_key and deployment_configs[deployment_key].get("DATABASE_URI"):
+        return create_engine(deployment_configs[deployment_key].get("DATABASE_URI"))
+    else:
+        return create_engine(os.getenv("CLIMSOFT_DATABASE_URI"))
+
+
+def get_climsoft_session_local(deployment_key: str = None):
+    return sessionmaker(get_climsoft_engine(deployment_key))
 
 
 @contextmanager

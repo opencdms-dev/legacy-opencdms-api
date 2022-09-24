@@ -26,6 +26,7 @@ from opencdms.models.climsoft import v4_1_1_core as climsoft_models
 from src.opencdms_api.middleware import get_authorized_climsoft_user
 from climsoft_api.api import api_routers
 from src.opencdms_api.utils.multi_deployment import load_deployment_configs
+from src.opencdms_api.db import get_climsoft_session_local
 
 deployment_configs = load_deployment_configs()
 
@@ -116,29 +117,48 @@ def get_app():
             session.close()
 
         if settings.CLIMSOFT_API_ENABLED:
-            climsoft_engine = create_engine(os.getenv("CLIMSOFT_DATABASE_URI"))
-            ClimsoftSessionLocal = sessionmaker(climsoft_engine)
-            session = ClimsoftSessionLocal()
-            try:
-                clim_user_role = (
-                    session.query(climsoft_models.ClimsoftUser)
-                    .filter_by(userName=settings.DEFAULT_USERNAME)
-                    .one_or_none()
-                )
+            if deployment_configs:
+                for dk in deployment_configs:
+                    session = get_climsoft_session_local(dk)()
+                    try:
+                        clim_user_role = (
+                            session.query(climsoft_models.ClimsoftUser)
+                            .filter_by(userName=settings.DEFAULT_USERNAME)
+                            .one_or_none()
+                        )
 
-                if clim_user_role is None:
-                    clim_user_role = climsoft_models.ClimsoftUser(
-                        userName=settings.DEFAULT_USERNAME, userRole="ClimsoftAdmin"
+                        if clim_user_role is None:
+                            clim_user_role = climsoft_models.ClimsoftUser(
+                                userName=settings.DEFAULT_USERNAME,
+                                userRole="ClimsoftAdmin",
+                            )
+                            session.add(clim_user_role)
+                            session.commit()
+                    except Exception as e:
+                        session.rollback()
+                        logging.getLogger("OpenCDMSLogger").exception(e)
+                    finally:
+                        session.close()
+            else:
+                session = get_climsoft_session_local()()
+                try:
+                    clim_user_role = (
+                        session.query(climsoft_models.ClimsoftUser)
+                        .filter_by(userName=settings.DEFAULT_USERNAME)
+                        .one_or_none()
                     )
-                    session.add(clim_user_role)
-                    session.commit()
-            except Exception as e:
-                session.rollback()
-                logging.getLogger("OpenCDMSLogger").exception(e)
-            finally:
-                session.close()
 
-            session.close()
+                    if clim_user_role is None:
+                        clim_user_role = climsoft_models.ClimsoftUser(
+                            userName=settings.DEFAULT_USERNAME, userRole="ClimsoftAdmin"
+                        )
+                        session.add(clim_user_role)
+                        session.commit()
+                except Exception as e:
+                    session.rollback()
+                    logging.getLogger("OpenCDMSLogger").exception(e)
+                finally:
+                    session.close()
 
     return app
 
